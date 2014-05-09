@@ -1,0 +1,140 @@
+body {
+    background-color: rgb(233,234,237);
+}
+
+.white-background {
+  background-color: #fff;
+}
+
+.devards-main-navbar {
+  background-color: rgb(60,90,153);
+  border-color: rgb(50,80,153);
+}
+
+.devards-main-navbar .navbar-brand {
+  color: #e8e8e8;
+}
+
+.devards-main-navbar .navbar-brand:hover {
+  color: #e8e8e8;
+}
+
+.test-body {
+    padding-left: 1em;
+}
+
+.test-body .operator {
+    font-weight: bold;
+    color: black;
+    width: 1.5em;
+    display: inline-block;
+}
+
+.test-body .exp {
+    color: #666;
+    padding-left: 1em;
+}
+
+.devcard-panel {
+/*    border: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+
+    border: 1px solid #ddd;
+    -webkit-box-shadow: 1px 1px 1px #bbb;
+    box-shadow: 1px 1px 1px #bbb;
+*/
+background: #fff;
+border: 1px solid;
+border-color: #e5e6e9 #dfe0e4 #d0d1d5;
+-webkit-border-radius: 3px;
+}
+
+
+
+.breadcrumb {
+    background: #fff;
+    border: 1px solid;
+    border-color: #e5e6e9 #dfe0e4 #d0d1d5;
+    -webkit-border-radius: 3px;
+    
+}
+
+.devcard-panel > .panel-heading {
+  background-color: #fff;
+  border-top: solid 1px #f1f1f1;
+  border-bottom: solid 1px #f1f1f1;
+  border-bottom: none;
+ 
+}  
+
+.devcard-panel > .panel-heading .devcard-rendered-card h1,
+.devcard-panel > .panel-heading .devcard-rendered-card h2,
+.devcard-panel > .panel-heading .devcard-rendered-card h3,
+.devcard-panel > .panel-heading .devcard-rendered-card h4,
+.devcard-panel > .panel-heading .devcard-rendered-card h5 {
+    margin-top: 5px;
+}
+
+
+.test-group > .list-group-item {
+  border: none;
+  border-top: solid 1px #fafafa;  
+}
+
+.test-group > .list-group-item:first-child {
+  border: none;
+  border-top: none;  
+}
+
+
+
+.list-group.test-group > .list-group-item:first-child,
+.list-group.test-group > .list-group-item:last-child {
+  border-radius: 0px;
+}
+
+.list-group.test-group .list-group-item {
+  
+}
+
+.devcard-padding {
+  padding-left: 14px;
+  padding-right: 14px;
+  padding-bottom: 14px;
+}
+
+#devcards {
+    padding-bottom: 250px;
+    
+}
+
+.devcard-rendered-card ul.test-group {
+  margin-bottom: 0px;
+}
+
+.devcard-rendered-card .heckler-card .table {
+  margin-bottom: 0px;
+}
+
+.heckler-card .table > tbody > tr > td:first-child,
+.heckler-card .table > tbody > tr > th:first-child {
+  padding-left: 14px;
+}
+
+.devcard-rendered-card .history-manager > .rendered-edn {
+  padding-left: 14px; 
+  padding-bottom: 14px; 
+}
+
+.devcards-pad-left {
+  padding-left: 14px;
+}
+
+.devcards-margin-left {
+  margin-left: 14px;
+}
+
+.devcards-pad-card {
+  padding: 14px;
+}
