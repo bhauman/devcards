@@ -10,3 +10,4 @@ pom.xml
 checkouts/
 .nrepl-port
 resources/public/js/compiled
+.\#*
