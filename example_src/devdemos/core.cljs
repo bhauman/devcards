@@ -25,19 +25,28 @@
    (are= (+ 3 4 5) 12)
    (are-not= (+ 3 4 5) 7)))
 
-(defcard test-card-ex2
-  (dc/test-card
-   (is (= 23 (+ 21 2)))
-   (are= (+ 3 4 5) 12)
-   (are-not= (+ 3 4 5) 7)))
+(defn rand-strs [c]
+  (repeatedly c #(apply str (map (fn [x] (char (rand-int 255)))
+                                 (range (rand-int 12))))))
+
+(defcard slider-card-dev
+  (dc/slider-card (fn [& args] (apply + args))
+                  [(rand-strs 255) (rand-strs 255) (rand-strs 255)]))
+
+(defn to-heckle-f [a b]
+  (if (zero? (mod b 10))
+    (throw (js/Error. "Crappers Error Thrown"))
+    (+ a b)))
 
 (defcard hekler-card-ex
   (dc/heckler-card
-   (fn [a b] (+ a b))
+   to-heckle-f
    ;; generator
    (fn [] (map vector
               (repeatedly 30 #(rand-int 300))
-              (repeatedly 30 #(rand-int 300))))))
+              (repeatedly 30 #(rand-int 300))))
+   :test-func (fn [x] (< x 200))))
+
 
 (defcard reduce-slider-trans
   (dc/reduce-fr-card
