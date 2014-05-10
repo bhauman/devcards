@@ -16,6 +16,7 @@
    [devcards.util.edn-renderer :refer [html-edn]]
    [markdown.core :as md]
    [clojure.string :as string]
+   [om.core :as om :include-macros true]
    [figwheel.client :refer [watch-and-reload]]
    [cljs.core.async :refer [put! chan] :as async]))
 
@@ -103,8 +104,8 @@ rerender."
 (defmulti render-test :type)
 
 (defn test-wrapper [test bd]
-  [:li.list-group-item
-   {:className (if (:passed test) "list-group-item-success" "list-group-item-danger")}
+  [:li
+   {:className (if (:passed test) "list-group-item list-group-item-success" "list-group-item list-group-item-danger")}
    (if (:passed test)
      [:span.glyphicon.glyphicon-ok]
      [:span.glyphicon.glyphicon-remove])
@@ -324,3 +325,16 @@ rerender."
         (set! (.-innerHTML node)
               (md/mdToHtml (string/join "\n" mkdn-strs))))
       {:tags [:no-heading]})))
+
+;; om-card
+
+(defn om-card [om-comp initial-state]
+  (reify IMountable
+    (mount [_ {:keys [node data]}]
+      (when (or (nil? @data)
+                (= {} @data))
+        (reset! data initial-state))
+      (om/root om-comp data {:target node}))
+    (unmount [_ {:keys [node]}]
+      (.unmountComponentAtNode js/React node))))
+

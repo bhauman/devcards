@@ -1,7 +1,9 @@
 (ns devdemos.core
   (:require
    [devcards.core :as dc]
-   [clojure.string :as string])
+   [om.core :as om :include-macros true]   
+   [clojure.string :as string]
+   [sablono.core :as sab :include-macros true])
   (:require-macros
    [devcards.core :refer [defcard is are= are-not=]]))
 
@@ -11,7 +13,7 @@
 
 (defcard intro
   (dc/markdown-card
-   "## Devcard Demos   \n" 
+   "## Devcard Demos \n" 
    "This page holds example devcards. \n"
    "```"
    '(defn add [a b] (+ a b))
@@ -31,7 +33,9 @@
 
 (defcard slider-card-dev
   (dc/slider-card (fn [& args] (apply + args))
-                  [(rand-strs 255) (rand-strs 255) (rand-strs 255)]))
+                  [(rand-strs 255)
+                   (rand-strs 255)
+                   (rand-strs 255)]))
 
 (defn to-heckle-f [a b]
   (if (zero? (mod b 10))
@@ -106,9 +110,9 @@
    (cube { :size 200
           :cube-css (css-transform state)
           :side-css {  :width   "200px"
-                     :height  "200px"
-                     :opacity "0.5"
-                     :border "10px solid #333"}})])
+                       :height  "200px"
+                       :opacity "0.5"
+                       :border "10px solid #333"}})])
 
 (defcard threed-fun
   (dc/slider-card
@@ -118,3 +122,13 @@
     (range 360)
     (range 360)]
    :value-render-func cube-template))
+
+(defn widget [data owner]
+  (reify
+    om/IRender
+    (render [this]
+      (sab/html [:h1 "thi heh? " (:text data)]))))
+
+(defcard omcard-ex
+    (dc/om-card widget {}))
+

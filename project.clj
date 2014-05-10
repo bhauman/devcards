@@ -8,10 +8,11 @@
                  [org.clojure/clojurescript "0.0-2202"]
                  [org.clojure/core.async "0.1.278.0-76b25b-alpha"]
                  [markdown-clj "0.9.43"]
-                 [sablono "0.1.5"]
+                 [sablono "0.2.16"]
                  [crate "0.2.4"]
                  [jayq "2.4.0"]
-                 [om "0.5.3"]
+                 [om "0.6.2"]
+                 [frontier "0.1.0-SNAPSHOT"]
                  [figwheel "0.1.2-SNAPSHOT"]]
 
   :plugins [[lein-cljsbuild "1.0.3"] [lein-figwheel "0.1.2-SNAPSHOT"]]
