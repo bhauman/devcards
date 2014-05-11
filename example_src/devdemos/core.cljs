@@ -13,7 +13,8 @@
 
 (defcard intro
   (dc/markdown-card
-   "## Devcard Demos \n" 
+   "## Devcards \n"
+   
    "This page holds example devcards. \n"
    "```"
    '(defn add [a b] (+ a b))
