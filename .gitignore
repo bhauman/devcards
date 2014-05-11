@@ -9,5 +9,5 @@ pom.xml
 .lein-plugins/
 checkouts/
 .nrepl-port
-resources/public/js/compiled
+resources/public/devcards/js/compiled
 .\#*

@@ -20,11 +20,11 @@
   :source-paths ["src"]
 
   :cljsbuild { 
-    :builds [{:id "devcards"
+    :builds [{:id "devcards-demos"
               :source-paths ["src" "example_src"]
               :compiler {
-                         :output-to "resources/public/js/compiled/devdemos.js"
-                         :output-dir "resources/public/js/compiled/out"
+                         :output-to "resources/public/devcards/js/compiled/devdemos.js"
+                         :output-dir "resources/public/devcards/js/compiled/out"
                          :optimizations :none
                          :source-map true}}]}
   :figwheel { :css-dirs ["resources/public/css"] })
