@@ -9,15 +9,19 @@
   [vname expr]
   (let [ns (-> &env :ns :name name munge)]
     `(do
-       (def ~vname (fn [] ~expr))
-       (devcards.core/register-card  [~(keyword ns) ~(keyword vname)] (or (:tags (meta ~expr)) []) ~vname))))
+       (def ~vname (fn [] (:func ~expr)))
+       (devcards.core/register-card  [~(keyword ns) ~(keyword vname)]
+                                     (or (:options ~expr) {})
+                                     ~vname))))
 
 (defmacro hidecard
   [vname expr]
   (let [ns (-> &env :ns :name name munge)]
     `(do
        (def ~vname (fn [] (fn [{:keys [node data]}] (if node (set! (.-innerHTML node) "")))))
-       (devcards.core/register-card  [~(keyword ns) ~(keyword vname)] [:hidden] ~vname))))
+       (devcards.core/register-card  [~(keyword ns) ~(keyword vname)]
+                                     {:hidden true}
+                                     ~vname))))
 
 (defmacro is [body]
   `{ :type :is  :body (quote ~body) :passed ~body })

@@ -36,7 +36,13 @@
   (mount [o data])
   (unmount [o data]))
 
-(defrecord DevCard [path tags func position data-atom])
+(def default-card-options 
+  {:heading           true
+   :padding           true
+   :unmount-on-reload true
+   :hidden            false})
+
+(defrecord DevCard [path options func position data-atom])
 
 (defn devcard? [d]
   (and (map? d)
@@ -58,7 +64,7 @@
 
 (defmethod dev-trans :default [msg state] state)
 
-(defmethod dev-trans :register-card [[_ {:keys [path tags func]}] state]
+(defmethod dev-trans :register-card [[_ {:keys [path options func]}] state]
   (let [position (:position state)]
     (-> state
         (update-in [:position] inc)
@@ -66,10 +72,12 @@
                    (fn [dc]
                      (if dc
                        (assoc dc
-                         :tags tags
+                         :options  (merge default-card-options options)
                          :position position
                          :func func)
-                       (DevCard. path tags func position (atom {}))))))))
+                       (DevCard. path
+                                 (merge default-card-options options)
+                                 func position (atom {}))))))))
 
 (defmethod dev-trans :add-to-current-path [[_ {:keys [path]}] state]
   (-> state
@@ -109,10 +117,6 @@
       :render-cards (not= (set visible-cards)
                           (set intended-cards)))))
 
-(defn unmount-cards? [state]
-  
-  )
-
 (defn breadcrumbs [{:keys [current-path] :as state}]
   (let [cpath (map name (cons :home current-path))
         crumbs
@@ -150,19 +154,22 @@
     (.setItem js/sessionStorage "__devcards__current-path" (prn-str (:current-path state)))
     state))
 
-(defn naked-card [{:keys [path]}]
-  [:div.devcard-rendered-card {:id (unique-card-id path)}])
+(defn naked-card [{:keys [path options]}]
+  [:div 
+   {:id (unique-card-id path)
+    :class (str "devcard-rendered-card" (if (:padding options) " devcard-padding" "")) }])
 
-(defn card-template [{:keys [path] :as card}]
-  (if-not (some #(= % :hidden) (:tags card))
-    (if (some #(= % :no-heading) (:tags card))
-      [:div.panel.panel-default.devcard-panel
-       [:div.panel-heading (naked-card card)]]
+(defn card-template [{:keys [path options] :as card}]
+  (if-not (:hidden options)
+    (if (:heading options)
       [:div.panel.panel-default.devcard-panel
        [:div.panel-heading.devcards-set-current-path
         {:data-path (string/join ":::" (map name path))}
         [:span.panel-title (name (last path)) " "]]
-       (naked-card card)])
+       (naked-card card)]
+      [:div.panel.panel-default.devcard-panel
+       (naked-card card)
+       #_[:div.panel-heading ]])
     [:span]))
 
 (defn display-cards [cards]
@@ -243,19 +250,20 @@
     ))
 
 (defn unmount-card-nodes [data]
-  (when (:render-cards data)
-    (doseq [[card node] (:visible-card-nodes data)]
-      (when-let [card  (get-in data (cons :cards (unique-card-id->path (.-id node))))]
-        (let [functionality ((:func card))]
-          (when (satisfies? IMountable functionality)
+  (doseq [[card node] (:visible-card-nodes data)]
+    (when-let [card  (get-in data (cons :cards (unique-card-id->path (.-id node))))]
+      (let [functionality ((:func card))]
+        (when (and (satisfies? IMountable functionality)
+                   (or (:render-cards data)
+                       (:unmount-on-reload (:options card)))) 
             (unmount functionality { :node node
-                                     :data (:data-atom card)})))))))
+                                    :data (:data-atom card)}))))))
 
 (defn mount-card-nodes [data]
   (doseq [[card node] (visible-card-nodes data)]
     (let [functionality ((:func card))
           arg { :node node
-                :data (:data-atom card)}]
+               :data (:data-atom card)}]
       (if (satisfies? IMountable functionality)
         (mount functionality arg)
         (apply functionality [arg])))))

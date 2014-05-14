@@ -18,7 +18,7 @@
    [markdown.core :as md]
    [clojure.string :as string]
    [om.core :as om :include-macros true]
-   [figwheel.client :refer [watch-and-reload]]
+   [figwheel.client :refer [watch-and-reload-with-opts]]
    [cljs.core.async :refer [put! chan] :as async]))
 
 ;; oh well
@@ -42,15 +42,17 @@
                             (mount-card-nodes state))
                            50))))
 
+(defn figwheel-jsload-callback [x]
+  (put! devcard-event-chan [:jsreload]))
+
 (defn start-figwheel-reloader!
   ([opts]
-     (watch-and-reload (merge {:jsload-callback (fn [x] (put! devcard-event-chan [:jsreload]))}
-                              opts)))
+     (watch-and-reload-with-opts (assoc opts :jsload-callback figwheel-jsload-callback)))
   ([] (start-figwheel-reloader! {})))
 
-(defn register-card [path tags func]
+(defn register-card [path options func]
   (put! devcard-event-chan
-        [:register-card {:path path :tags tags :func func}]))
+        [:register-card {:path path :options options :func func}]))
 
 (defn render-single-card [card-path node]
   (let [id (unique-card-id card-path)]
@@ -65,18 +67,28 @@
   ([react-dom html-node]
      (render-to react-dom html-node identity)))
 
-(defn react-card [react-component]
+(defn react-card
   "Simple react card. It only renders the react component passed in."
-  (reify IMountable
-    (mount [_ {:keys [node]}]
-      (render-to react-component
-                 node identity))
-    (unmount [_ {:keys [node]}]
-      (.unmountComponentAtNode js/React node))))
+  ([react-component options]
+     {:func (reify
+              IMountable
+              (mount [_ {:keys [node]}]
+                (println "calling mount")
+                (render-to react-component
+                             node identity))
+              (unmount [_ {:keys [node]}]
+                (println "calling UNmount")
+                (.unmountComponentAtNode js/React node)))
+      :options (merge { :unmount-on-reload false }
+                      options)})
+  ([react-component] (react-card react-component {})))
 
-(defn sab-card [sab-template]
+(defn sab-card
   "Card that renders sablono."
-  (react-card (sab/html sab-template)))
+  ([sab-template options]
+     (react-card (sab/html sab-template) options))
+  ([sab-template]
+     (react-card (sab/html sab-template) {})))
 
 (defn edn-card [clj-data]
   "A card that renders end."
@@ -88,7 +100,7 @@
 ;; another way to do this is to create a runner component and
 ;; pass it to the react card.
 (defn react-runner-card [react-component-fn]
-  "The card takes a function which takes a data atom and returns a
+  "This card takes a function which takes a data atom and returns a
 react component. Any changes to the atom cause the component to
 rerender."
   (reify IMountable
@@ -112,11 +124,11 @@ rerender."
    (if (:passed test)
      [:span.glyphicon.glyphicon-ok.test-icon]
      [:span.glyphicon.glyphicon-remove.test-icon])
-   [:span.test-body body]])
+   body])
 
 (defmethod render-test :is [test]
   (test-wrapper test
-                [:span.body-area
+                [:span.test-body
                   [:span.operator "is"]
                   [:span.result-area
                    [:span.exp (prn-str (:body test))]
@@ -129,7 +141,7 @@ rerender."
 
 (defmethod render-test :are= [test]
   (test-wrapper test
-                [:span.body-area
+                [:span.test-body
                  [:span.operator "="]
                  [:span.result-area
                   [:span.exp (prn-str (:exp1 test))]
@@ -143,7 +155,7 @@ rerender."
 
 (defmethod render-test :are-not= [test]
   (test-wrapper test
-                [:span.body-area
+                [:span.test-body
                  [:span.operator "!="]
                  [:span.result-area
                   [:span.exp (prn-str (:exp1 test))]
@@ -158,7 +170,9 @@ rerender."
 (defn test-card [& assertions]
   (sab-card
    [:ul.list-group.test-group
-    (map render-test assertions)]))
+    (map (fn [t] (render-test t) )  
+         assertions)]
+   {:padding false}))
 
 ;; slider card
 
@@ -346,21 +360,21 @@ rerender."
 
 (def markdown-card
   (fn [& mkdn-strs]
-    (with-meta
-      (fn [{:keys [node]}]
-        (set! (.-innerHTML node)
-              (md/mdToHtml (string/join "\n" mkdn-strs))))
-      {:tags [:no-heading]})))
+    {:func (fn [{:keys [node]}]
+             (set! (.-innerHTML node)
+                   (md/mdToHtml (string/join "\n" mkdn-strs))))
+     :options {:heading false}}))
 
 ;; om-card
 
 (defn om-card [om-comp initial-state]
-  (reify IMountable
-    (mount [_ {:keys [node data]}]
-      (when (or (nil? @data)
-                (= {} @data))
-        (reset! data initial-state))
-      (om/root om-comp data {:target node}))
-    (unmount [_ {:keys [node]}]
-      (.unmountComponentAtNode js/React node))))
+  {:func (reify IMountable
+           (mount [_ {:keys [node data]}]
+             (when (or (nil? @data)
+                       (= {} @data))
+               (reset! data initial-state))
+             (om/root om-comp data {:target node}))
+           (unmount [_ {:keys [node]}]
+             (.unmountComponentAtNode js/React node)))
+   :options { :unmount-on-reload false } })
 

@@ -34,9 +34,7 @@
     (map board-cell data)]])
 
 (defcard board-style
-  (dc/sab-card
-   [:div.devcard-padding
-    (game-board [])]))
+  (dc/sab-card (game-board [])))
 
 (defcard intro-3
   (dc/markdown-card
@@ -45,18 +43,17 @@
 
 (defcard board-with-cells
   (dc/sab-card
-   [:div.devcard-padding
-    (game-board [{ :top 0 :left 0 :v 2}
-                 { :top 0 :left 1 :v 4}
-                 { :top 0 :left 2 :v 8}
-                 { :top 0 :left 3 :v 16}
-                 { :top 1 :left 0 :v 32}
-                 { :top 1 :left 1 :v 64}
-                 { :top 1 :left 2 :v 128}
-                 { :top 1 :left 3 :v 256}
-                 { :top 2 :left 0 :v 512}
-                 { :top 2 :left 1 :v 1024}
-                 { :top 2 :left 2 :v 2048}])]))
+   (game-board [{ :top 0 :left 0 :v 2}
+                { :top 0 :left 1 :v 4}
+                { :top 0 :left 2 :v 8}
+                { :top 0 :left 3 :v 16}
+                { :top 1 :left 0 :v 32}
+                { :top 1 :left 1 :v 64}
+                { :top 1 :left 2 :v 128}
+                { :top 1 :left 3 :v 256}
+                { :top 2 :left 0 :v 512}
+                { :top 2 :left 1 :v 1024}
+                { :top 2 :left 2 :v 2048}])))
 
 (defcard basic-data-transformations
   (dc/markdown-card

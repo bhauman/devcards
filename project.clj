@@ -26,7 +26,7 @@
 
   :cljsbuild { 
     :builds [{:id "devcards-demos"
-              :source-paths ["src" "example_src"]
+              :source-paths ["src" "example_src" "../lein-figwheel/support/src"]
               :compiler {
                          :output-to "resources/public/devcards/js/compiled/devdemos.js"
                          :output-dir "resources/public/devcards/js/compiled/out"
