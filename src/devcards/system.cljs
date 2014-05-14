@@ -61,19 +61,20 @@
 (defmethod dev-trans :register-card [[_ {:keys [path tags func]}] state]
   (let [position (:position state)]
     (-> state
-     (update-in [:position] inc)
-     (update-in (cons :cards path)
-                (fn [dc]
-                  (if dc
-                    (assoc dc
-                      :tags tags
-                      :position position
-                      :func func)
-                    (DevCard. path tags func position (atom {}))))))))
+        (update-in [:position] inc)
+        (update-in (cons :cards path)
+                   (fn [dc]
+                     (if dc
+                       (assoc dc
+                         :tags tags
+                         :position position
+                         :func func)
+                       (DevCard. path tags func position (atom {}))))))))
 
 (defmethod dev-trans :add-to-current-path [[_ {:keys [path]}] state]
-  (update-in state [:current-path] 
-             (fn [x] (conj x (keyword path)))))
+  (-> state
+      (update-in [:current-path] 
+                 (fn [x] (conj x (keyword path))))))
 
 (defmethod dev-trans :current-path [[_ {:keys [path]}] state]
   (assoc state :current-path (vec path)))
@@ -107,6 +108,10 @@
     (assoc state
       :render-cards (not= (set visible-cards)
                           (set intended-cards)))))
+
+(defn unmount-cards? [state]
+  
+  )
 
 (defn breadcrumbs [{:keys [current-path] :as state}]
   (let [cpath (map name (cons :home current-path))
@@ -238,12 +243,13 @@
     ))
 
 (defn unmount-card-nodes [data]
-  (doseq [[card node] (:visible-card-nodes data)]
-    (when-let [card  (get-in data (cons :cards (unique-card-id->path (.-id node))))]
-      (let [functionality ((:func card))]
+  (when (:render-cards data)
+    (doseq [[card node] (:visible-card-nodes data)]
+      (when-let [card  (get-in data (cons :cards (unique-card-id->path (.-id node))))]
+        (let [functionality ((:func card))]
           (when (satisfies? IMountable functionality)
             (unmount functionality { :node node
-                                     :data (:data-atom card)}))))))
+                                     :data (:data-atom card)})))))))
 
 (defn mount-card-nodes [data]
   (doseq [[card node] (visible-card-nodes data)]
@@ -253,6 +259,15 @@
       (if (satisfies? IMountable functionality)
         (mount functionality arg)
         (apply functionality [arg])))))
+
+(defn render-base-if-necessary! []
+  (if-let [devcards-node (.getElementById js/document "devcards")]
+    (do
+      (when-not (.getElementById js/document "devcards-controls")
+        (.appendChild devcards-node (c/html [:div#devcards-controls])))
+      (when-not (.getElementById js/document "devcards-cards")
+        (.appendChild devcards-node (c/html [:div#devcards-cards]))))
+    (throw (js/Error. "The devcards interface needs an element with an id of \"devcards\" to be on the page."))))
 
 (defn devcard-renderer [{:keys [state event-chan]}]
   (unmount-card-nodes state)

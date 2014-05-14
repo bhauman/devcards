@@ -32,4 +32,4 @@
                          :output-dir "resources/public/devcards/js/compiled/out"
                          :optimizations :none
                          :source-map true}}]}
-  :figwheel { :css-dirs ["resources/public/css"] })
+  :figwheel { :css-dirs ["resources/public/devcards/css"] })

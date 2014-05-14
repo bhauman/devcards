@@ -5,6 +5,7 @@
                           runner-start] :as fr]
    [frontier.cards :as fc]
    [devcards.system :refer [devcard-system-start
+                            render-base-if-necessary!
                             devcard-renderer
                             register-listeners
                             unmount-card-nodes
@@ -25,10 +26,12 @@
 
 (defn start-devcard-ui! []
   (defonce devcard-system
-    (let [ds (devcard-system-start devcard-event-chan
-                                   (throttle-function devcard-renderer 50))]
-      (register-listeners "#devcards" devcard-event-chan)
-      ds)))
+    (do
+      (render-base-if-necessary!)
+      (let [ds (devcard-system-start devcard-event-chan
+                                     (throttle-function devcard-renderer 50))]
+        (register-listeners "#devcards" devcard-event-chan)
+        ds))))
 
 (defn start-single-card-ui! []
   (defonce devcard-system
@@ -103,31 +106,54 @@ rerender."
 
 (defmulti render-test :type)
 
-(defn test-wrapper [test bd]
+(defn test-wrapper [test body]
   [:li
    {:className (if (:passed test) "list-group-item list-group-item-success" "list-group-item list-group-item-danger")}
    (if (:passed test)
-     [:span.glyphicon.glyphicon-ok]
-     [:span.glyphicon.glyphicon-remove])
-   [:span.test-body
-    bd]])
+     [:span.glyphicon.glyphicon-ok.test-icon]
+     [:span.glyphicon.glyphicon-remove.test-icon])
+   [:span.test-body body]])
 
 (defmethod render-test :is [test]
   (test-wrapper test
-                (list [:span.operator "is"]
-                      [:span.exp (prn-str (:body test))])))
+                [:span.body-area
+                  [:span.operator "is"]
+                  [:span.result-area
+                   [:span.exp (prn-str (:body test))]
+                   (if-not (:passed test)
+                     [:span.explain "Expected "
+                      [:span.code (prn-str (:passed test))]
+                      " to be "
+                      [:span.code "true"]]
+                     [:span])]]))
 
 (defmethod render-test :are= [test]
   (test-wrapper test
-                (list [:span.operator "="]
-                      [:span.exp (prn-str (:exp1 test))]
-                      [:span.exp (prn-str (:exp2 test))])))
+                [:span.body-area
+                 [:span.operator "="]
+                 [:span.result-area
+                  [:span.exp (prn-str (:exp1 test))]
+                  [:span.exp (prn-str (:exp2 test))]
+                  (if-not (:passed test)
+                    [:span.explain "Expected "
+                     [:span.code (prn-str (:val1 test))]
+                     " to equal "
+                     [:span.code (prn-str (:val2 test))]]
+                    [:span])]]))
 
 (defmethod render-test :are-not= [test]
   (test-wrapper test
-                (list [:span.operator "!="]
-                      [:span.exp (prn-str (:exp1 test))]
-                      [:span.exp (prn-str (:exp2 test))])))
+                [:span.body-area
+                 [:span.operator "!="]
+                 [:span.result-area
+                  [:span.exp (prn-str (:exp1 test))]
+                  [:span.exp (prn-str (:exp2 test))]
+                  (if-not (:passed test)
+                    [:div.explain "Expected "
+                     [:span.code (prn-str (:val1 test))]
+                     " not to equal "
+                     [:span.code (prn-str (:val2 test))]]
+                    [:span])]]))
 
 (defn test-card [& assertions]
   (sab-card

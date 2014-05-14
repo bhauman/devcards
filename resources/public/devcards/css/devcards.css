@@ -21,18 +21,41 @@ body {
 
 .test-body {
     padding-left: 1em;
+    display: inline-block;
+}
+.test-body .result-area {
+    padding-left: 40px;
+    display: inline-block;
 }
 
 .test-body .operator {
     font-weight: bold;
     color: black;
     width: 1.5em;
-    display: inline-block;
+    position: absolute;
+    left: 41px;
+}
+
+.glyphicon.test-icon {
+  position: absolute;
+  top: 14px;
 }
 
 .test-body .exp {
     color: #666;
-    padding-left: 1em;
+    padding-right: 1em;
+    display: inline-block;
+}
+
+.test-group .explain {
+  display: inline-block;
+}
+
+.test-group .explain .code {
+    font-weight: bold;
+    color: black;
+    font-family: monospace;
+    display: inline-block;
 }
 
 .devcard-panel {
@@ -68,14 +91,13 @@ border-color: #e5e6e9 #dfe0e4 #d0d1d5;
  
 }  
 
-.devcard-panel > .panel-heading .devcard-rendered-card h1,
-.devcard-panel > .panel-heading .devcard-rendered-card h2,
-.devcard-panel > .panel-heading .devcard-rendered-card h3,
-.devcard-panel > .panel-heading .devcard-rendered-card h4,
-.devcard-panel > .panel-heading .devcard-rendered-card h5 {
+.devcard-panel > .panel-heading .devcard-rendered-card h1:first-child,
+.devcard-panel > .panel-heading .devcard-rendered-card h2:first-child,
+.devcard-panel > .panel-heading .devcard-rendered-card h3:first-child,
+.devcard-panel > .panel-heading .devcard-rendered-card h4:first-child,
+.devcard-panel > .panel-heading .devcard-rendered-card h5:first-child {
     margin-top: 5px;
 }
-
 
 .test-group > .list-group-item {
   border: none;

@@ -3,9 +3,10 @@
    [devcards.core :as dc]
    [om.core :as om :include-macros true]   
    [clojure.string :as string]
-   [sablono.core :as sab :include-macros true])
+   [sablono.core :as sab :include-macros true]
+   [devdemos.two-zero])
   (:require-macros
-   [devcards.core :refer [defcard is are= are-not=]]))
+   [devcards.core :refer [defcard is are= are-not= format-code]]))
 
 (enable-console-print!)
 (devcards.core/start-devcard-ui!)
@@ -14,13 +15,76 @@
 (defcard intro
   (dc/markdown-card
    "## Devcards \n"
-   
-   "This page holds example devcards. \n"
+   "ClojureScript Devcards are a tool to help you **quickly** surface what you are working on."
+   "This page holds an quick introduction to devcards.\n"
+   "#### This is a devcard"
+   "You can create a card like this on the page like so:\n"
    "```"
-   '(defn add [a b] (+ a b))
-   ";; compiles to -> "
-   (defn add [a b] (+ a b))
-   "```\n"))
+   (format-code (defcard
+                  (markdown-card
+                   "# This is a test")))
+   "```"))
+
+(defcard intro-2
+  (dc/markdown-card
+   "## Devcards are intended to be interactive"
+   "The cars on this page can be found in the file `example_src/devdemos/core.cljs`. "
+   "Please follow along in this file to see how these examples are created."
+   "\n"
+   "If you ran `lein figwheel` to get this demo started, if you edit "
+   "and save the file that this code is in you will see the changes "
+   "show up on this page as you save your file. \n"
+   "Go ahead and change this text to see the changes reflected here."))
+
+(defcard sablono-card-example
+  (dc/sab-card
+   [:div.devcard-padding ;; if you want padding
+    [:h2 "This is a Sablono card"]
+    [:p "It can help you interactively work on sablono templates like this one:"]
+    [:pre [:code
+           (format-code [:div.devcard-padding ;; if you want padding
+                         [:h2 "This is a Sablono card"]
+                         [:p "It can help you interactively work on Sablono templates:"]
+                         [:pre [:code (format-code ...)]]])
+           ]]
+    [:h2 "Working on cards individually"]
+    [:p "You will notice that unlike the markdown cards, this card has a heading at the top: "
+     [:code "sablono-card-example"]]
+    [:p "You can click the heading on this card to get it on a page all to itself."
+     " This can reduce the noise of having all the cards on one page."]]))
+
+
+
+
+
+
+
+(defcard base-api
+  (dc/markdown-card
+   "## Base API"
+   "Devcards are basically functions that take a `DOM node and a data atom."
+   "\n"
+   "For example this is a devcard."
+   "```"
+   (format-code (fn [{:keys [node data]}] (.innerHTML node "<h2>Awesome?</h2>")))
+   "```"
+   "and you can use it like so:"
+   "```"
+   (format-code (defcard my-first-card (fn [{:keys [node data]}]
+                                         (set! (.-innerHTML node) "<h2>Awesome?</h2>"))))
+   "```"
+   "You can see it rendered below."))
+
+
+(defcard my-first-card (fn [{:keys [node data]}]
+                         (set! (.-innerHTML node) "<h2>Awesome?</h2>")))
+
+(defcard advanced-api
+  (dc/markdown-card
+   "## Mountable API"
+   "")
+  )
+
 
 (defcard test-card-ex
   (dc/test-card

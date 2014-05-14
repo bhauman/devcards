@@ -19,8 +19,8 @@ mocking up:
                  [:div {:class "cell xpos-1 ypos-3"} 8]]]))
 ```
 
-When used with lein figwheel after saving the file that contains this
-definition you will see this sablono template rendered in the devcards
+When used with lein figwheel, saving the file that contains this
+definition  will see this sablono template rendered in the devcards
 interface.  
 
 

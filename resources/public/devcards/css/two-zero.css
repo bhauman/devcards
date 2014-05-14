@@ -1,0 +1,102 @@
+.board-area {
+    background-color: rgb(187,173,160);
+    width: 499px;
+    height: 499px;
+    border-radius: 6px;
+    position: relative;
+}
+
+.cell {
+    background-color: rgb(205,193,180);
+    height: 106px;
+    width: 106px;
+    position:absolute;
+    border-radius: 4px;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 55px;
+    line-height: 102px; 
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    -webkit-transition: all 0.1s;
+    transition: all 0.1s;
+}
+
+.pos-top-0 { top: 15px; }
+.pos-top-1 { top: 136px; }
+.pos-top-2 { top: 257px; }
+.pos-top-3 { top: 378px; }
+
+.pos-left-0 { left: 15px; }
+.pos-left-1 { left: 136px; }
+.pos-left-2 { left: 257px; }
+.pos-left-3 { left: 378px; }
+
+.cell-num-2 {
+  background-color: rgb(238, 228,218);
+  color: rgb(110,102,93);
+} 
+
+.cell-num-4 {
+  background-color: rgb(237, 224,200);
+  color: rgb(119,110,101);
+} 
+
+.cell-num-8 {
+  background-color: rgb(242, 177, 121);
+  color: rgb(249,246,242);
+} 
+
+.cell-num-16 {
+  background-color: rgb(245, 149, 99);
+  color: rgb(249,246,242);
+} 
+
+.cell-num-32 {
+  background-color: rgb(245, 124, 95);
+  color: rgb(249,246,242);
+} 
+
+.cell-num-64 {
+  background-color: rgb(246, 94, 59);
+  color: rgb(249,246,242);
+} 
+
+.cell-num-128 {
+  background-color: rgb(237, 207,114);
+  color: rgb(249,246,242);
+  font-size: 48px;
+} 
+
+.cell-num-256 {
+  background-color: rgb(237, 204, 97);
+  color: rgb(249,246,242);
+  font-size: 48px;
+  border: 1px solid rgba(238, 228, 218, 0.5);
+  box-shadow: 0 0 25px 5px rgb(237, 204, 97);
+} 
+
+.cell-num-512 {
+  background-color: rgb(237, 204, 97);
+  color: rgb(249,246,242);
+  font-size: 48px;
+  border: 1px solid rgba(238, 228, 218, 0.5);
+  box-shadow: 0 0 25px 5px rgb(237, 204, 97);
+} 
+
+.cell-num-1024 {
+  background-color: rgb(237, 204, 97);
+  color: rgb(249,246,242);
+  font-size: 40px;
+  border: 1px solid rgba(238, 228, 218, 0.5);
+  box-shadow: 0 0 25px 5px rgb(237, 204, 97);
+} 
+
+.cell-num-2048 {
+  background-color: rgb(237, 204, 97);
+  color: rgb(249,246,242);
+  font-size: 40px;
+  border: 1px solid rgba(238, 228, 218, 0.5);
+  box-shadow: 0 0 25px 5px rgb(237, 204, 97);
+}
+
