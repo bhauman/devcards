@@ -196,7 +196,7 @@
            [:span.glyphicon.glyphicon-folder-close]
            [:span.badge (count child-tree)]
            [:span " " (name key)]])
-        dirs)])
+        (reverse dirs))])
 
 (defn breadcrumbs-templ [crumbs]
   [:ol.breadcrumb

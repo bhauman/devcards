@@ -39,7 +39,7 @@
 
 (defcard sablono-card-example
   (dc/sab-card
-   [:div.devcard-padding ;; if you want padding
+   [:div ;; if you want padding
     [:h2 "This is a Sablono card"]
     [:p "It can help you interactively work on sablono templates like this one:"]
     [:pre [:code
@@ -91,10 +91,10 @@
                                  (range (rand-int 12))))))
 
 (defcard slider-card-dev
-  (dc/slider-card (fn [& args] (apply + args))
-                  [(rand-strs 255)
-                   (rand-strs 255)
-                   (rand-strs 255)]))
+  (dc/slider-card (fn [{:keys [x y z]}] (+ x y z))
+                  {:x (rand-strs 255)
+                   :y (rand-strs 255)
+                   :z (rand-strs 255)}))
 
 (defn to-heckle-f [a b]
   (if (zero? (mod b 10))
@@ -110,13 +110,12 @@
               (repeatedly 30 #(rand-int 300))))
    :test-func (fn [x] (< x 200))))
 
-
-(defcard reduce-slider-trans
-  (dc/reduce-fr-card
-   (dc/SliderCard. 1 1)
-   {}
-   [:set-index-for-key {:k 0 :index 5}] {:keyed-vals {0 5}}
-   [:set-index-for-key {:k 0 :index 3}] {:keyed-vals {0 3}}
+#_(defcard reduce-slider-trans
+    (dc/reduce-fr-card
+     (dc/SliderCard. 1 1)
+     {}
+     [:set-index-for-key {:k 0 :index 5}] {:keyed-vals {0 5}}
+     [:set-index-for-key {:k 0 :index 3}] {:keyed-vals {0 3}}
    [:set-index-for-key {:k 1 :index 3}] {:keyed-vals {0 3 1 3}}))
 
 (defcard reduce-card-ex
@@ -175,11 +174,10 @@
 
 (defcard threed-fun
   (dc/slider-card
-   (fn [x y z]
-     {:rx x :ry y :rz z})
-   [(range 360)
-    (range 360)
-    (range 360)]
+   identity
+   {:rx (range 360)
+    :ry (range 360)
+    :rz (range 360)}
    :value-render-func cube-template))
 
 (defn widget [data owner]

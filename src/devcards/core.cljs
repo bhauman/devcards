@@ -198,37 +198,37 @@ rerender."
       state))
   fr/IDerive
   (-derive [o state]
-    (let [sorted-keyed-values (sort-by first (into [] (:keyed-vals state)))
-          slider-inputs (map (fn [[k i] seq*]
-                              {:k k
-                               :index i
-                               :v (nth seq* i)
-                               :max (dec (count seq*))})
-                              sorted-keyed-values
-                              arg-seqs)]
+    (let [slider-inputs (map (fn [[k seq*]]
+                               (let [i (k (:keyed-vals state))]
+                                 {:k k
+                                  :index i
+                                  :v   (nth seq* i)
+                                  :max (dec (count seq*))}))
+                             arg-seqs)]
       (assoc state
         :slider-inputs slider-inputs
         :result
-        (apply f (map :v slider-inputs))))))
+        (f (into {} (map (juxt :k :v) slider-inputs)))))))
 
 (defn slider-input-control [{:keys [k v index seq*] :as ic} event-chan]
   [:div.slider-control
-    [:input {:type "range"
-             :onChange (fn [e]
-                         (async/put! event-chan
-                               [:set-index-for-key
-                                {:k k,
-                                 :index (.parseInt
-                                         js/window
-                                         (.-value (.-target e)))}]))
-             :defaultValue index
-             :min 0
-             :max (:max ic)}]
-   [:div (prn-str v)]])
+   [:div [:strong (str k)] " " (prn-str v)]
+   [:input {:type "range"
+            :onChange (fn [e]
+                        (async/put! event-chan
+                                    [:set-index-for-key
+                                     {:k k,
+                                      :index (.parseInt
+                                              js/window
+                                              (.-value (.-target e)))}]))
+            :defaultValue index
+            :min 0
+            :max (:max ic)}]])
 
 (defn make-slider-renderer [value-render-func]
   (fn [{:keys [state event-chan] :as rstate}]
-    [:div
+    (println        (:slider-inputs state))
+    [:div.devcard-padding
      [:div.col-md-4
       [:h4 "args"]
       (map
@@ -240,15 +240,13 @@ rerender."
       [:div (value-render-func (:result state))]]
      [:div.clearfix]]))
 
-
 (defn slider-card [f arg-seqs & {:keys [value-render-func]}]
   (fc/system-card { :keyed-vals (into {}
-                                   (mapv vector (range (count arg-seqs))
-                                         (repeat 0)))}
-               (fr/make-renderable
-                (fr/compose (SliderCard. f arg-seqs))
-                (make-slider-renderer (or value-render-func html-edn)))
-               []))
+                                      (mapv vector (keys arg-seqs) (repeat 0)))}
+                  (fr/make-renderable
+                   (fr/compose (SliderCard. f arg-seqs))
+                   (make-slider-renderer (or value-render-func html-edn)))
+                  []))
 
 ;; heckler card
 
