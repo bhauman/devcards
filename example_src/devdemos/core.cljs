@@ -76,8 +76,8 @@
    "You can see it rendered below."))
 
 
-(defcard my-first-card (fn [{:keys [node data]}]
-                         (set! (.-innerHTML node) "<h2>Awesome?</h2>")))
+(defcard my-first-card {:func (fn [{:keys [node data]}]
+                                (set! (.-innerHTML node) "<h2>Awesome?</h2>"))})
 
 (defcard advanced-api
   (dc/markdown-card

@@ -74,8 +74,7 @@
               IMountable
               (mount [_ {:keys [node]}]
                 (println "calling mount")
-                (render-to react-component
-                             node identity))
+                (render-to react-component node))
               (unmount [_ {:keys [node]}]
                 (println "calling UNmount")
                 (.unmountComponentAtNode js/React node)))
@@ -103,18 +102,16 @@
   "This card takes a function which takes a data atom and returns a
 react component. Any changes to the atom cause the component to
 rerender."
-  (reify IMountable
-    (mount [_ {:keys [node data]}]
-      (add-watch data :react-runner
-                 (fn [_ _ _ n]
-                   (render-to (react-component-fn data)
-                              node identity)
-                   ))
-      (render-to (react-component-fn data)
-                 node identity))
-    (unmount [_ {:keys [node data]}]
-      (remove-watch data :react-runner)
-      (.unmountComponentAtNode js/React node))))
+  { :func (reify IMountable
+            (mount [_ {:keys [node data]}]
+              (add-watch data :react-runner
+                         (fn [_ _ _ _] (render-to (react-component-fn data)
+                                                 node)))
+              (reset! data @data))
+            (unmount [_ {:keys [node data]}]
+              (remove-watch data :react-runner)
+              (.unmountComponentAtNode js/React node)))
+   :options { :unmount-on-reload false } })
 
 (defmulti render-test :type)
 

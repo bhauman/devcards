@@ -36,6 +36,9 @@
   (mount [o data])
   (unmount [o data]))
 
+#_(defprotocol IConfig
+    (-options [o]))
+
 (def default-card-options 
   {:heading           true
    :padding           true

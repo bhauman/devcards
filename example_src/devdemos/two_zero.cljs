@@ -14,7 +14,7 @@
 (defcard intro-2
   (dc/markdown-card
    "### Board Style"
-   "First we'll work on the style for the board."))
+   "Let's start with the style for the board."))
 
 (defn board-cell [{:keys [top left id v]}]
   [:div { :class (str "cell "
@@ -124,13 +124,20 @@
    (are= (reduce row-reduce [] [ :_ {:v 8} :_ :_]) [{:v 8} :_ :_ :_])
    (are= (reduce row-reduce [] [ :_ :_ {:v 8} :_]) [{:v 8} :_ :_ :_])
    (are= (reduce row-reduce [] [ :_ :_ :_ {:v 8}]) [{:v 8} :_ :_ :_])
-   (are= (reduce row-reduce [] [ {:v 4} {:v 4} :_ :_]) [{:v 4 :double true} :_ :_ :_])
-   (are= (reduce row-reduce [] [ {:v 4} :_ :_ {:v 4}]) [{:v 4 :double true} :_ :_ :_])
-   (are= (reduce row-reduce [] [ :_ {:v 4} :_ {:v 4}]) [{:v 4 :double true} :_ :_ :_])
-   (are= (reduce row-reduce [] [ :_ :_ {:v 4} {:v 4}]) [{:v 4 :double true} :_ :_ :_])
-   (are= (reduce row-reduce [] [ :_ {:v 4} {:v 4} {:v 4}]) [{:v 4 :double true} {:v 4} :_ :_])
-   (are= (reduce row-reduce [] [ {:v 4} {:v 4} {:v 4} {:v 4}]) [{:v 4 :double true} {:v 4 :double true} :_ :_])
-   (are= (reduce row-reduce [] [ {:v 4} {:v 8} {:v 8} {:v 4}]) [{:v 4} {:v 8 :double true} {:v 4} :_])
+   (are= (reduce row-reduce [] [ {:v 4} {:v 4} :_ :_])
+         [{:v 4 :double true} :_ :_ :_])
+   (are= (reduce row-reduce [] [ {:v 4} :_ :_ {:v 4}])
+         [{:v 4 :double true} :_ :_ :_])
+   (are= (reduce row-reduce [] [ :_ {:v 4} :_ {:v 4}])
+         [{:v 4 :double true} :_ :_ :_])
+   (are= (reduce row-reduce [] [ :_ :_ {:v 4} {:v 4}])
+         [{:v 4 :double true} :_ :_ :_])
+   (are= (reduce row-reduce [] [ :_ {:v 4} {:v 4} {:v 4}])
+         [{:v 4 :double true} {:v 4} :_ :_])
+   (are= (reduce row-reduce [] [ {:v 4} {:v 4} {:v 4} {:v 4}])
+         [{:v 4 :double true} {:v 4 :double true} :_ :_])
+   (are= (reduce row-reduce [] [ {:v 4} {:v 8} {:v 8} {:v 4}])
+         [{:v 4} {:v 8 :double true} {:v 4} :_])
    (are= (reduce row-reduce [] [ {:id :a :v 4} { :id :b :v 4}
                                  {:id :c :v 8} { :id :d :v 8}])
          [{:id :b :v 4 :double true }
