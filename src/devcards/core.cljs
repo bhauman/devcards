@@ -12,7 +12,9 @@
                             mount-card-nodes
                             unique-card-id
                             throttle-function
-                            IMountable]]
+                            IMount
+                            IUnMount
+                            IConfig]]
    [sablono.core :as sab :include-macros true]
    [devcards.util.edn-renderer :refer [html-edn]]
    [markdown.core :as md]
@@ -67,19 +69,26 @@
   ([react-dom html-node]
      (render-to react-dom html-node identity)))
 
+(defn unmount-react [node]
+  (.unmountComponentAtNode js/React node))
+
+(defrecord ReactCard [react-component options]
+  IMount
+  (mount [_ {:keys [node]}]
+    (println "calling mount")
+    (render-to react-component node))
+  IUnMount
+  (unmount [_ {:keys [node]}]
+    (println "calling UNmount")
+    (unmount-react node))
+  IConfig
+  (-options [_]
+    (merge { :unmount-on-reload false } options)))
+
 (defn react-card
   "Simple react card. It only renders the react component passed in."
   ([react-component options]
-     {:func (reify
-              IMountable
-              (mount [_ {:keys [node]}]
-                (println "calling mount")
-                (render-to react-component node))
-              (unmount [_ {:keys [node]}]
-                (println "calling UNmount")
-                (.unmountComponentAtNode js/React node)))
-      :options (merge { :unmount-on-reload false }
-                      options)})
+     (ReactCard. react-component options))
   ([react-component] (react-card react-component {})))
 
 (defn sab-card
@@ -95,23 +104,31 @@
    [:div.devcards-pad-card
     (html-edn clj-data)]))
 
+(defrecord ReactRunnerCard [react-component-fn options]
+  IMount
+  (mount [_ {:keys [node data]}]
+    (add-watch data :react-runner
+               (fn [_ _ _ _] (render-to (react-component-fn data)
+                                       node)))
+    (reset! data @data))
+  IUnMount
+  (unmount [_ {:keys [node data]}]
+    (remove-watch data :react-runner)
+    (unmount-react node))
+  IConfig
+  (-options [_]
+    (merge { :unmount-on-reload false } options )))
 
 ;; another way to do this is to create a runner component and
 ;; pass it to the react card.
-(defn react-runner-card [react-component-fn]
+(defn react-runner-card
   "This card takes a function which takes a data atom and returns a
 react component. Any changes to the atom cause the component to
 rerender."
-  { :func (reify IMountable
-            (mount [_ {:keys [node data]}]
-              (add-watch data :react-runner
-                         (fn [_ _ _ _] (render-to (react-component-fn data)
-                                                 node)))
-              (reset! data @data))
-            (unmount [_ {:keys [node data]}]
-              (remove-watch data :react-runner)
-              (.unmountComponentAtNode js/React node)))
-   :options { :unmount-on-reload false } })
+  ([react-component-fn options]
+     (ReactRunnerCard. react-component-fn options))
+  ([react-component-fn]
+     (react-runner-card react-component-fn {})))
 
 (defmulti render-test :type)
 
@@ -327,7 +344,7 @@ rerender."
                        (heckle-renderer f data generator
                                         (or value-render-func html-edn)
                                         (or test-func (fn [x] true)))))]
-    (react-runner-card system-func)))
+    (react-runner-card system-func {:padding false})))
 
 ;; reduce-card
 
@@ -357,21 +374,31 @@ rerender."
 
 (def markdown-card
   (fn [& mkdn-strs]
-    {:func (fn [{:keys [node]}]
-             (set! (.-innerHTML node)
-                   (md/mdToHtml (string/join "\n" mkdn-strs))))
-     :options {:heading false}}))
+    (reify
+      IMount
+      (mount [_ {:keys [node data]}]
+        (set! (.-innerHTML node) (md/mdToHtml (string/join "\n" mkdn-strs))))
+      IConfig
+      (-options [_] {:heading false}))))
 
 ;; om-card
 
-(defn om-card [om-comp initial-state]
-  {:func (reify IMountable
-           (mount [_ {:keys [node data]}]
-             (when (or (nil? @data)
-                       (= {} @data))
-               (reset! data initial-state))
-             (om/root om-comp data {:target node}))
-           (unmount [_ {:keys [node]}]
-             (.unmountComponentAtNode js/React node)))
-   :options { :unmount-on-reload false } })
+(defrecord OmCard [om-comp initial-state options]
+  IMount
+  (mount [_ {:keys [node data]}]
+    (when (or (nil? @data)
+              (= {} @data))
+      (reset! data initial-state))
+    (om/root om-comp data {:target node}))
+  IUnMount
+  (unmount [_ {:keys [node]}]
+    (unmount-react node))
+  IConfig
+  (-options [_]
+    (merge { :unmount-on-reload false } options)))
 
+(defn om-card
+  ([om-comp initial-state options]
+     (OmCard. om-comp initial-state options))
+  ([om-comp initial-state]
+     (om-card om-comp initial-state {})))

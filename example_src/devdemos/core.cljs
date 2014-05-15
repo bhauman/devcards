@@ -1,6 +1,7 @@
 (ns devdemos.core
   (:require
    [devcards.core :as dc]
+   [devcards.system :refer [IMount]]   
    [om.core :as om :include-macros true]   
    [clojure.string :as string]
    [sablono.core :as sab :include-macros true]
@@ -53,12 +54,6 @@
     [:p "You can click the heading on this card to get it on a page all to itself."
      " This can reduce the noise of having all the cards on one page."]]))
 
-
-
-
-
-
-
 (defcard base-api
   (dc/markdown-card
    "## Base API"
@@ -75,16 +70,15 @@
    "```"
    "You can see it rendered below."))
 
-
-(defcard my-first-card {:func (fn [{:keys [node data]}]
-                                (set! (.-innerHTML node) "<h2>Awesome?</h2>"))})
+(defcard my-first-card
+  (fn [{:keys [node data]}]
+    (set! (.-innerHTML node) "<h2>Awesome?</h2>")))
 
 (defcard advanced-api
   (dc/markdown-card
    "## Mountable API"
    "")
   )
-
 
 (defcard test-card-ex
   (dc/test-card

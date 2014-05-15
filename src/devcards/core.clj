@@ -9,10 +9,10 @@
   [vname expr]
   (let [ns (-> &env :ns :name name munge)]
     `(do
-       (def ~vname (fn [] (:func ~expr)))
+       (def ~vname (fn [] ~expr))
        (devcards.core/register-card  [~(keyword ns) ~(keyword vname)]
-                                     (or (:options ~expr) {})
-                                     ~vname))))
+                                     (devcards.system/get-options ~expr)
+                                     (fn [] ~expr)))))
 
 (defmacro hidecard
   [vname expr]

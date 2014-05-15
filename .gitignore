@@ -11,3 +11,4 @@ checkouts/
 .nrepl-port
 resources/public/devcards/js/compiled
 .\#*
+\#*

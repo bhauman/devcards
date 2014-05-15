@@ -32,11 +32,13 @@
        (:cards data)
        (get-in (:cards data) (:current-path data))))
 
-(defprotocol IMountable
-  (mount [o data])
+(defprotocol IMount
+  (mount [o data]))
+
+(defprotocol IUnMount
   (unmount [o data]))
 
-#_(defprotocol IConfig
+(defprotocol IConfig
     (-options [o]))
 
 (def default-card-options 
@@ -44,6 +46,13 @@
    :padding           true
    :unmount-on-reload true
    :hidden            false})
+
+(defn get-options [card]
+  (merge default-card-options
+         (or
+          (and (satisfies? IConfig card)
+               (-options card))
+          {})))
 
 (defrecord DevCard [path options func position data-atom])
 
@@ -256,7 +265,7 @@
   (doseq [[card node] (:visible-card-nodes data)]
     (when-let [card  (get-in data (cons :cards (unique-card-id->path (.-id node))))]
       (let [functionality ((:func card))]
-        (when (and (satisfies? IMountable functionality)
+        (when (and (satisfies? IUnMount functionality)
                    (or (:render-cards data)
                        (:unmount-on-reload (:options card)))) 
             (unmount functionality { :node node
@@ -267,7 +276,7 @@
     (let [functionality ((:func card))
           arg { :node node
                :data (:data-atom card)}]
-      (if (satisfies? IMountable functionality)
+      (if (satisfies? IMount functionality)
         (mount functionality arg)
         (apply functionality [arg])))))
 
