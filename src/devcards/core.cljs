@@ -227,7 +227,6 @@ rerender."
 
 (defn make-slider-renderer [value-render-func]
   (fn [{:keys [state event-chan] :as rstate}]
-    (println        (:slider-inputs state))
     [:div.devcard-padding
      [:div.col-md-4
       [:h4 "args"]

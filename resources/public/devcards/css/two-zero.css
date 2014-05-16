@@ -6,11 +6,28 @@
     position: relative;
 }
 
+.board-area-one-row {
+    height: 136px;
+}
+
+.cell-pos {
+    height: 106px;
+    width: 106px;
+    position:absolute;
+    border-radius: 4px;
+    -webkit-transition: all 0.12s;
+    transition: all 0.12s;
+}
+
+.cell-empty {
+   background-color: rgb(205,193,180);
+}
+
 .cell {
     background-color: rgb(205,193,180);
     height: 106px;
     width: 106px;
-    position:absolute;
+    /* position: relative; */
     border-radius: 4px;
     font-family: "Helvetica Neue", Arial, sans-serif;
     font-size: 55px;
@@ -18,8 +35,29 @@
     font-weight: bold;
     text-align: center;
     vertical-align: middle;
-    -webkit-transition: all 0.1s;
-    transition: all 0.1s;
+}
+
+.cell.highlight {
+  -webkit-animation: highlight 0.1s;
+}
+
+@-webkit-keyframes highlight {
+  0%   { -webkit-transform: scale3d(1.2,1.2,1.0); 
+         opacity: 0.7;}
+  100% { -webkit-transform: scale3d(1.0,1.0,1.0); 
+         opacity: 1.0;}  
+}
+
+.cell.reveal {
+  -webkit-animation: reveal 0.1s;
+}
+
+@-webkit-keyframes reveal {
+  0%   { -webkit-transform: scale3d(0.1,0.1,1.0); 
+         opacity: 0.1;
+         }
+  100% { -webkit-transform: scale3d(1.0,1.0,1.0); 
+         opacity: 1.0;}  
 }
 
 .pos-top-0 { top: 15px; }
@@ -31,6 +69,8 @@
 .pos-left-1 { left: 136px; }
 .pos-left-2 { left: 257px; }
 .pos-left-3 { left: 378px; }
+
+
 
 .cell-num-2 {
   background-color: rgb(238, 228,218);
@@ -99,4 +139,41 @@
   border: 1px solid rgba(238, 228, 218, 0.5);
   box-shadow: 0 0 25px 5px rgb(237, 204, 97);
 }
+
+
+@media (max-width: 480px){
+  .board-area {
+      width: 280px;
+      height: 280px;
+  }
+  .cell-pos, .cell {
+      width: 60px;
+      height: 60px;
+  }
+
+  .cell {
+    font-size: 25px;
+    line-height: 60px;       
+  }
+
+  .cell-num-128, .cell-num-256, .cell-num-512 {
+    font-size: 26px;
+  } 
+  
+  .cell-num-1024, .cell-num-2048 {
+    font-size: 21px;
+  }
+
+  .pos-top-0 { top: 8px; }
+  .pos-top-1 { top: 76px; }
+  .pos-top-2 { top: 144px; }
+  .pos-top-3 { top: 212px; }
+
+  .pos-left-0 { left: 8px; }
+  .pos-left-1 { left: 76px; }
+  .pos-left-2 { left: 144px; }
+  .pos-left-3 { left: 212px; }
+
+}
+
 
