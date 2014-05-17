@@ -1,6 +1,6 @@
 (ns devcards.util.edn-renderer
   (:require
-   [sablono.core :as sab :include-macros true]))
+   [om.dom :as dom :include-macros true]))
 
 (declare html)
 
@@ -8,46 +8,58 @@
   (and (not (seq? x))
        (not (coll? x))))
 
-(defn smart-seperate [s coll]
-  (if (every? literal? coll)
-    [:span.separator s]
-    [:span [:span.separator s]
-     [:span.clearfix]]))
+(defn separator* [s]
+  (dom/span #js { :className "separator" } s))
+
+(defn clearfix-separator* [s]
+  (dom/span #js {}
+            (separator* s)
+            (dom/span #js { :className "clearfix" } "")))
+
+(defn separate-fn [coll]
+  (if (not (every? literal? coll))
+    clearfix-separator*
+    separator*))
+
+(defn interpose-separator [rct-coll s sep-fn]
+  (-> (butlast rct-coll)
+      (interleave (repeatedly #(sep-fn s))) 
+      vec
+      (conj (last rct-coll))
+      to-array))
 
 (defn literal [class x]
-  [:span {:className class} (prn-str x)])
+  (dom/span #js { :className class } (prn-str x)))
 
 (defn join-html [separator coll]
-  (interpose (smart-seperate separator coll)
-             (map html coll)))
-
-(defn html-collection [class opener closer coll]
-  [:span.collection  { :className class }
-   [:span.opener opener]
-   [:span.contents (join-html " " coll)]
-   [:span.closer closer]])
+  (interpose-separator (mapv html coll) separator
+                       (separate-fn coll)))
 
 (defn html-keyval [[k v]]
-  [:span.keyval {:key (prn-str k)}
-   (html k)
-   [:span.separator " "]
-   (html v)])
+  (dom/span #js {:className "keyval"
+                 :key (prn-str k)}
+            (html k)
+            (dom/span #js {:className "separator"} " ")
+            (html v)))
 
 (defn html-keyvals [coll]
-  (interpose (smart-seperate " " (vals coll))
-             (map html-keyval coll)))
+  (interpose-separator (mapv html-keyval coll) " "
+                       (separate-fn (vals coll))))
+
+(defn open-close [class-str opener closer rct-coll]
+  (dom/span #js {:className class-str}
+            (dom/span #js { :className "opener"} opener)
+            (dom/span #js { :className "contents" } rct-coll)
+            (dom/span #js { :className "closer"} closer)))
+
+(defn html-collection [class opener closer coll]
+  (open-close (str "collection " class ) opener closer (join-html " " coll)))
 
 (defn html-map [coll]
-  [:span.collection.map
-   [:span.opener "{"]
-   [:span.contents (html-keyvals coll)]
-   [:span.closer "}"]])
+  (open-close "collection map" "{" "}" (html-keyvals coll)))
 
 (defn html-string [s]
-  [:span.string
-   [:span.opener "\""]
-   [:span.contents s]
-   [:span.closer "\""]])
+  (open-close "string" "\"" "\"" s))
 
 (defn html [x]
   (cond
@@ -62,5 +74,6 @@
    :else        (literal "literal" x)))
 
 (defn html-edn [e]
-  [:div.rendered-edn
-   (html e)])
+  (dom/div #js { :className "rendered-edn" }
+            (html e)))
+

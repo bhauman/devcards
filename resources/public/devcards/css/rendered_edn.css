@@ -20,7 +20,7 @@
 
 .rendered-edn .collection.map {
     padding: 1.8em;
-    display: block; 
+    display: inline-block; 
     vertical-align: top;
 }
 

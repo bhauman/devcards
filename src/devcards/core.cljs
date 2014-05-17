@@ -17,9 +17,9 @@
                             IConfig]]
    [sablono.core :as sab :include-macros true]
    [devcards.util.edn-renderer :refer [html-edn]]
-   [markdown.core :as md]
    [clojure.string :as string]
    [om.core :as om :include-macros true]
+   [om.dom :as dom :include-macros true]
    [figwheel.client :refer [watch-and-reload-with-opts]]
    [cljs.core.async :refer [put! chan] :as async]))
 
@@ -62,6 +62,11 @@
       (.html (js/$ node) (str "<div class='devcard-rendered-card' id='" id "'></div>")))))
 
 ;;; cards
+
+(let [conv-class (.-converter js/Showdown)
+      converter (conv-class.)]
+  (defn markdown-to-html [markdown-txt]
+    (.makeHtml converter markdown-txt)))
 
 (defn render-to
   ([react-dom html-node callback]
@@ -141,64 +146,60 @@ rerender."
                               (string? x) :string)))
 
 (defn test-wrapper [test body]
-  [:li
-   {:className (if (:passed test) "list-group-item list-group-item-success" "list-group-item list-group-item-danger")}
-   (if (:passed test)
-     [:span.glyphicon.glyphicon-ok.test-icon]
-     [:span.glyphicon.glyphicon-remove.test-icon])
-   body])
+  (dom/li #js { :className (str "list-group-item list-group-item-"
+                                (if (:passed test) "success" "danger")) }
+          (dom/span #js { :className (str "test-icon glyphicon glyphicon-"
+                                          (if (:passed test) "ok" "remove")) })
+          body))
 
 (defmethod render-test :string [s]
-  [:li
-   {:className "list-group-item"}
-   (react-raw (md/mdToHtml s))])
+  (dom/li #js {:className "list-group-item"}
+          (react-raw (markdown-to-html s))))
+
+(defn error-message [test val1 val-join-msg val2]
+  (if-not (:passed test)
+    (dom/span #js {:className "explain"}
+              "Expected "
+              (dom/span #js {:className "code"} val1)
+              val-join-msg
+              (dom/span #js {:className "code"} val2))
+    (dom/span #js {} "")))
 
 (defmethod render-test :is [test]
   (test-wrapper test
-                [:span.test-body
-                  [:span.operator "is"]
-                  [:span.result-area
-                   [:span.exp (prn-str (:body test))]
-                   (if-not (:passed test)
-                     [:span.explain "Expected "
-                      [:span.code (prn-str (:passed test))]
-                      " to be "
-                      [:span.code "true"]]
-                     [:span])]]))
+                (dom/span #js {:className "test-body"}
+                          (dom/span #js {:className "operator"} "is")
+                          (dom/span #js {:className "result-area"}
+                                    (dom/span #js {:className "exp"}
+                                              (prn-str (:body test)))
+                                    (error-message test
+                                                   (prn-str (:passed test))
+                                                   " to be "
+                                                   "true")))))
+
+(defn operator-relation-test [test op relation-phrase]
+  (test-wrapper test
+                (dom/span #js {:className "test-body"}
+                          (dom/span #js {:className "operator"} op)
+                          (dom/span #js {:className "result-area"}
+                                    (dom/span #js {:className "exp"} (prn-str (:exp1 test)))
+                                    (dom/span #js {:className "exp"} (prn-str (:exp2 test)))                                    
+                                    (error-message test
+                                                   (prn-str (:val1 test))
+                                                   relation-phrase
+                                                   (prn-str (:val2 test)))))))
 
 (defmethod render-test :are= [test]
-  (test-wrapper test
-                [:span.test-body
-                 [:span.operator "="]
-                 [:span.result-area
-                  [:span.exp (prn-str (:exp1 test))]
-                  [:span.exp (prn-str (:exp2 test))]
-                  (if-not (:passed test)
-                    [:span.explain "Expected "
-                     [:span.code (prn-str (:val1 test))]
-                     " to equal "
-                     [:span.code (prn-str (:val2 test))]]
-                    [:span])]]))
+  (operator-relation-test test "=" " to equal "))
 
 (defmethod render-test :are-not= [test]
-  (test-wrapper test
-                [:span.test-body
-                 [:span.operator "!="]
-                 [:span.result-area
-                  [:span.exp (prn-str (:exp1 test))]
-                  [:span.exp (prn-str (:exp2 test))]
-                  (if-not (:passed test)
-                    [:div.explain "Expected "
-                     [:span.code (prn-str (:val1 test))]
-                     " not to equal "
-                     [:span.code (prn-str (:val2 test))]]
-                    [:span])]]))
+  (operator-relation-test test "!=" " not to equal "))
 
 (defn test-card [& assertions]
-  (sab-card
-   [:ul.list-group.test-group
-    (map (fn [t] (render-test t) )  
-         assertions)]
+  (react-card
+   (dom/ul #js {:className "list-group test-group"}
+           (to-array (mapv (fn [t] (render-test t))  
+                           assertions)))
    {:padding false}))
 
 ;; slider card
@@ -224,33 +225,38 @@ rerender."
         (f (into {} (map (juxt :k :v) slider-inputs)))))))
 
 (defn slider-input-control [{:keys [k v index seq*] :as ic} event-chan]
-  [:div.slider-control
-   [:div [:strong (str k)] " " (prn-str v)]
-   [:input {:type "range"
-            :onChange (fn [e]
-                        (async/put! event-chan
-                                    [:set-index-for-key
-                                     {:k k,
-                                      :index (.parseInt
-                                              js/window
-                                              (.-value (.-target e)))}]))
-            :defaultValue index
-            :min 0
-            :max (:max ic)}]])
+  (dom/div #js {:className "slider-control"}
+   (dom/div #js {} (dom/strong #js {} (str k)) " " (prn-str v))
+   (dom/input #js {:type "range"
+                   :onChange (fn [e]
+                               (async/put! event-chan
+                                           [:set-index-for-key
+                                            {:k k,
+                                             :index (.parseInt
+                                                     js/window
+                                                     (.-value (.-target e)))}]))
+                   :defaultValue index
+                   :min 0
+                   :max (:max ic)})))
 
 (defn make-slider-renderer [value-render-func]
   (fn [{:keys [state event-chan] :as rstate}]
-    [:div.devcard-padding
-     [:div.col-md-4
-      [:h4 "args"]
-      (map
-       (fn [slider-in]
-         (slider-input-control slider-in event-chan))
-       (:slider-inputs state))]
-     [:div.col-md-8
-      [:h4 "result"]
-      [:div (value-render-func (:result state))]]
-     [:div.clearfix]]))
+    (dom/div
+     #js {:className "devcard-padding"}
+     (dom/div
+      #js {:className "col-md-4"}
+      (dom/h4 #js{} "args")
+      (to-array
+       (mapv
+        (fn [slider-in]
+          (slider-input-control slider-in event-chan))
+        (:slider-inputs state))))
+     (dom/div
+      #js {:className "col-md-8"}
+      (dom/h4 #js{} "result")
+      (dom/div #js {} (sab/html (value-render-func (:result state)))))
+     (dom/div
+      #js {:className "clearfix"}))))
 
 (defn slider-card [f arg-seqs & {:keys [value-render-func]}]
   (fc/system-card { :keyed-vals (into {}
@@ -293,55 +299,58 @@ rerender."
 
 (defn heckle-renderer [f data generator value-render-func test-func]
   (let [derived-data (heckle-derive @data f test-func)]
-    [:div.heckler-card
-     [:div.devcards-pad-left
-      [:a.btn.btn-danger.navbar-btn
-       {:type "button"
-        :onClick (fn [] (swap! data assoc-in [:gen-arg-list]
-                              (heckle-values generator)))}
-       "Re-heckle!"]
-      [:a.btn.btn-default.navbar-btn.devcards-margin-left
-       {
-        :className (if (:only-errors @data) "active" "")
-        :onClick (fn [] (swap! data update-in [:only-errors] (fn [x] (not x)))) }
-       "Toggle Errors"]
-      [:span.devcards-pad-left
-       (if (pos? (count (filter :error derived-data)))
-         [:span.label.label-danger
-          (count (filter :error derived-data))
-          " Errors"]
-         [:span.label.label-success "No errors"])]
-      [:span {:style (js-obj "paddingLeft" "14px")}
-       (let [failed-tests (filter (fn [x] (= false (:passed x))) derived-data)]
-         (if (pos? (count failed-tests))
-           [:span.label.label-warning
-            (count failed-tests)
-            " Tests Failed"]
-           [:span]))]]
-     [:table.table.table-striped.table-hover 
-      [:tr
-       [:th "Called"]
-       [:th "Result"]]
-      (map
-       (fn [{:keys [args error res-val] :as res}]
-         (let []
-           [:tr
-            {:className (str (:class res))}
-            [:td
-             [:span.text-muted "(f "]
-             (interpose [:span.text-muted ", "]
-                        (map
-                         (fn [a] [:span (prn-str a)])
-                         args)) [:span.text-muted " )"]]
-            [:td
-             (if error
-               (.-message error)
-               (value-render-func res-val))
-             ]]
-           ))
-       derived-data
-       )]]
-    ))
+    (dom/div
+     #js {:className "heckler-card"}
+     (dom/div #js {:className "devcards-pad-left"}
+              (dom/a #js {:type "button"
+                          :className "btn btn-danger navbar-btn"
+                          :onClick (fn [] (swap! data assoc-in [:gen-arg-list]
+                                                (heckle-values generator)))}
+                     "Re-heckle!")
+              (dom/a #js { :className 
+                          (str
+                           "btn btn-default navbar-btn devcards-margin-left"
+                           (if (:only-errors @data) "active" ""))
+                          :onClick (fn [] (swap! data update-in [:only-errors] (fn [x] (not x)))) }
+                     "Toggle Errors")
+              (dom/span #js {:className  "devcards-pad-left" }
+                        (let [error-count (count (filter :error derived-data))]
+                          (if (pos? error-count)
+                            (dom/span #js {:className "label label-danger"}
+                                      error-count
+                                      " Errors")
+                            (dom/span #js {}))))
+              (dom/span #js {:style #js {:paddingLeft "14px"}}
+                        (let [failed-tests (filter (fn [x] (= false (:passed x))) derived-data)]
+                          (if (pos? (count failed-tests))
+                            (dom/span #js {:className "label label-warning"}
+                                      (count failed-tests)
+                                      " Tests Failed")
+                            (dom/span #js {}))))
+              )
+          (dom/table #js { :className "table table-striped table-hover"}
+                (dom/tr #js {}
+                        (dom/th #js {} "Called")
+                        (dom/th #js {} "Result"))
+                (to-array
+                 (mapv
+                  (fn [{:keys [args error res-val] :as res}]
+                    (let []
+                      (dom/tr #js {:className (str (:class res))}
+                              (let [args' (map #(dom/span #js {} (prn-str %)) args)]
+                                (dom/td #js {}
+                                        (to-array
+                                         (concat
+                                          [(dom/span #js {:className "text-muted"} "(f ")]
+                                          (interleave (butlast args')
+                                                      (repeatedly #(dom/span #js {:className "text-muted"} ",")))
+                                          [(last args')
+                                           (dom/span #js {:className "text-muted"} ")")]))))
+                              (dom/td #js {}
+                                      (if error
+                                        (.-message error)
+                                        (sab/html (value-render-func res-val)))))))
+                  derived-data))))))
 
 (defn heckler-card [f generator & {:keys [test-func
                                           value-render-func]}]
@@ -387,7 +396,8 @@ rerender."
     (reify
       IMount
       (mount [_ {:keys [node data]}]
-        (set! (.-innerHTML node) (md/mdToHtml (string/join "\n" mkdn-strs))))
+        (set! (.-innerHTML node) (markdown-to-html
+                                  (string/join "\n" mkdn-strs))))
       IConfig
       (-options [_] {:heading false}))))
 

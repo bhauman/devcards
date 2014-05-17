@@ -15,11 +15,11 @@
 
 (defcard intro
   (dc/markdown-card
-   "## Devcards \n"
+   "## Devcards"
    "ClojureScript Devcards are a tool to help you **quickly** surface what you are working on."
-   "This page holds an quick introduction to devcards.\n"
+   "This page holds an quick introduction to devcards."
    "#### This is a devcard"
-   "You can create a card like this on the page like so:\n"
+   "You can create a card like this on the page like so"
    "```"
    (format-code (defcard
                   (markdown-card

@@ -5,6 +5,10 @@
    [clojure.string :as string]
    [clojure.set :refer [difference union]]
    [sablono.core :as sab :include-macros true]
+
+   [om.core :as om :include-macros true]
+   [om.dom :as dom :include-macros true]
+   [devcards.util.edn-renderer :as edn]
    [cljs.core.async :refer [timeout]]
    [goog.labs.userAgent.device :as device])
   (:require-macros
@@ -12,6 +16,8 @@
    [devcards.core :refer [defcard is are= are-not= format-code format-data]]))
 
 (defn lh [x] (print (prn-str x)) x)
+
+(defn lc [x] (.log js/console x) x)
 
 (def is-mobile? (or (device/isMobile)
                     ;; we could hook into a callback to set this on resize
@@ -185,7 +191,7 @@
   (dc/markdown-card
    "### Transforming one row"
    "We need to get a transformation for one row. From there we can get
-all the other transformations."
+   all the other transformations."
    "We will be transforming one row for a move `:left`."))
 
 (def remove-blanks (partial filterv #(not= % :_)))
@@ -443,4 +449,6 @@ all the other transformations."
        [:div [:a {:onClick (fn [] (move :down data))} "down"]]       
        [:div
         [:a {:onClick (fn [] (reset! data start-data))} "reset"]]
-       #_(html-edn @data)]))))
+       (html-edn @data)]))))
+
+
