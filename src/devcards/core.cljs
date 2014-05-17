@@ -72,6 +72,12 @@
 (defn unmount-react [node]
   (.unmountComponentAtNode js/React node))
 
+(defn react-raw [raw-html-str]
+  (.div (.-DOM js/React)
+        (clj->js { :dangerouslySetInnerHTML 
+                   { :__html
+                     raw-html-str }})))
+
 (defrecord ReactCard [react-component options]
   IMount
   (mount [_ {:keys [node]}]
@@ -130,7 +136,9 @@ rerender."
   ([react-component-fn]
      (react-runner-card react-component-fn {})))
 
-(defmulti render-test :type)
+(defmulti render-test (fn [x] (cond
+                              (map? x) (:type x)
+                              (string? x) :string)))
 
 (defn test-wrapper [test body]
   [:li
@@ -139,6 +147,11 @@ rerender."
      [:span.glyphicon.glyphicon-ok.test-icon]
      [:span.glyphicon.glyphicon-remove.test-icon])
    body])
+
+(defmethod render-test :string [s]
+  [:li
+   {:className "list-group-item"}
+   (react-raw (md/mdToHtml s))])
 
 (defmethod render-test :is [test]
   (test-wrapper test

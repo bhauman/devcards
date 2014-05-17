@@ -4,6 +4,11 @@
     height: 499px;
     border-radius: 6px;
     position: relative;
+
+    /* initialize as 3d */
+    -webkit-transform: translate3d(0,0,0);
+    -moz-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
 }
 
 .board-area-one-row {
@@ -15,8 +20,14 @@
     width: 106px;
     position:absolute;
     border-radius: 4px;
+
     -webkit-transition: all 0.12s;
     transition: all 0.12s;
+
+    /* initialize as 3d */
+    -webkit-transform: translate3d(0,0,0);
+    -moz-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
 }
 
 .cell-empty {
@@ -35,6 +46,11 @@
     font-weight: bold;
     text-align: center;
     vertical-align: middle;
+
+    /* initialize as 3d */
+    -webkit-transform: translate3d(0,0,0);
+    -moz-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
 }
 
 .cell.highlight {
