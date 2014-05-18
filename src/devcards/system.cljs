@@ -290,13 +290,11 @@
     (throw (js/Error. "The devcards interface needs an element with an id of \"devcards\" to be on the page."))))
 
 (defn devcard-renderer [{:keys [state event-chan]}]
-  (go
-   (unmount-card-nodes state)
-   (<! (timeout 200))
-   (.html ($ "#devcards-controls") (c/html (main-template state)))
-   (create-needed-card-nodes state)
-   (toggle-background-to-white state)
-   (mount-card-nodes state)))
+  (unmount-card-nodes state)
+  (.html ($ "#devcards-controls") (c/html (main-template state)))
+  (create-needed-card-nodes state)
+  (toggle-background-to-white state)
+  (mount-card-nodes state))
 
 (def devcard-initial-data { :current-path []
                             :position 0
