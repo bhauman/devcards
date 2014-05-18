@@ -1,6 +1,7 @@
 (ns devcards.util.edn-renderer
   (:require
    [devcards.util.reactor :as rct :include-macros true]
+   [sablono.core :as sab :include-macros true]
    [om.dom :as dom :include-macros true]))
 
 (declare html)
@@ -39,7 +40,7 @@
   (dom/span #js {:className "keyval"
                  :key (prn-str k)}
             (html k)
-            (dom/span #js {:className "separator"} " ")
+            #_(dom/span #js {:className "separator"} " ")
             (html v)))
 
 (defn html-keyvals [coll]
@@ -79,5 +80,28 @@
 
 (defn html-edn [e]
   (dom/div #js { :className "rendered-edn" }
-            (html e)))
+                     (html e)))
 
+(comment
+  (enable-console-print!)
+  
+  (def test-data (mapcat identity (take 100 (repeat [{ :top 0 :left 0 :v 2 :id :t1}
+                                                     { :top 0 :left 1 :v 4 :id :t2}
+                                                     { :top 0 :left 2 :v 8 :id :t3}
+                                                     { :top 0 :left 3 :v 16 :id :t4}
+                                                     { :top 1 :left 0 :v 32 :id :t5}
+                                                     { :top 1 :left 1 :v 64 :id :t6}
+                                                     { :top 1 :left 2 :v 128 :id :t7}
+                                                     { :top 1 :left 3 :v 256 :id :t8}
+                                                     { :top 2 :left 0 :v 512 :id :t9}
+                                                     { :top 2 :left 1 :v 1024 :id :t10}]))))
+
+  (defn run-time-test [li-fn]
+    (let [now (js/Date.)]
+      (.renderComponent js/React (li-fn test-data)
+                        (.getElementById js/document "test-area") identity)
+      (/ (- (.getTime (js/Date.))
+            (.getTime now)) 1000)))
+
+  (println (run-time-test html-edn))
+  #_(.unmountComponentAtNode js/React (.getElementById js/document "test-area")))

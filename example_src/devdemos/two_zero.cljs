@@ -47,40 +47,40 @@
 (defn pixel-pos [pos]
   (str (to-pixel-pos pos) "px"))
 
-(defn transform-to-pos [top left]
+(defn board-cell [{:keys [top left id v highlight reveal]}]
   (let [translate (str "translate3d("
                        (pixel-pos left) ","
                        (pixel-pos top) ", 0px)")]
-    { "-webkit-transform" translate
-      "-moz-transform" translate
-      "transform" translate }))
-
-(defn board-cell [{:keys [top left id v highlight reveal]}]
-  (let [opts { :style (transform-to-pos top left)
-               :key (str (name id))}]
-    [:div.cell-pos opts
-     [:div {:class (str "cell cell-num-" v
-                        (when highlight " highlight")
-                        (when reveal " reveal"))} v]]))
+    (sab/html
+     [:div.cell-pos { :style { "-webkit-transform" translate
+                               "-moz-transform" translate
+                               "transform" translate }
+                      :key (str (name id)) }
+      [:div { :class (str "cell cell-num-" v
+                          (when highlight " highlight")
+                          (when reveal " reveal")) } v]])))
 
 ;; These are the background cells of the board, they never change.
-(def background-cells
-   (for [top (range 4) left (range 4)]
-    [:div.cell-pos.cell-empty
-     { :style { :top (pixel-pos top)
-                :left (pixel-pos left)}}]))
+(defn background-cells []
+  (for [top (range 4) left (range 4)]
+    (sab/html
+     [:div.cell-pos.cell-empty
+      { :style { :top (pixel-pos top)
+                :left (pixel-pos left)}}])))
 
 (defn one-row-board
   "Only used for the demo process"
   [data]
-  [:div.board-area.board-area-one-row
-   [:div.background (take 4 background-cells)]
-   [:div.cells (map board-cell data)]])
+  (sab/html
+   [:div.board-area.board-area-one-row
+    [:div.background (take 4 (background-cells))]
+    [:div.cells (map board-cell data)]]))
 
 (defn game-board [data]
-  [:div.board-area
-   [:div.background background-cells]
-   [:div.cells (map board-cell data)]])
+  (sab/html
+   [:div.board-area
+    [:div.background (background-cells)]
+    [:div.cells (map board-cell data)]]))
 
 (defcard board-style
   (dc/sab-card (game-board [])))
