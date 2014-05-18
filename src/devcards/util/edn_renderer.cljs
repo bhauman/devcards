@@ -1,5 +1,6 @@
 (ns devcards.util.edn-renderer
   (:require
+   [devcards.util.reactor :as rct :include-macros true]
    [om.dom :as dom :include-macros true]))
 
 (declare html)
@@ -9,7 +10,7 @@
        (not (coll? x))))
 
 (defn separator* [s]
-  (dom/span #js { :className "separator" } s))
+  (dom/span #js { :className "separator"} s))
 
 (defn clearfix-separator* [s]
   (dom/span #js {}
@@ -22,11 +23,10 @@
     separator*))
 
 (defn interpose-separator [rct-coll s sep-fn]
-  (-> (butlast rct-coll)
-      (interleave (repeatedly #(sep-fn s))) 
-      vec
-      (conj (last rct-coll))
-      to-array))
+  (->> (rest rct-coll)
+       (interleave (repeatedly #(sep-fn s))) 
+       (cons (first rct-coll))
+       to-array))
 
 (defn literal [class x]
   (dom/span #js { :className class } (prn-str x)))
