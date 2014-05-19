@@ -26,7 +26,9 @@
 ;; oh well
 (defonce devcard-event-chan (chan))
 
-(defn start-devcard-ui! []
+(defn start-devcard-ui!
+  "This function starts the full devcard UI."
+  []
   (defonce devcard-system
     (do
       (render-base-if-necessary!)
@@ -35,8 +37,11 @@
         (register-listeners "#devcards" devcard-event-chan)
         ds))))
 
-(defn start-single-card-ui! []
-  (defonce devcard-system
+(defn start-single-card-ui!
+  "Start a devcard UI that allows you to cherry pick which cards to display. 
+   You will need to call render-single-card to put cards into the dom."
+  []
+  (defonce devcard-single-card-system
     (devcard-system-start devcard-event-chan
                           (throttle-function
                            (fn [{:keys [state event-chan]}]
@@ -48,36 +53,65 @@
   (put! devcard-event-chan [:jsreload]))
 
 (defn start-figwheel-reloader!
+  "Start the figwheel reloader and hook it into devcards so that cards
+   are reloaded on code reloads."
   ([opts]
      (watch-and-reload-with-opts (assoc opts :jsload-callback figwheel-jsload-callback)))
   ([] (start-figwheel-reloader! {})))
 
+;; Register a new card
+;; this is normally called from the defcard macro
+;;
+;; path - a seq of keywords that describe where this card belongs in
+;;        the UI. The first key in the list is typically the namespace.
+;; options - a map of card rendering options
+;;           :heading - (default true) rendering a heading on the card
+;;           :padding - (default true) render padding around the card body
+;;           :unmount-on-reload - (default true) call unmount on the
+;;                                cards functionality on relaod
+;;           :hidden - (default false) Don't render this card
+;; func - is a thunk which contains the functionality of the card.
+;;        The thunk has to be executed to get the functionality of
+;;        the card.
+;;        The functionality can be either a function that takes a map
+;;        {:node HTMLElement :data Atom } or an object that implements
+;;        the IMount protocol, It can also have the IUnMount and
+;;        IConfig protocols.
+
 (defn register-card [path options func]
+  "Register a new card."
   (put! devcard-event-chan
         [:register-card {:path path :options options :func func}]))
 
 (defn render-single-card [card-path node]
+  "Declare that a card with a certain path will be rendered to a
+   certain node. This is helpful for blog post examples."
   (let [id (unique-card-id card-path)]
     (when-not (.getElementById js/document id)
       (.html (js/$ node) (str "<div class='devcard-rendered-card' id='" id "'></div>")))))
 
-;;; cards
+;;; utils
 
 (let [conv-class (.-converter js/Showdown)
       converter (conv-class.)]
-  (defn markdown-to-html [markdown-txt]
+  (defn markdown-to-html
+    "render markdown"
+    [markdown-txt]
     (.makeHtml converter markdown-txt)))
 
 (defn render-to
+  "Render a react component to a node."
   ([react-dom html-node callback]
      (.renderComponent js/React react-dom html-node callback))
   ([react-dom html-node]
      (render-to react-dom html-node identity)))
 
 (defn unmount-react [node]
+  "Unmount a react component from a node."
   (.unmountComponentAtNode js/React node))
 
 (defn react-raw [raw-html-str]
+  "A React component that renders raw html."
   (.div (.-DOM js/React)
         (clj->js { :dangerouslySetInnerHTML 
                    { :__html
@@ -86,11 +120,11 @@
 (defrecord ReactCard [react-component options]
   IMount
   (mount [_ {:keys [node]}]
-    (println "calling mount")
+    #_(println "calling mount")
     (render-to react-component node))
   IUnMount
   (unmount [_ {:keys [node]}]
-    (println "calling UNmount")
+    #_(println "calling UNmount")
     (unmount-react node))
   IConfig
   (-options [_]
@@ -110,10 +144,8 @@
      (react-card (sab/html sab-template) {})))
 
 (defn edn-card [clj-data]
-  "A card that renders end."
-  (sab-card
-   [:div.devcards-pad-card
-    (html-edn clj-data)]))
+  "A card that renders EDN."
+  (react-card (html-edn clj-data)))
 
 (defrecord ReactRunnerCard [react-component-fn options]
   IMount
@@ -283,7 +315,7 @@ rerender."
      (let [res (try (apply f (:args args))
                     (catch :default e (with-meta {} {:heckle-error e})))
            passed (if (heckle-error? res) true
-                      (test-func res))]
+                      (test-func args res))]
        { :args (:args args)
          :class (if (heckle-error? res)
                   "danger "
@@ -312,7 +344,7 @@ rerender."
                            "btn btn-default navbar-btn devcards-margin-left"
                            (if (:only-errors @data) "active" ""))
                           :onClick (fn [] (swap! data update-in [:only-errors] (fn [x] (not x)))) }
-                     "Toggle Errors")
+                     "Filter Errors")
               (dom/span #js {:className  "devcards-pad-left" }
                         (let [error-count (count (filter :error derived-data))]
                           (if (pos? error-count)
@@ -403,22 +435,24 @@ rerender."
 
 ;; om-card
 
-(defrecord OmCard [om-comp initial-state options]
+(defrecord OmRootCard [om-comp initial-state om-options devcard-options]
   IMount
   (mount [_ {:keys [node data]}]
-    (when (or (nil? @data)
-              (= {} @data))
-      (reset! data initial-state))
     (om/root om-comp data {:target node}))
   IUnMount
   (unmount [_ {:keys [node]}]
     (unmount-react node))
   IConfig
   (-options [_]
-    (merge { :unmount-on-reload false } options)))
+    (merge { :unmount-on-reload false
+             :initial-state initial-state } devcard-options)))
 
-(defn om-card
-  ([om-comp initial-state options]
-     (OmCard. om-comp initial-state options))
-  ([om-comp initial-state]
-     (om-card om-comp initial-state {})))
+(defn om-root-card
+  ([om-comp-fn initial-state om-options devcard-options]
+     (OmRootCard. om-comp-fn initial-state om-options devcard-options))
+  ([om-comp-fn initial-state om-options]
+     (om-root-card om-comp-fn initial-state om-options {}))
+  ([om-comp-fn initial-state]
+     (om-root-card om-comp-fn initial-state {} {}))
+  ([om-comp-fn]
+     (om-root-card om-comp-fn {} {} {})))

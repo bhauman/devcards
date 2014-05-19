@@ -89,7 +89,9 @@
                          :func func)
                        (DevCard. path
                                  (merge default-card-options options)
-                                 func position (atom {}))))))))
+                                 func
+                                 position
+                                 (atom (or (:initial-state options) {})))))))))
 
 (defmethod dev-trans :add-to-current-path [[_ {:keys [path]}] state]
   (-> state
