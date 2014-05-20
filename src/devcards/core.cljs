@@ -20,7 +20,8 @@
    [clojure.string :as string]
    [om.core :as om :include-macros true]
    [om.dom :as dom :include-macros true]
-   [figwheel.client :refer [watch-and-reload-with-opts]]
+   [figwheel.client :refer [watch-and-reload-with-opts
+                            default-on-compile-fail]]
    [cljs.core.async :refer [put! chan] :as async]))
 
 ;; oh well
@@ -52,11 +53,18 @@
 (defn figwheel-jsload-callback [x]
   (put! devcard-event-chan [:jsreload]))
 
+(defn figwheel-on-compile-fail [exception-msg]
+  (put! devcard-event-chan [:compile-fail exception-msg])
+  exception-msg)
+
 (defn start-figwheel-reloader!
   "Start the figwheel reloader and hook it into devcards so that cards
    are reloaded on code reloads."
   ([opts]
-     (watch-and-reload-with-opts (assoc opts :jsload-callback figwheel-jsload-callback)))
+     (watch-and-reload-with-opts (assoc opts
+                                   :jsload-callback figwheel-jsload-callback
+                                   :on-compile-fail (comp figwheel-on-compile-fail
+                                                          default-on-compile-fail))))
   ([] (start-figwheel-reloader! {})))
 
 ;; Register a new card

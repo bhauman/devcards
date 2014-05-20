@@ -76,6 +76,17 @@
 
 (defmethod dev-trans :default [msg state] state)
 
+(defmethod dev-trans :jsreload [msg state]
+  (-> state
+   (assoc :code-loaded true)
+   (dissoc :compile-failed)))
+
+(defmethod dev-trans :remove-code-loaded-effect [msg state]
+  (dissoc state :code-loaded true))
+
+(defmethod dev-trans :compile-fail [msg state]
+  (assoc state :compile-failed (last msg)))
+
 (defmethod dev-trans :register-card [[_ {:keys [path options func]}] state]
   (let [position (:position state)]
     (-> state
@@ -257,6 +268,19 @@
     (.addClass (js/$ "body") "white-background")
     (.removeClass (js/$ "body") "white-background")))
 
+(defn compile-failure [state]
+  (if (:compile-failed state)
+    (.addClass (js/$ "#devcards") "devcards-compile-failed")
+    (.removeClass (js/$ "#devcards") "devcards-compile-failed")))
+
+(defn code-loaded [state event-chan]
+  (when (:code-loaded state)
+    (.addClass (js/$ "#devcards") "devcards-load-highlight")
+    (go
+     (<! (timeout 500))
+     (.removeClass (js/$ "#devcards") "devcards-load-highlight")
+     (put! event-chan [:remove-code-loaded-effect]))))
+
 (defn create-needed-card-nodes [data]
   (when (:render-cards data)
     (.html ($ "#devcards-cards") (c/html (cards-templates data)))
@@ -296,6 +320,8 @@
   (.html ($ "#devcards-controls") (c/html (main-template state)))
   (create-needed-card-nodes state)
   (toggle-background-to-white state)
+  (compile-failure state)
+  (code-loaded state event-chan)
   (mount-card-nodes state))
 
 (def devcard-initial-data { :current-path []

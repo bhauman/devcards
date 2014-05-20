@@ -6,6 +6,11 @@ body {
   background-color: #fff;
 }
 
+.devcards-compile-failed {
+  background-color: #a94442;
+  #_background-color: #f2dede;
+}
+
 .devards-main-navbar {
   background-color: rgb(60,90,153);
   border-color: rgb(50,80,153);
@@ -160,3 +165,12 @@ border-color: #e5e6e9 #dfe0e4 #d0d1d5;
 .devcards-pad-card {
   padding: 14px;
 }
+
+.devcards-load-highlight {
+  -webkit-animation: load-highlight 0.15s;
+}
+
+@-webkit-keyframes load-highlight {
+  50%   { background-color: rgba(60,118,61,0.1);}
+}
+
