@@ -167,10 +167,26 @@ border-color: #e5e6e9 #dfe0e4 #d0d1d5;
 }
 
 .devcards-load-highlight {
-  -webkit-animation: load-highlight 0.15s;
+  -webkit-animation: load-highlight-white 1.3s;
 }
 
-@-webkit-keyframes load-highlight {
-  50%   { background-color: rgba(60,118,61,0.1);}
+.devcards-cssload-highlight {
+  -webkit-animation: load-highlight-yellow 1.3s;
 }
 
+.white-background .devcards-load-highlight {
+  -webkit-animation: load-highlight-grey 1.3s;
+}
+
+@-webkit-keyframes load-highlight-white {
+  20%   { background-color: #fff; }
+//  20%   { background-color: rgba(60,118,61,0.1);}
+}
+
+@-webkit-keyframes load-highlight-grey {
+  20%   { background-color: rgb(233,234,237); }
+}
+
+@-webkit-keyframes load-highlight-yellow {
+  20%   { background-color: #fcf8e3;}
+}

@@ -78,11 +78,14 @@
 
 (defmethod dev-trans :jsreload [msg state]
   (-> state
-   (assoc :code-loaded true)
+   (assoc :code-loaded :js)
    (dissoc :compile-failed)))
 
+(defmethod dev-trans :cssload [msg state]
+   (assoc state :code-loaded :css))
+
 (defmethod dev-trans :remove-code-loaded-effect [msg state]
-  (dissoc state :code-loaded true))
+  (dissoc state :code-loaded))
 
 (defmethod dev-trans :compile-fail [msg state]
   (assoc state :compile-failed (last msg)))
@@ -273,12 +276,15 @@
     (.addClass (js/$ "#devcards") "devcards-compile-failed")
     (.removeClass (js/$ "#devcards") "devcards-compile-failed")))
 
+(def code-loaded-class {:js "devcards-load-highlight"
+                        :css "devcards-cssload-highlight"})
+
 (defn code-loaded [state event-chan]
-  (when (:code-loaded state)
-    (.addClass (js/$ "#devcards") "devcards-load-highlight")
+  (when-let [class (code-loaded-class (:code-loaded state))]
+    (.addClass (js/$ "#devcards") class)
     (go
-     (<! (timeout 500))
-     (.removeClass (js/$ "#devcards") "devcards-load-highlight")
+     (<! (timeout 1400))
+     (.removeClass (js/$ "#devcards") class)
      (put! event-chan [:remove-code-loaded-effect]))))
 
 (defn create-needed-card-nodes [data]

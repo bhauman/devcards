@@ -21,7 +21,8 @@
    [om.core :as om :include-macros true]
    [om.dom :as dom :include-macros true]
    [figwheel.client :refer [watch-and-reload-with-opts
-                            default-on-compile-fail]]
+                            default-on-compile-fail
+                            default-on-cssload]]
    [cljs.core.async :refer [put! chan] :as async]))
 
 ;; oh well
@@ -50,10 +51,11 @@
                             (mount-card-nodes state))
                            50))))
 
-(defn figwheel-jsload-callback [x]
-  (put! devcard-event-chan [:jsreload]))
+(defn devcard-on-jsload [x] (put! devcard-event-chan [:jsreload]) x)
 
-(defn figwheel-on-compile-fail [exception-msg]
+(defn devcard-on-cssload [x] (put! devcard-event-chan [:cssload]) x)
+
+(defn devcard-on-compile-fail [exception-msg]
   (put! devcard-event-chan [:compile-fail exception-msg])
   exception-msg)
 
@@ -62,9 +64,11 @@
    are reloaded on code reloads."
   ([opts]
      (watch-and-reload-with-opts (assoc opts
-                                   :jsload-callback figwheel-jsload-callback
-                                   :on-compile-fail (comp figwheel-on-compile-fail
-                                                          default-on-compile-fail))))
+                                   :on-jsload       devcard-on-jsload
+                                   :on-compile-fail (comp devcard-on-compile-fail
+                                                          default-on-compile-fail)
+                                   :on-cssload (comp devcard-on-cssload
+                                                     default-on-cssload))))
   ([] (start-figwheel-reloader! {})))
 
 ;; Register a new card
