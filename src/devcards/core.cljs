@@ -22,7 +22,8 @@
    [om.dom :as dom :include-macros true]
    [figwheel.client :refer [watch-and-reload-with-opts
                             default-on-compile-fail
-                            default-on-cssload]]
+                            default-on-cssload
+                            default-before-load]]
    [cljs.core.async :refer [put! chan] :as async]))
 
 ;; oh well
@@ -51,7 +52,9 @@
                             (mount-card-nodes state))
                            50))))
 
-(defn devcard-on-jsload [x] (put! devcard-event-chan [:jsreload]) x)
+(defn devcard-before-jsload [x] (put! devcard-event-chan [:before-jsload x]) x)
+
+(defn devcard-on-jsload [x] (put! devcard-event-chan [:jsreload x]) x)
 
 (defn devcard-on-cssload [x] (put! devcard-event-chan [:cssload]) x)
 
@@ -64,6 +67,8 @@
    are reloaded on code reloads."
   ([opts]
      (watch-and-reload-with-opts (assoc opts
+                                   :before-jsload   (comp devcard-before-jsload
+                                                          default-before-load)
                                    :on-jsload       devcard-on-jsload
                                    :on-compile-fail (comp devcard-on-compile-fail
                                                           default-on-compile-fail)

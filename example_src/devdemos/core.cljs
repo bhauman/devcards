@@ -39,7 +39,7 @@
    "Please follow along in this file to see how these examples are created."
    "\n"
    "If you ran `lein figwheel` to get this demo started, if you edit "
-   "and save the file that this code is in you will see the changes "
+   "and save the file that this code is in, you will see the changes "
    "show up on this page as you save your file. \n"
    "Go ahead and change this text to see the changes reflected here."))
 

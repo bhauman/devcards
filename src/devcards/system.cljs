@@ -11,6 +11,7 @@
    [jayq.core :refer [$]]
    [crate.core :as c]
    [clojure.string :as string]
+   [clojure.set :refer [intersection difference]]
    [cljs.core.async :refer [put! chan sliding-buffer timeout]]
    [cljs.reader :refer [read-string]])
   (:require-macros
@@ -61,7 +62,8 @@
        (:data-atom d)
        (:func d)
        (:path d)
-       (:position d)))
+       (:position d)
+       d))
 
 ;; input filters
 (defmulti ifilter first)
@@ -76,10 +78,65 @@
 
 (defmethod dev-trans :default [msg state] state)
 
-(defmethod dev-trans :jsreload [msg state]
+;; mark and sweep to support card removal
+;; this was much more complex than I expected
+;; it would be sooo much easier if I could write the
+;; whole thing in React, but alas I want to host anything
+
+(defn map-vals [f h-map]
+  (into {} (map (fn [[k v]] [k (f v)]) h-map)))
+
+(defn map-all-cards-in-ns [f state ns]
+  (update-in state [:cards ns] #(map-vals f %)))
+
+(defn mark-card [card]
+  (assoc card :sweep-marker true))
+
+(defn remove-mark-from-card [card]
+  (dissoc card :sweep-marker))
+
+(defn set-card-to-be-deleted [card]
+  (if (:sweep-marker card)
+    (assoc card :delete-card true)
+    card))
+
+(defn set-deleted-and-remove-marks-in-ns [state ns]
+  (map-all-cards-in-ns (comp
+                        remove-mark-from-card
+                        set-card-to-be-deleted)
+                       state ns))
+
+(defn card-namespaces-being-reloaded [state files]
+  (intersection (set (map (comp keyword :namespace) files))
+                (set (keys (:cards state)))))
+
+(defn mark-all-cards [state files]
+  (reduce (partial map-all-cards-in-ns mark-card)
+          state
+          (card-namespaces-being-reloaded state files)))
+
+(defn remove-deleted-cards [card-map]
+  (into {} (filter (fn [[k v]] (not (:delete-card v))) card-map)))
+
+(defn remove-deleted-cards-in-ns [state ns]
+  (update-in state [:cards ns] remove-deleted-cards))
+
+(defn sweep-ns [state ns]
   (-> state
-   (assoc :code-loaded :js)
-   (dissoc :compile-failed)))
+      (remove-deleted-cards-in-ns ns)
+      (set-deleted-and-remove-marks-in-ns ns)))
+
+(defn sweep [state files]
+  (reduce sweep-ns state (set (keys (:cards state)))))
+
+(defmethod dev-trans :before-jsload [[_ files] state]
+  (mark-all-cards state files))
+
+(defmethod dev-trans :jsreload [[_ files] state]
+  (-> state
+      (sweep files)
+      (assoc :code-loaded :js)
+      (dissoc :compile-failed)))
 
 (defmethod dev-trans :cssload [msg state]
    (assoc state :code-loaded :css))
@@ -97,10 +154,13 @@
         (update-in (cons :cards path)
                    (fn [dc]
                      (if dc
-                       (assoc dc
-                         :options  (merge default-card-options options)
-                         :position position
-                         :func func)
+                       (-> dc
+                           (assoc
+                               :options  (merge default-card-options options)
+                               :position position
+                               :func func)
+                           (dissoc :sweep-marker)
+                           (dissoc :delete-card))
                        (DevCard. path
                                  (merge default-card-options options)
                                  func
@@ -118,6 +178,7 @@
 ;; derivatives
 
 (declare visible-card-nodes)
+(declare visible-card-paths)
 
 (defn visible-cards [state]
   (assoc state
@@ -131,19 +192,20 @@
           (assoc :display-dir-paths
             (filter (complement (comp devcard? second)) cur))
           (assoc :display-cards
-            (filter (comp devcard? second) cur))))))
+            (filter (comp #(and (not (:delete-card %))
+                                (devcard? %)) second) cur))))))
 
 (defn render-cards? [state]
   ;; impure as we are relying on the dom state to calculate this but since
   ;; we aren't using react this is a good way to diff the nodes on
   ;; on the page
-  (let [visible-cards  (map (comp :path first) (:visible-card-nodes state))
-        intended-cards (keep :path
-                             (concat [(:display-single-card state)]
-                                     (vals (:display-cards state))))]
+  (let [visible-cards  (set (map (comp :path first) (:visible-card-nodes state)))
+        intended-cards (set (keep :path
+                                  (concat [(:display-single-card state)]
+                                          (vals (:display-cards state)))))]
     (assoc state
-      :render-cards (not= (set visible-cards)
-                          (set intended-cards)))))
+      :render-cards (not= visible-cards
+                          intended-cards))))
 
 (defn breadcrumbs [{:keys [current-path] :as state}]
   (let [cpath (map name (cons :home current-path))
@@ -257,6 +319,13 @@
 (defn sel-nodes [sel]
   (mapv to-node ($ sel)))
 
+(defn visible-card-paths []
+  (let [card-nodes (sel-nodes ".devcard-rendered-card")]
+    (filter first
+            (map
+             #(unique-card-id->path (.-id %))
+             card-nodes))))
+
 (defn visible-card-nodes [data]
   (let [card-nodes (sel-nodes ".devcard-rendered-card")]
     (filter first
@@ -299,7 +368,8 @@
       (let [functionality ((:func card))]
         (when (and (satisfies? IUnMount functionality)
                    (or (:render-cards data)
-                       (:unmount-on-reload (:options card)))) 
+                       (:unmount-on-reload (:options card))
+                       (:delete-card card))) 
             (unmount functionality { :node node
                                     :data (:data-atom card)}))))))
 
@@ -307,10 +377,24 @@
   (doseq [[card node] (visible-card-nodes data)]
     (let [functionality ((:func card))
           arg { :node node
-               :data (:data-atom card)}]
-      (if (satisfies? IMount functionality)
-        (mount functionality arg)
-        (apply functionality [arg])))))
+                :data (:data-atom card)}]
+      (when-not (:delete-card card)
+        (if (satisfies? IMount functionality)
+          (mount functionality arg)
+          (apply functionality [arg]))))))
+
+(defn remove-node [node]
+  (when node (.removeChild (.-parentNode node) node)))
+
+(defn remove-card [card]
+  (when-let [node (.getElementById
+                   js/document
+                   (unique-card-id (:path card)))]
+    (remove-node (.-parentNode node))))
+
+(defn delete-deleted-card-nodes [data]
+  (doseq [[card node] (:visible-card-nodes data)]
+    (when (:delete-card card) (remove-card card))))
 
 (defn render-base-if-necessary! []
   (if-let [devcards-node (.getElementById js/document "devcards")]
@@ -323,6 +407,7 @@
 
 (defn devcard-renderer [{:keys [state event-chan]}]
   (unmount-card-nodes state)
+  (delete-deleted-card-nodes state)
   (.html ($ "#devcards-controls") (c/html (main-template state)))
   (create-needed-card-nodes state)
   (toggle-background-to-white state)
@@ -331,8 +416,8 @@
   (mount-card-nodes state))
 
 (def devcard-initial-data { :current-path []
-                            :position 0
-                            :cards {} })
+                           :position 0
+                           :cards {} })
 
 (def devcard-comp (compose
                    (DevCards.)
@@ -348,9 +433,9 @@
                         :keywordize-keys true)])))))
 
 (defn register-listeners [sel event-chan]
-    (.on ($ sel) "click" "a.devcards-add-to-current-path"
-         (data-to-message :add-to-current-path event-chan))
-    (.on ($ sel) "click" ".devcards-set-current-path"
+  (.on ($ sel) "click" "a.devcards-add-to-current-path"
+       (data-to-message :add-to-current-path event-chan))
+  (.on ($ sel) "click" ".devcards-set-current-path"
          (data-to-message :set-current-path event-chan)))
 
 (defn devcard-system-start [event-chan render-callback]

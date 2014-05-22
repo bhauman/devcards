@@ -15,7 +15,7 @@
    [cljs.core.async.macros :refer [go]]
    [devcards.core :refer [defcard is are= are-not= format-code format-data]]))
 
-(defn lh [x] (print (prn-str x)) x)
+(defn lh [x] (prn-str x) x)
 
 (defn lc [x] (.log js/console x) x)
 
@@ -133,23 +133,25 @@
      :t3 { :top 2 :left 0 :v 8 :id :t3}
      :t4 { :top 3 :left 0 :v 4 :id :t4}})
    "```"
-   "Each tile will have an `:id`, a value `:v` and a position on the board."
-   "\n"
-   "Data handling is complicated because we will have to manage the
+   "Each tile will have an `:id`, a value `:v` and a position on the board.
+
+   Data handling is complicated because we will have to manage the
    state in phases to support animation. Tiles will be marked with the
-   following flags:"
-   
-   "* `:double` - this flag marks the tiles value to be doubled"
-   "* `:remove` - this flag marks the tile to be removed"
-   "* `:reveal` - this flag marks the tile to be rendered with the **reveal** class"
-   "* `:highlight` - this flag marks the tile to be rendered with the **highlight** class\n"
-   
+   following flags:
+
+   * `:double` - this flag marks the tiles value to be doubled
+   * `:remove` - this flag marks the tile to be removed
+   * `:reveal` - this flag marks the tile to be rendered with the **reveal** class
+   * `:highlight` - this flag marks the tile to be rendered with the **highlight** class
+   "
+
    "All of these flags are temporary markings that will be removed in
    a couple of phases of animation right after a move is made."
+   
+   "#### Board view
 
-   "#### Board view"
+   The tile map will be converted to a board view that will look like this:"
 
-   "The tile map will be converted to a board view that will look like this:"
    "```"
    (format-data [[{:v 2, :id :t1} :_ :_ :_]
                  [{:v 8, :id :t2} :_ :_ :_]
@@ -226,8 +228,10 @@
 
 (defcard transform-row-tests
   (dc/test-card
+   
    "In a move `:left` all the blanks will end up on the right.
    So let's `remove-blanks` first"
+   
    (are= (remove-blanks [:_ :_ :_ :_]) [])
    (are= (remove-blanks [:_ :_ :_ {:v 8}]) [{:v 8}])
    "We should also be able to `pad-blanks` back to finish the move."
@@ -235,6 +239,7 @@
    "Next we are going to create a function to reduce the row. And to
    help us we are going to create a predicate `combine?` to tell us if we
    can combine two tiles."
+   
    (is (combine? {:v 2} {:v 2}))
    (is (not (combine? {:v 2 :double true} {:v 2})))
    (is (not (combine? {:v 2} {:v 2 :double true})))      
@@ -450,5 +455,3 @@
        [:div
         [:a {:onClick (fn [] (reset! data start-data))} "reset"]]
        (html-edn @data)]))))
-
-
