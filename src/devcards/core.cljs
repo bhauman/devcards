@@ -37,7 +37,7 @@
       (render-base-if-necessary!)
       (let [ds (devcard-system-start devcard-event-chan
                                      (throttle-function devcard-renderer 50))]
-        (register-listeners "#devcards" devcard-event-chan)
+        (register-listeners devcard-event-chan)
         ds))))
 
 (defn start-single-card-ui!
@@ -197,7 +197,7 @@ rerender."
 (defn test-wrapper [test body]
   (dom/li #js { :className (str "list-group-item list-group-item-"
                                 (if (:passed test) "success" "danger")) }
-          (dom/span #js { :className (str "test-icon glyphicon glyphicon-"
+          (dom/span #js { :className (str "devcards-test-icon glyphicon glyphicon-"
                                           (if (:passed test) "ok" "remove")) })
           body))
 
@@ -216,7 +216,7 @@ rerender."
 
 (defmethod render-test :is [test]
   (test-wrapper test
-                (dom/span #js {:className "test-body"}
+                (dom/span #js {:className "devcards-test-body"}
                           (dom/span #js {:className "operator"} "is")
                           (dom/span #js {:className "result-area"}
                                     (dom/span #js {:className "exp"}
@@ -228,7 +228,7 @@ rerender."
 
 (defn operator-relation-test [test op relation-phrase]
   (test-wrapper test
-                (dom/span #js {:className "test-body"}
+                (dom/span #js {:className "devcards-test-body"}
                           (dom/span #js {:className "operator"} op)
                           (dom/span #js {:className "result-area"}
                                     (dom/span #js {:className "exp"} (prn-str (:exp1 test)))
@@ -246,7 +246,7 @@ rerender."
 
 (defn test-card [& assertions]
   (react-card
-   (dom/ul #js {:className "list-group test-group"}
+   (dom/ul #js {:className "list-group devcards-test-group"}
            (to-array (mapv (fn [t] (render-test t))  
                            assertions)))
    {:padding false}))
@@ -349,7 +349,7 @@ rerender."
 (defn heckle-renderer [f data generator value-render-func test-func]
   (let [derived-data (heckle-derive @data f test-func)]
     (dom/div
-     #js {:className "heckler-card"}
+     #js {:className "devcards-heckler-card"}
      (dom/div #js {:className "devcards-pad-left"}
               (dom/a #js {:type "button"
                           :className "btn btn-danger navbar-btn"
@@ -359,7 +359,7 @@ rerender."
               (dom/a #js { :className 
                           (str
                            "btn btn-default navbar-btn devcards-margin-left"
-                           (if (:only-errors @data) "active" ""))
+                           (if (:only-errors @data) " active" ""))
                           :onClick (fn [] (swap! data update-in [:only-errors] (fn [x] (not x)))) }
                      "Filter Errors")
               (dom/span #js {:className  "devcards-pad-left" }

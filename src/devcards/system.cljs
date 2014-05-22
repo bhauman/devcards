@@ -17,6 +17,16 @@
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
+(def devcards-app-element-id "devcards-main")
+(def devcards-controls-element-id "devcards-controls")
+(def devcards-cards-element-id "devcards-cards")
+
+(defn get-element-by-id [id] (.getElementById js/document id))
+
+(defn devcards-app-node [] (get-element-by-id devcards-app-element-id))
+(defn devcards-controls-node [] (get-element-by-id devcards-controls-element-id))
+(defn devcards-cards-node [] (get-element-by-id devcards-cards-element-id))
+
 (defn unique-card-id [path]
   (string/join "." (map (fn [x] (str "[" x "]"))
                         (map name (cons :cardpath path)))))
@@ -277,7 +287,7 @@
         (reverse dirs))])
 
 (defn breadcrumbs-templ [crumbs]
-  [:ol.breadcrumb
+  [:ol.breadcrumb.devcards-breadcrumb
    (map (fn [[n path]]
           [:li
            [:a.devcards-set-current-path {:href "#"
@@ -337,29 +347,29 @@
 
 (defn toggle-background-to-white [data]
   (if (:display-single-card data)
-    (.addClass (js/$ "body") "white-background")
-    (.removeClass (js/$ "body") "white-background")))
+    (.addClass (js/$ "body") "devcards-white-background")
+    (.removeClass (js/$ "body") "devcards-white-background")))
 
 (defn compile-failure [state]
   (if (:compile-failed state)
-    (.addClass (js/$ "#devcards") "devcards-compile-failed")
-    (.removeClass (js/$ "#devcards") "devcards-compile-failed")))
+    (.addClass (js/$ (devcards-app-node)) "devcards-compile-failed")
+    (.removeClass (js/$ (devcards-app-node)) "devcards-compile-failed")))
 
 (def code-loaded-class {:js "devcards-load-highlight"
                         :css "devcards-cssload-highlight"})
 
 (defn code-loaded [state event-chan]
   (when-let [class (code-loaded-class (:code-loaded state))]
-    (.addClass (js/$ "#devcards") class)
+    (.addClass (js/$ (devcards-app-node)) class)
     (go
      (<! (timeout 1400))
-     (.removeClass (js/$ "#devcards") class)
+     (.removeClass (js/$ (devcards-app-node)) class)
      (put! event-chan [:remove-code-loaded-effect]))))
 
 (defn create-needed-card-nodes [data]
   (when (:render-cards data)
-    (.html ($ "#devcards-cards") (c/html (cards-templates data)))
-    ;; otherwise leave the nodes as they are
+    (.html ($ (devcards-cards-node)) 
+           (c/html (cards-templates data)))
     ))
 
 (defn unmount-card-nodes [data]
@@ -371,7 +381,7 @@
                        (:unmount-on-reload (:options card))
                        (:delete-card card))) 
             (unmount functionality { :node node
-                                    :data (:data-atom card)}))))))
+                                     :data (:data-atom card)}))))))
 
 (defn mount-card-nodes [data]
   (doseq [[card node] (visible-card-nodes data)]
@@ -397,18 +407,18 @@
     (when (:delete-card card) (remove-card card))))
 
 (defn render-base-if-necessary! []
-  (if-let [devcards-node (.getElementById js/document "devcards")]
+  (if-let [devcards-node (devcards-app-node)]
     (do
-      (when-not (.getElementById js/document "devcards-controls")
-        (.appendChild devcards-node (c/html [:div#devcards-controls])))
-      (when-not (.getElementById js/document "devcards-cards")
-        (.appendChild devcards-node (c/html [:div#devcards-cards]))))
-    (throw (js/Error. "The devcards interface needs an element with an id of \"devcards\" to be on the page."))))
+      (when-not (devcards-controls-node)
+        (.appendChild devcards-node (c/html [:div {:id devcards-controls-element-id}])))
+      (when-not (devcards-cards-node)
+        (.appendChild devcards-node (c/html [:div {:id devcards-cards-element-id}]))))
+    (throw (js/Error. "The devcards interface needs an element with an id of \"devcards\""))))
 
 (defn devcard-renderer [{:keys [state event-chan]}]
   (unmount-card-nodes state)
   (delete-deleted-card-nodes state)
-  (.html ($ "#devcards-controls") (c/html (main-template state)))
+  (.html ($ (devcards-controls-node)) (c/html (main-template state)))
   (create-needed-card-nodes state)
   (toggle-background-to-white state)
   (compile-failure state)
@@ -432,11 +442,11 @@
                (js->clj data
                         :keywordize-keys true)])))))
 
-(defn register-listeners [sel event-chan]
-  (.on ($ sel) "click" "a.devcards-add-to-current-path"
+(defn register-listeners [event-chan]
+  (.on ($ (devcards-app-node)) "click" "a.devcards-add-to-current-path"
        (data-to-message :add-to-current-path event-chan))
-  (.on ($ sel) "click" ".devcards-set-current-path"
-         (data-to-message :set-current-path event-chan)))
+  (.on ($ (devcards-app-node)) "click" ".devcards-set-current-path"
+       (data-to-message :set-current-path event-chan)))
 
 (defn devcard-system-start [event-chan render-callback]
   (-> (make-runnable devcard-comp devcard-initial-data)
