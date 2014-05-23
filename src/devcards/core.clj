@@ -23,7 +23,12 @@
   `{ :type :are-not=  :exp1 (quote ~exp1) :exp2 (quote ~exp2) :passed (not= ~exp1 ~exp2)
     :val1 ~exp1 :val2 ~exp2 })
 
+
 ;; formatting macros
+
+(defn wrap-markdown-code [x]
+  (str "```\n" x "```\n"))
+
 (defn format-code* [code]
   (.toString (let [out (java.io.ByteArrayOutputStream.)]
                (with-pprint-dispatch code-dispatch
@@ -36,10 +41,16 @@
                out)))
 
 (defmacro format-code [body]
-  `(str ~(apply str (butlast (format-code* body)))))
+  (apply str (butlast (format-code* body))))
 
 (defmacro format-data [body]
-  `(str ~(apply str (butlast (format-data* body)))))
+  (apply str (butlast (format-data* body))))
+
+(defmacro mkdn-code [body]
+  (wrap-markdown-code (format-code* body)))
+
+(defmacro mkdn-data [body]
+  (wrap-markdown-code (format-data* body)))
 
 (defmacro markdown [name & body]
   `(devcards.core/defcard ~name

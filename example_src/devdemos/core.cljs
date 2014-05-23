@@ -8,7 +8,7 @@
    [sablono.core :as sab :include-macros true]
    [devdemos.two-zero])
   (:require-macros
-   [devcards.core :refer [defcard is are= are-not= format-code format-data]]))
+   [devcards.core :refer [defcard is are= are-not= format-code format-data mkdn-code mkdn-data]]))
 
 (enable-console-print!)
 (devcards.core/start-devcard-ui!)
@@ -17,31 +17,38 @@
 
 (defcard intro
   (dc/markdown-card
-   "## Devcards"
-   "ClojureScript Devcards are a tool to help you **quickly** surface what you are working on."
-   "This page holds an quick introduction to devcards."
-   "#### This is a devcard"
-   "This is a **markdown-card**."
-   "You can create a markdown-card like this like so:"
-   "```"
-   (format-code
+   "## Devcards
+
+    ClojureScript Devcards are a tool to help you **quickly** surface what
+    you are working on. This page holds an quick introduction to
+    devcards.
+
+    #### This is a devcard
+
+    This is a **markdown-card**. You can create a markdown-card like
+    this like so:"
+
+   (mkdn-code
     (defcard first-markdown-card
       (markdown-card "# This is a heading")))
-   "```"
+   
    "Devards are designed to be written inline with your code during
-   development. They are like fancy `println`s that can hold any
-   arbitrary functionality that you want." ))
+    development. They are like fancy `println`s that can hold any
+    arbitrary functionality that you want." ))
 
 (defcard intro-2
   (dc/markdown-card
-   "## Devcards are intended to be interactive"
-   "The cars on this page can be found in the file `example_src/devdemos/core.cljs`. "
-   "Please follow along in this file to see how these examples are created."
-   "\n"
-   "If you ran `lein figwheel` to get this demo started, if you edit "
-   "and save the file that this code is in, you will see the changes "
-   "show up on this page as you save your file. \n"
-   "Go ahead and change this text to see the changes reflected here."))
+   "## Devcards are intended to be interactive
+
+   The cars on this page can be found in the file
+   `example_src/devdemos/core.cljs`.Please follow along in this file
+   to see how these examples are created.
+
+   If you ran `lein figwheel` to get this demo started, if you edit
+   and save the file that this code is in, you will see the changes
+   show up on this page as you save your file.
+
+   Go ahead and change this text to see the changes reflected here."))
 
 (defcard examples-intro
   (dc/markdown-card
@@ -84,33 +91,31 @@
 
 (defcard react-runner-card-example
   (dc/react-runner-card
-   (fn [data]
+   (fn [data-atom]
      (sab/html [:div
                 [:h3 "This is a " "react-runner-card"]
                 [:p "This card triggers a re-render when it the atom is modified"]
-                [:div "Count: " (:count @data)]
+                [:div "Count: " (:count @data-atom)]
                 [:ul
-                 [:li [:a {:onClick (fn [] (swap! data update-in [:count] inc))} "inc"]]
-                 [:li [:a {:onClick (fn [] (swap! data update-in [:count] dec))} "dec"]]]]))
+                 [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]]
+                 [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] dec))} "dec"]]]]))
    { :initial-state {:count 30 } }))
 
 (defn widget [data owner]
   (reify
     om/IRender
     (render [this]
-      (sab/html [:h2 "This is an om card, yozers" (:text data)]))))
-
-(dc/om-root myshort-er-test widget)
+      (sab/html [:h2 "This is an om card, " (:text data)]))))
 
 (defcard omcard-ex
-    (dc/om-root-card widget {}))
+    (dc/om-root-card widget {:text "yozers"}))
 
 (defcard test-card-ex
   (dc/test-card
    "## Test card
-   Test cards provide interactive testing inline with your code.
-   Test cards allow arbitrary markdown in them, this can allow for a
-   literate coding style"
+    Test cards provide interactive testing inline with your code.
+    Test cards allow arbitrary markdown in them, this can allow for a
+    literate coding style"
    (is (= 23 (+ 21 2)))
    (are= (+ 3 4 5) 12)
    "`(+ 3 4 5)` is definitely equal to `12`"
@@ -250,34 +255,34 @@
 
 (defcard base-api
   (dc/markdown-card
-   "## Function API"
-   "Devcard functions are basically functions that take a DOM node and a data atom."
-   "\n"
-   "For example this is a devcard."
-   "```"
-   (format-code (fn [{:keys [node data]}] (.innerHTML node "<h2>Awesome?</h2>")))
-   "```"
+   "## Function API
+   Devcard functions are basically functions that take a DOM node and a data atom.
+
+   For example this is a devcard."
+
+   (mkdn-code (fn [{:keys [node data-atom]}] (.innerHTML node "<h2>Awesome?</h2>")))
+
    "and you can use it like so:"
-   "```"
-   (format-code (defcard my-first-card (fn [{:keys [node data]}]
-                                         (set! (.-innerHTML node) "<h2>Awesome?</h2>"))))
-   "```"
+
+   (mkdn-code (defcard my-first-card
+                (fn [{:keys [node data-atom]}]
+                  (set! (.-innerHTML node) "<h2>Awesome?</h2>"))))
+
    "You can see it rendered below."))
 
 (defcard my-first-card
-  (fn [{:keys [node data]}]
+  (fn [{:keys [node data-atom]}]
     (set! (.-innerHTML node) "<h2>Awesome?</h2>")))
 
 (defcard advanced-api
   (dc/markdown-card
    "## The Devcard Protocols API"
    "Creating a devcard with the protocols API looks like this"
-   "```"
-   (format-code
+   (mkdn-code
     (defn super-card [initial-state]
       (reify
         IMount
-        (mount [_ {:keys [node data]}]
+        (mount [_ {:keys [node data-atom]}]
           (render-to (sab/html [:h1 "Super!"]) node))
         IUnMount
         (unmount [_ {:keys [node]}]
@@ -286,11 +291,7 @@
         (-options [_]
           { :unmount-on-reload false
             :initial-state initial-state }))))
-   "```"
    "You can then use the card like so:"
-   "```"
-   (format-code
-    (defcard my-card-ex (super-card {})))
-   "```"
-   )
-  )
+   (mkdn-code
+    (defcard my-card-ex (super-card {})))))
+

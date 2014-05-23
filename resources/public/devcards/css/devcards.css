@@ -63,6 +63,10 @@ body {
     display: inline-block;
 }
 
+.devcards-test-group .list-group-item > div > p:last-child {
+    margin-bottom: 0px;
+}
+
 .devcard-panel {
   background: #fff;
   border: 1px solid;
@@ -84,12 +88,17 @@ body {
   border-bottom: none;
 }  
 
-.devcard-panel > .panel-heading .devcard-rendered-card h1:first-child,
-.devcard-panel > .panel-heading .devcard-rendered-card h2:first-child,
-.devcard-panel > .panel-heading .devcard-rendered-card h3:first-child,
-.devcard-panel > .panel-heading .devcard-rendered-card h4:first-child,
-.devcard-panel > .panel-heading .devcard-rendered-card h5:first-child {
-    margin-top: 5px;
+.devcards-test-group .list-group-item > div > h1:first-child,
+.devcards-test-group .list-group-item > div > h2:first-child,
+.devcards-test-group .list-group-item > div > h3:first-child,
+.devcards-test-group .list-group-item > div > h4:first-child,
+.devcards-test-group .list-group-item > div > h5:first-child,
+.devcard-panel > .devcard-rendered-card h1:first-child,
+.devcard-panel > .devcard-rendered-card h2:first-child,
+.devcard-panel > .devcard-rendered-card h3:first-child,
+.devcard-panel > .devcard-rendered-card h4:first-child,
+.devcard-panel > .devcard-rendered-card h5:first-child {
+    margin-top: 14px;
 }
 
 .devcards-test-group > .list-group-item {
@@ -113,15 +122,12 @@ body {
   padding-bottom: 14px;
 }
 
-#devcards {
+#devcards-main {
     padding-bottom: 250px;
 }
 
-.devcard-rendered-card ul.test-group {
-  margin-bottom: 0px;
-}
-
-.devcard-rendered-card .heckler-card .table {
+.devcard-rendered-card ul.devcards-test-group,
+.devcard-rendered-card .devcards-heckler-card .table {
   margin-bottom: 0px;
 }
 

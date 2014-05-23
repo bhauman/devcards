@@ -381,13 +381,13 @@
                        (:unmount-on-reload (:options card))
                        (:delete-card card))) 
             (unmount functionality { :node node
-                                     :data (:data-atom card)}))))))
+                                     :data-atom (:data-atom card)}))))))
 
 (defn mount-card-nodes [data]
   (doseq [[card node] (visible-card-nodes data)]
     (let [functionality ((:func card))
           arg { :node node
-                :data (:data-atom card)}]
+                :data-atom (:data-atom card)}]
       (when-not (:delete-card card)
         (if (satisfies? IMount functionality)
           (mount functionality arg)

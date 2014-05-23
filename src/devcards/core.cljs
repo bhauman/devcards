@@ -91,7 +91,7 @@
 ;;        The thunk has to be executed to get the functionality of
 ;;        the card.
 ;;        The functionality can be either a function that takes a map
-;;        {:node HTMLElement :data Atom } or an object that implements
+;;        {:node HTMLElement :data-atom Atom } or an object that implements
 ;;        the IMount protocol, It can also have the IUnMount and
 ;;        IConfig protocols.
 
@@ -109,12 +109,58 @@
 
 ;;; utils
 
+;; I am abridging regular markdown here so that we can
+;; handle big long indented strings.
+
+(defn leading-space-count [s]
+  (when-let [ws (second (re-matches #"^([\s]*).*"  s))]
+    (.-length ws)))
+
+(defn code-delim? [s]
+  (and (not (nil? s))
+       (re-matches #"^\s.*```.*" s)))
+
+(defn group-and-trim-code-block [xs]
+  (let [opener (first xs)
+        leading-spaces (leading-space-count opener)
+        code-block (take-while (complement code-delim?) (rest xs))
+        after-code-block (rest (drop-while (complement code-delim?) (rest xs)))]
+    (cons (string/join "\n"
+                 (concat [(string/trim opener)]
+                         (map #(subs % leading-spaces) code-block)
+                         ["```"]))
+          after-code-block)))
+
+(defn group-and-trim-code-blocks [xs]
+  (cond
+   (nil? xs) []
+   (empty? xs) []   
+   (code-delim? (first xs))
+   (-> (group-and-trim-code-block xs)
+       group-and-trim-code-blocks)
+   :else (cons (first xs) (group-and-trim-code-blocks (rest xs)))))
+
+(defn trim-markdown-string [s]
+  (if (not-empty (re-matches #"^```[\s\S]*" s))
+    s
+    (->> (string/split s "\n")
+         group-and-trim-code-blocks
+         (map string/trim)
+         (string/join "\n"))))
+
+(defn preformat-markdown [mkdn-strs]
+  (string/join "\n" (map trim-markdown-string mkdn-strs)))
+
 (let [conv-class (.-converter js/Showdown)
       converter (conv-class.)]
   (defn markdown-to-html
     "render markdown"
     [markdown-txt]
     (.makeHtml converter markdown-txt)))
+
+(def less-sensitive-markdown (comp markdown-to-html preformat-markdown))
+
+
 
 (defn render-to
   "Render a react component to a node."
@@ -166,14 +212,13 @@
 
 (defrecord ReactRunnerCard [react-component-fn options]
   IMount
-  (mount [_ {:keys [node data]}]
-    (add-watch data :react-runner
-               (fn [_ _ _ _] (render-to (react-component-fn data)
-                                       node)))
-    (reset! data @data))
+  (mount [_ {:keys [node data-atom]}]
+    (add-watch data-atom :react-runner
+               (fn [_ _ _ _] (render-to (react-component-fn data-atom) node)))
+    (reset! data-atom @data-atom))
   IUnMount
-  (unmount [_ {:keys [node data]}]
-    (remove-watch data :react-runner)
+  (unmount [_ {:keys [node data-atom]}]
+    (remove-watch data-atom :react-runner)
     (unmount-react node))
   IConfig
   (-options [_]
@@ -203,7 +248,7 @@ rerender."
 
 (defmethod render-test :string [s]
   (dom/li #js {:className "list-group-item"}
-          (react-raw (markdown-to-html s))))
+          (react-raw (less-sensitive-markdown [s]))))
 
 (defn error-message [test val1 val-join-msg val2]
   (if-not (:passed test)
@@ -444,9 +489,9 @@ rerender."
   (fn [& mkdn-strs]
     (reify
       IMount
-      (mount [_ {:keys [node data]}]
-        (set! (.-innerHTML node) (markdown-to-html
-                                  (string/join "\n" mkdn-strs))))
+      (mount [_ {:keys [node]}]
+        (set! (.-innerHTML node)
+              (less-sensitive-markdown mkdn-strs)))
       IConfig
       (-options [_] {:heading false}))))
 
@@ -454,8 +499,8 @@ rerender."
 
 (defrecord OmRootCard [om-comp initial-state om-options devcard-options]
   IMount
-  (mount [_ {:keys [node data]}]
-    (om/root om-comp data {:target node}))
+  (mount [_ {:keys [node data-atom]}]
+    (om/root om-comp data-atom {:target node}))
   IUnMount
   (unmount [_ {:keys [node]}]
     (unmount-react node))

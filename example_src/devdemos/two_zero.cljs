@@ -1,3 +1,4 @@
+
 (ns devdemos.two-zero
   (:require
    [devcards.core :as dc]
@@ -13,7 +14,7 @@
    [goog.labs.userAgent.device :as device])
   (:require-macros
    [cljs.core.async.macros :refer [go]]
-   [devcards.core :refer [defcard is are= are-not= format-code format-data]]))
+   [devcards.core :refer [defcard is are= are-not= format-code format-data mkdn-data mkdn-code]]))
 
 (defn lh [x] (prn-str x) x)
 
@@ -27,15 +28,16 @@
 
 (defcard intro
   (dc/markdown-card
-   "# 2048"
-   "Let's build 2048 interactively with devcards"))
+   "# 2048
+    Let's build 2048 interactively with devcards"))
 
 (defcard intro-2
   (dc/markdown-card
-   "### Board Style"
-   "Let's start by creating the style for the board."
-   "\n"
-   "The board is a 4x4 board. It will have one container with 16
+   "### Board Style
+
+   Let's start by creating the style for the board.
+
+   The board is a 4x4 board. It will have one container with 16
    absolutely positioned cells in it. These cells will mark where the
    potential locations for the game tiles."))
 
@@ -87,8 +89,8 @@
 
 (defcard intro-3
   (dc/markdown-card
-   "### Cell Style"
-   "Then we'll work on the style for the cells. The hard part is
+   "### Cell Style
+   Then we'll work on the style for the cells. The hard part is
    getting the colors and the font sizes correct."))
 
 (defcard board-with-cells
@@ -119,20 +121,18 @@
 
 (defcard stored-board-data-structure
   (dc/markdown-card
-   "## Main data structures"
+   "## Main data structures
+    #### Tile Map
 
-   "#### Tile Map"
+    The only data structure we are going to hold in our atom is a map
+    of the tiles on the page. The list will look like this:"
 
-   "The only data structure we are going to hold in our atom is a map
-   of the tiles on the page. The list will look like this:"
-
-   "```"
-   (format-data
+   (mkdn-data
     {:t1 { :top 0 :left 0 :v 2 :id :t1}
      :t2 { :top 1 :left 0 :v 4 :id :t2}
      :t3 { :top 2 :left 0 :v 8 :id :t3}
-     :t4 { :top 3 :left 0 :v 4 :id :t4}})
-   "```"
+     :t4 { :top 3 :left 0 :v 4 :id :t4}})   
+
    "Each tile will have an `:id`, a value `:v` and a position on the board.
 
    Data handling is complicated because we will have to manage the
@@ -143,58 +143,56 @@
    * `:remove` - this flag marks the tile to be removed
    * `:reveal` - this flag marks the tile to be rendered with the **reveal** class
    * `:highlight` - this flag marks the tile to be rendered with the **highlight** class
-   "
 
-   "All of these flags are temporary markings that will be removed in
-   a couple of phases of animation right after a move is made."
-   
-   "#### Board view
+   All of these flags are temporary markings that will be removed in
+   a couple of phases of animation right after a move is made.
+
+   #### Board view
 
    The tile map will be converted to a board view that will look like this:"
 
-   "```"
-   (format-data [[{:v 2, :id :t1} :_ :_ :_]
-                 [{:v 8, :id :t2} :_ :_ :_]
-                 [{:v 4, :id :t3} :_ :_ :_]
-                 [{:v 4, :id :t4} :_ :_ :_]]
-    )
-   "```"
-   "The board view removes the position data as it is implicit."
-   "\n"
-   "The board view is used to compute the board transformation given a
+   (mkdn-data
+    [[{:v 2, :id :t1} :_ :_ :_]
+     [{:v 8, :id :t2} :_ :_ :_]
+     [{:v 4, :id :t3} :_ :_ :_]
+     [{:v 4, :id :t4} :_ :_ :_]])
+
+   "The board view removes the position data as it is implicit.
+
+   The board view is used to compute the board transformation given a
    `:left`, `:right`, `:up`, or `:down` move. For instance if we move
    the above board to the `:right` it will end up looking like this:"
-   "```"
-   (format-data [[:_ :_ :_ {:v 2, :id :t1}]
-                 [:_ :_ :_ {:v 8, :id :t2}]
-                 [:_ :_ :_ {:v 4, :id :t3}]
-                 [:_ :_ :_ {:v 4, :id :t4}]]
-    )
-   "```"
+
+   (mkdn-data
+    [[:_ :_ :_ {:v 2, :id :t1}]
+     [:_ :_ :_ {:v 8, :id :t2}]
+     [:_ :_ :_ {:v 4, :id :t3}]
+     [:_ :_ :_ {:v 4, :id :t4}]])
+   
    "And then if we move it `:down` it will look like this."
-   "```"
-   (format-data [[:_ :_ :_ :_]
-                 [:_ :_ :_ {:v 2, :id :t1}]
-                 [:_ :_ :_ {:v 8, :id :t2}]
-                 [:_ :_ :_ {:v 4, :id :t3 :double true :replaces :t4}]]
-    )
-   "```"
+
+   (mkdn-data
+    [[:_ :_ :_ :_]
+     [:_ :_ :_ {:v 2, :id :t1}]
+     [:_ :_ :_ {:v 8, :id :t2}]
+     [:_ :_ :_ {:v 4, :id :t3 :double true :replaces :t4}]])
+   
    "Once we have transformed the board we will turn it back into the tile map."
-   "```"
-   (format-data
+
+   (mkdn-data
     {:t1 { :top 1 :left 3 :v 2 :id :t1}
      :t2 { :top 0 :left 3 :v 8 :id :t2}
      :t3 { :top 0 :left 3 :v 4 :id :t3 :double true }
-     :t4 { :top 0 :left 3 :v 4 :id :t4 :remove true }})
-   "```"
-   ))
+     :t4 { :top 0 :left 3 :v 4 :id :t4 :remove true }})))
 
 (defcard basic-data-transformations
   (dc/markdown-card
-   "### Transforming one row"
-   "We need to get a transformation for one row. From there we can get
-   all the other transformations."
-   "We will be transforming one row for a move `:left`."))
+   "### Transforming one row
+
+   We need to get a transformation for one row. From there we can get
+   all the other transformations.
+
+   We will be transforming one row for a move `:left`."))
 
 (def remove-blanks (partial filterv #(not= % :_)))
 
