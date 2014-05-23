@@ -82,9 +82,8 @@
   (dom/div #js { :className "rendered-edn" }
                      (html e)))
 
-  (enable-console-print!)
-
 (comment
+  (enable-console-print!)
 
   (def test-data
     (mapcat identity

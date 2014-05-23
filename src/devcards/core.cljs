@@ -1,8 +1,6 @@
 (ns devcards.core
   (:require
-   [frontier.core :refer [run
-                          make-runnable
-                          runner-start] :as fr]
+   [frontier.core  :as fr]
    [frontier.cards :as fc]
    [devcards.system :refer [devcard-system-start
                             render-base-if-necessary!
@@ -518,3 +516,53 @@ rerender."
      (om-root-card om-comp-fn initial-state {} {}))
   ([om-comp-fn]
      (om-root-card om-comp-fn {} {} {})))
+
+
+;; for frontier components don't look down here yet :)
+;; super alpha
+
+(defrecord FrontierSystemCard [initial-state component initial-inputs devcard-options]
+  IMount
+  (mount [_ {:keys [node data-atom]}]
+    (let [sys (fr/run-with-atom
+               (or (:state-atom @data-atom) (atom nil)) 
+               initial-state
+               component
+               (fn [state]
+                 (when-let [react-dom (fr/-render component state)]
+                   (.renderComponent js/React (sab/html react-dom) node identity))))]
+      (if (and (nil? (:state-atom @data-atom))
+               (and initial-inputs (pos? (count initial-inputs))))
+        (doseq [msg initial-inputs]
+          (put! (:event-chan sys) msg))
+        (put! (:event-chan sys) [:__system.noop]))
+      (reset! data-atom sys)))
+  IUnMount
+  (unmount [_ {:keys [node data-atom]}]
+    (when (:running @data-atom)
+      (reset! data-atom (fr/runner-stop @data-atom)))
+    (.unmountComponentAtNode js/React node))
+  IConfig
+  (-options [_]
+    (merge { :unmount-on-reload false
+             :padding false }
+           devcard-options)))
+
+(defn frontier-system-card
+  ([initial-state component initial-inputs devcard-options]
+     (FrontierSystemCard. initial-state component initial-inputs devcard-options))
+  ([initial-state component initial-inputs]
+     (frontier-system-card initial-state component initial-inputs {})))
+
+(defn managed-history-card
+  ([initial-state component initial-inputs devcard-options]
+     (let [inputs (mapv (partial fr/msg-prefix [:__history-keeper :state]) initial-inputs)
+           initial-state' (assoc-in {} [:__history-keeper :state] initial-state)]
+       (frontier-system-card initial-state'
+                    (fc/history-manager initial-state
+                                     component)
+                    inputs
+                    devcard-options)))
+  ([initial-state component initial-inputs]
+     (managed-history-card initial-state component initial-inputs {})))
+

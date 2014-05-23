@@ -12,12 +12,12 @@
                  [jayq "2.5.1"]
                  [om "0.6.2"]
                  [frontier "0.1.0-SNAPSHOT"]
-                 [figwheel "0.1.2-SNAPSHOT"]]
+                 [figwheel "0.1.3-SNAPSHOT"]]
 
   :profiles {
              :dev {
                    :plugins [[lein-cljsbuild "1.0.3"]
-                             [lein-figwheel "0.1.2-SNAPSHOT"]]
+                             [lein-figwheel "0.1.3-SNAPSHOT"]]
                    }
              }
   

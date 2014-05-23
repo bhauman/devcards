@@ -413,7 +413,8 @@
         (.appendChild devcards-node (c/html [:div {:id devcards-controls-element-id}])))
       (when-not (devcards-cards-node)
         (.appendChild devcards-node (c/html [:div {:id devcards-cards-element-id}]))))
-    (throw (js/Error. "The devcards interface needs an element with an id of \"devcards\""))))
+    (throw (js/Error. (str "The devcards interface needs an element with an id of \""
+                           devcards-app-element-id "\"")))))
 
 (defn devcard-renderer [{:keys [state event-chan]}]
   (unmount-card-nodes state)
