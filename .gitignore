@@ -1,0 +1,17 @@
+pom.xml
+*jar
+/lib/
+/classes/
+/out/
+/target/
+.lein-deps-sum
+.lein-repl-history
+.lein-plugins/
+checkouts/
+.nrepl-port
+.lein-classpath
+.rbenv-version
+config.ru
+resources/public/devcards/js/compiled
+.\#*
+\#*
