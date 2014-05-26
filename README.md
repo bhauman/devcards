@@ -9,9 +9,14 @@ your source files, but it attempts to provide a REPL-like experience
 by allowing developers to quickly try different code examples and
 see how they behave in an actual DOM.
 
+Devcards provides an interface which allows developer navigate to
+different *cards* that they have defined in their code base. When used
+in conjunction with **lein figwheel** the cards can be created and
+edited interactively in the one's ClojureScript source files.
+
 <img src="https://s3.amazonaws.com/bhauman-blog-images/devcards-action-shot.png"/>
 
-For example, this code will interactively surface a Sablono template
+For example, the following code will interactively surface a Sablono template
 that you might be working on:
 
 ```clojure
@@ -23,9 +28,10 @@ that you might be working on:
                  [:div {:class "cell xpos-1 ypos-3"} 8]]]))
 ```
 
-When used with lein figwheel, saving the file that contains this
-definition will cause this sablono template to be rendered into the
-devcards interface.
+When used with
+[lein-figwheel](https://github.com/bhauman/lein-figwheel), saving the
+file that contains this definition will cause this Sablono template to
+be rendered into the Devcards interface.
 
 ## Super Quick Start
 
@@ -39,7 +45,7 @@ Type the following to create a fresh project with devcards setup for you:
 lein new devcards hello-world
 ```
 
-Then run
+Then
 
 ```
 cd hello-world
@@ -120,7 +126,7 @@ following `resources/public/devcards/index.html` file.
 </html>
 ```
 
-The key things here are to pull in the devcards requirements, provide
+The key things here are to pull in the Devcards requirements, provide
 an element with a `devcards-main` **id** and require your compiled
 ClojureScript. If you are using `figwheel` make sure you are using an
 `:optimizations :none` build.
@@ -171,7 +177,7 @@ The `markdown-card` is just there to surface documentation into devcards interfa
 ### devcards.core/om-root-card
 
 The `om-root-card` has the same function signature as `om/root`. You
-can use it to quickly display om components.
+can use it to quickly display [Om](https://github.com/swannodette/om) components.
 
 ```
 (defn widget [data owner]
@@ -325,21 +331,22 @@ when code is reloaded.
 ```
 
 In the above example we are using the `IMount` protocol to define the
-cards rendering code.
+cards rendering code. The `IMount` Protocol is the only required protocol. 
 
 We are using the `IUnMount` to define any clean up actions that are
 needed before potentially destroying the node.
 
 And the `IConfig` protocol is used to pass options for this card type.
 
-The current options are:
+The current `IConfig` options are:
 
-* `:unmount-on-reload` default true; unmount is called on cards after
+* `:unmount-on-reload` default `true`; unmount is called on cards after
   a code reload
 * `:initial-state` default `{}`;  the initial state of the data atom for the card
 * `:heading`  default `true`; whether to deisplay the heading for this card
 * `:padding`  default `true`; whether or not to have css padding around the body of this card
- 
+
+
 
 
 
