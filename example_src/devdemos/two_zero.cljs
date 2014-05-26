@@ -1,15 +1,12 @@
-
 (ns devdemos.two-zero
   (:require
    [devcards.core :as dc]
-   [devcards.util.edn-renderer :refer [html-edn]]
    [clojure.string :as string]
    [clojure.set :refer [difference union]]
    [sablono.core :as sab :include-macros true]
 
    [om.core :as om :include-macros true]
    [om.dom :as dom :include-macros true]
-   [devcards.util.edn-renderer :as edn]
    [cljs.core.async :refer [timeout]]
    [goog.labs.userAgent.device :as device])
   (:require-macros
@@ -70,7 +67,7 @@
       { :style { :top (pixel-pos top)
                 :left (pixel-pos left)}}])))
 
-(defn one-row-board
+(defn one-row-board-static
   "Only used for the demo process"
   [data]
   (sab/html
@@ -117,7 +114,7 @@
    { :left (range 4) }
    :value-render-func
    (fn [{:keys [left]}]
-     (one-row-board [{:left left :top 0 :v 2 :id :t1}]))))
+     (one-row-board-static [{:left left :top 0 :v 2 :id :t1}]))))
 
 (defcard stored-board-data-structure
   (dc/markdown-card
@@ -434,6 +431,16 @@
        (<! (timeout 400))
        (swap! data remove-highlight-and-reveal)))))
 
+(defn one-row-move [dir data]
+  (let [prev @data]
+    (swap! data (partial transform-board dir))
+    (when (not= prev @data)
+      (go
+       (<! (timeout 100))
+       (swap! data double-tiles)
+       (<! (timeout 400))
+       (swap! data remove-highlight-and-reveal)))))
+
 (def start-data {:tile1 { :v 2 :top 0 :left 0 :id :tile1}
                  :tile2 { :v 2 :top 0 :left 3 :id :tile2}})
 
@@ -452,4 +459,5 @@
        [:div [:a {:onClick (fn [] (move :down data))} "down"]]       
        [:div
         [:a {:onClick (fn [] (reset! data start-data))} "reset"]]
-       (html-edn @data)]))))
+       (dc/edn->html @data)]))))
+

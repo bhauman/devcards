@@ -1,7 +1,7 @@
 (ns devcards.core
   (:require
    [frontier.core  :as fr]
-   [frontier.cards :as fc]
+   [frontier.cards  :as fc]   
    [devcards.system :refer [devcard-system-start
                             render-base-if-necessary!
                             devcard-renderer
@@ -14,7 +14,7 @@
                             IUnMount
                             IConfig]]
    [sablono.core :as sab :include-macros true]
-   [devcards.util.edn-renderer :refer [html-edn]]
+   [devcards.util.edn-renderer :as edn-rend]
    [clojure.string :as string]
    [om.core :as om :include-macros true]
    [om.dom :as dom :include-macros true]
@@ -107,6 +107,9 @@
 
 ;;; utils
 
+;; returns a react component of rendered edn
+(def edn->html edn-rend/html-edn)
+
 ;; I am abridging regular markdown here so that we can
 ;; handle big long indented strings.
 
@@ -116,7 +119,7 @@
 
 (defn code-delim? [s]
   (and (not (nil? s))
-       (re-matches #"^\s.*```.*" s)))
+       (re-matches #"^\s*```.*" s)))
 
 (defn group-and-trim-code-block [xs]
   (let [opener (first xs)
@@ -206,7 +209,7 @@
 
 (defn edn-card [clj-data]
   "A card that renders EDN."
-  (react-card (html-edn clj-data)))
+  (react-card (edn->html clj-data)))
 
 (defrecord ReactRunnerCard [react-component-fn options]
   IMount
@@ -350,12 +353,14 @@ rerender."
      (dom/div
       #js {:className "clearfix"}))))
 
+(declare frontier-system-card)
+
 (defn slider-card [f arg-seqs & {:keys [value-render-func]}]
-  (fc/system-card { :keyed-vals (into {}
+  (frontier-system-card { :keyed-vals (into {}
                                       (mapv vector (keys arg-seqs) (repeat 0)))}
                   (fr/make-renderable
                    (fr/compose (SliderCard. f arg-seqs))
-                   (make-slider-renderer (or value-render-func html-edn)))
+                   (make-slider-renderer (or value-render-func edn->html)))
                   []))
 
 ;; heckler card
@@ -453,7 +458,7 @@ rerender."
                                (heckle-values generator)))
                       (sab/html
                        (heckle-renderer f data generator
-                                        (or value-render-func html-edn)
+                                        (or value-render-func edn->html)
                                         (or test-func (fn [x] true)))))]
     (react-runner-card system-func {:padding false})))
 
@@ -519,7 +524,7 @@ rerender."
 
 
 ;; for frontier components don't look down here yet :)
-;; super alpha
+;; super alpha 
 
 (defrecord FrontierSystemCard [initial-state component initial-inputs devcard-options]
   IMount
@@ -565,4 +570,3 @@ rerender."
                     devcard-options)))
   ([initial-state component initial-inputs]
      (managed-history-card initial-state component initial-inputs {})))
-

@@ -54,14 +54,15 @@
             (dom/span #js { :className "closer"} closer)))
 
 (defn html-collection [class opener closer coll]
-  (rct/pure
-   coll
-   (open-close (str "collection " class ) opener closer (join-html " " coll))))
+  (open-close (str "collection " class ) opener closer (join-html " " coll))
+    ;; this speeds things up but fails in om
+  #_(rct/pure coll ...)
+  )
 
 (defn html-map [coll]
-  (rct/pure
-   coll
-   (open-close "collection map" "{" "}" (html-keyvals coll))))
+  (open-close "collection map" "{" "}" (html-keyvals coll))
+  ;; this speeds things up but fails in om
+  #_(rct/pure coll ...))
 
 (defn html-string [s]
   (open-close "string" "\"" "\"" s))
