@@ -203,7 +203,7 @@ This lets you quickly define React systems that have interactive behavior.
       (sablono/html
        [:div
          [:h1 "Count " (:count @data-atom)]
-         [:a {:onClick (fn [e] (swap! data-atom update-in :count inc)) } "Inc"]]))
+         [:a {:onClick (fn [e] (swap! data-atom update-in [:count] inc)) } "Inc"]]))
 
 (defcard my-react-runner-ex
    (dc/react-runner-card my-react-app {:initial-state {:count 50}}))
@@ -221,6 +221,47 @@ The `test-card` lets you define a group of tests.
     (dc/are= "'are=' is an equality test" "are= is an equlity test")
     (dc/are-not= "'are-not=' is an disequality test" "yep")))
 ```
+
+### devcards.core/edn-card
+
+The `edn-card` will display formatted EDN for inspection.
+
+```
+(defn my-opaque-func []
+   {:this "is"
+    :EDN  "yeppers"})
+
+(defcard inspect-opaque
+  (edn-card (my-opaque-func)))
+```
+
+### decards.core/slider-card
+
+The `slider-card` allows you to define a series of sliders over ranges
+of inputs.  
+
+The first argument to the `slider-card` is a function that will
+receive a map of the current value of the sliders. The return value of
+this function will be rendered with the `dc/edn->html` renderer. 
+
+The second argument is a map where the labels are the value keys and
+the values are sequences of values to be chosen by the slider.
+
+There is an optional keyword argument `:value-render-func` that can be
+associate with a function that will be passed result of first function
+arg and should return a react component.
+
+```
+(defcard threed-fun
+  (dc/slider-card
+   identity
+   {:rx (range 360)
+    :ry (range 360)
+    :rz (range 360)}
+   :value-render-func cube-template))
+```
+
+## Creating your own cards
 
 
 
