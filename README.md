@@ -2,15 +2,16 @@
 
 Devcards aims to provide ClojureScript developers with an interactive
 visual REPL. Devcards makes it simple to interactively surface code
-examples that have a visual aspect into a browser interface. Devcards
-is not a REPL, as it is driven by code that exists in your source
-files, but it attempts to provide a REPL-like experience by
-facilitating developers to quickly try different code examples and see
-how they behave in an actual DOM.
+examples that have a visual aspect into a browser interface. 
+
+Devcards is **not** a REPL, as it is driven by code that exists in
+your source files, but it attempts to provide a REPL-like experience
+by facilitating developers to quickly try different code examples and
+see how they behave in an actual DOM.
 
 <img src="https://s3.amazonaws.com/bhauman-blog-images/devcards-action-shot.png"/>
 
-For example this code will interactively surface a Sablono template
+For example, this code will interactively surface a Sablono template
 that you might be working on:
 
 ```clojure
