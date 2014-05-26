@@ -7,6 +7,9 @@ they provide version of a visual REPL. In contrast to these browser
 based editing environments Devcards are interactively produced from
 code that you are editing in your source files using your favorite editor.
 
+<img src="https://s3.amazonaws.com/bhauman-blog-images/devcards-action-shot.png"/>
+
+
 For example this code will surface an html template that you might be
 mocking up:
 
@@ -117,9 +120,9 @@ following `resources/public/devcards/index.html` file.
 ```
 
 The key things here are to pull in the devcards requirements, provide
-an element with a `devcards-main` and require your compiled
-ClojureScript. If you are using `figwheel` make sure you are requiring
-an `:optimizations :none` build.
+an element with a `devcards-main` **id** and require your compiled
+ClojureScript. If you are using `figwheel` make sure you are using an
+`:optimizations :none` build.
 
 Next you will need to include the Devcards library in your
 ClojureScript source file. 
@@ -190,6 +193,15 @@ for many cards since React components compose so well.
    (dc/react-card (sablono/html [:h1 "I'm a react card."])))
 ```
 
+### devcards.core/sab-card
+
+The `sab-card` simply renders Sablono.
+
+```
+(defcard react-card-ex
+   (dc/sab-card [:h1 "I'm a react card."]))
+```
+
 ### devcards.core/react-runner-card
 
 The `react-runner-card` takes a function that takes an atom and
@@ -232,7 +244,7 @@ The `edn-card` will display formatted EDN for inspection.
     :EDN  "yeppers"})
 
 (defcard inspect-opaque
-  (edn-card (my-opaque-func)))
+  (dc/edn-card (my-opaque-func)))
 ```
 
 ### decards.core/slider-card
@@ -263,16 +275,8 @@ arg and should return a react component.
 
 ## Creating your own cards
 
-
-
-   
-
-         
-
-
-
-
-
-
-
+Creating your own cards for devcards is not difficult. There are two
+main interfaces. There is a simple interface where you can just
+define a function and have it be a card. Then there is a more advanced
+version where you implement a few protocols.
 
