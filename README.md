@@ -143,9 +143,12 @@ ClojureScript source file.
 
 ## The predefined cards
 
+Devcards has several predefined cards. Cards are just functions so you
+can compose new cards from these base cards.
+
 ### devcards.core/markdown-card
 
-The markdown card is just there to surface documentation into devcards interface.
+The `markdown-card` is just there to surface documentation into devcards interface.
 
 ```
 (defcard markdown-example
@@ -160,6 +163,70 @@ The markdown card is just there to surface documentation into devcards interface
     ```
     "))
 ```
+
+### devcards.core/om-root-card
+
+The `om-root-card` has the same function signature as `om/root`. You
+can use it to quickly display om components.
+
+```
+(defn widget [data owner]
+  (reify
+    om/IRender
+    (render [this]
+      (sablono/html [:h2 "This is an om card, " (:text data)]))))
+
+(defcard omcard-ex
+    (dc/om-root-card widget {:text "yozers"}))
+```
+
+### devcards.core/react-card
+
+The `react-card` simply renders a React component. This is the base
+for many cards since React components compose so well.
+
+```
+(defcard react-card-ex
+   (dc/react-card (sablono/html [:h1 "I'm a react card."])))
+```
+
+### devcards.core/react-runner-card
+
+The `react-runner-card` takes a function that takes an atom and
+returns a React component. When the atom is changed it will trigger a
+rerender.
+
+This lets you quickly define React systems that have interactive behavior.
+
+```
+(defn my-react-app [data-atom]
+      (sablono/html
+       [:div
+         [:h1 "Count " (:count @data-atom)]
+         [:a {:onClick (fn [e] (swap! data-atom update-in :count inc)) } "Inc"]]))
+
+(defcard my-react-runner-ex
+   (dc/react-runner-card my-react-app {:initial-state {:count 50}}))
+```
+
+### devcards.core/test-card
+
+The `test-card` lets you define a group of tests.
+
+```
+(defcard my-tests-ex
+  (dc/test-card 
+    "You can have Markdown in test cards"
+    (dc/is   "'is' is an assertion")
+    (dc/are= "'are=' is an equality test" "are= is an equlity test")
+    (dc/are-not= "'are-not=' is an disequality test" "yep")))
+```
+
+
+
+   
+
+         
 
 
 
