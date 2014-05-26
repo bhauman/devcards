@@ -1,17 +1,17 @@
 # Devcards
 
-Devcards helps ClojureScript developers surface graphical artifacts
-quickly so that they can experience a graphical interactive workflow.
-Devcards are somewhat like iPython Notebook or Gorilla REPL in that
-they provide version of a visual REPL. In contrast to these browser
-based editing environments Devcards are interactively produced from
-code that you are editing in your source files using your favorite editor.
+Devcards aims to provide ClojureScript developers with an interactive
+visual REPL. Devcards makes it simple to interactively surface code
+examples that have a visual aspect into a browser interface. Devcards
+is not a REPL, as it is driven by code that exists in your source
+files, but it attempts to provide a REPL-like experience by
+facilitating developers to quickly try different code examples and see
+how they behave in an actual DOM.
 
 <img src="https://s3.amazonaws.com/bhauman-blog-images/devcards-action-shot.png"/>
 
-
-For example this code will surface an html template that you might be
-mocking up:
+For example this code will interactively surface a Sablono template
+that you might be working on:
 
 ```clojure
 (defcard two-zero-48-view 
@@ -23,8 +23,8 @@ mocking up:
 ```
 
 When used with lein figwheel, saving the file that contains this
-definition will cause this sablono template rendered in the devcards
-interface.
+definition will cause this sablono template to be rendered into the
+devcards interface.
 
 ## Super Quick Start
 
