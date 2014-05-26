@@ -25,7 +25,7 @@ interface.
 
 ## Super Quick Start
 
-There is a Leinigen template to get you up an running quickly.
+There is a Devcards Leinigen template to get you up an running quickly.
 
 Make sure you have the [latest version of leinigen installed](https://github.com/technomancy/leiningen#installation).
 
@@ -38,6 +38,8 @@ lein new devcards hello-world
 Then run
 
 ```
+cd hello-world
+
 lein figwheel
 ```
 
@@ -47,7 +49,7 @@ Then visit `http://localhost:3449/devcards/index.html`
 
 ## Quick Trial
 
-If you want to see and interact with a bunch of devcards demos:
+If you want to quickly interact with a bunch of devcards demos:
 
 ```
 git clone https://github.com/bhauman/devcards.git
@@ -61,6 +63,9 @@ Then visit `http://localhost:3449/devcards/index.html`
 
 The code for cards you see in the devcards interface is located in the
 `example_src` directory.
+
+Go ahead and edit the code in the examples and see how the devcards
+interface responds.
 
 ## Usage
 
@@ -78,12 +83,12 @@ See the [lein-figwheel repo](https://github.com/bhauman/lein-figwheel)
 for instructions on how to do that.
 
 Devcards is extremely new so the patterns for using it are completely
-up in the air so I am going to show you the least you need to setup to
+up in the air. I am going to show you the very least you need to setup to
 get devcards running.
 
-You will need an html file to host devcards, it makes sense to have a
-separate file to host devcards.  I would create this `resources/public/devcards/index.html`
-file.
+You will need an HTML file to host the devcards interface. It makes
+sense to have a separate file to host devcards. I would create the
+following `resources/public/devcards/index.html` file.
 
 ```html
 <!DOCTYPE html>
@@ -91,10 +96,11 @@ file.
   <head>
     <script src="//fb.me/react-0.9.0.js"></script>
     <script src="//code.jquery.com/jquery-1.11.0.js"></script>
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" 
-          rel="stylesheet" type="text/css">
     <!-- This showdown has been modified a tiny bit -->
     <script src="//rigsomelight.com/devcards/devcards-assets/showdown.js"></script>
+
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" 
+          rel="stylesheet" type="text/css">
     <link href="//rigsomelight.com/devcards/devcards-assets/devcards.css" 
           rel="stylesheet" type="text/css">
     <link href="//rigsomelight.com/devcards/devcards-assets/rendered_edn.css"
@@ -139,6 +145,9 @@ ClojureScript source file.
 
 ### devcards.core/markdown-card
 
+The markdown card is just there to surface documentation into devcards interface.
+
+```
 (defcard markdown-example
   (dc/markdown-card 
     "### This is markdown yo
@@ -150,7 +159,7 @@ ClojureScript source file.
     (defn myfunc [] "this is code")
     ```
     "))
-
+```
 
 
 
