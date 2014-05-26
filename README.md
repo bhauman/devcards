@@ -6,7 +6,7 @@ examples that have a visual aspect into a browser interface.
 
 Devcards is **not** a REPL, as it is driven by code that exists in
 your source files, but it attempts to provide a REPL-like experience
-by facilitating developers to quickly try different code examples and
+by allowing developers to quickly try different code examples and
 see how they behave in an actual DOM.
 
 <img src="https://s3.amazonaws.com/bhauman-blog-images/devcards-action-shot.png"/>
@@ -280,4 +280,66 @@ Creating your own cards for devcards is not difficult. There are two
 main interfaces. There is a simple interface where you can just
 define a function and have it be a card. Then there is a more advanced
 version where you implement a few protocols.
+
+Creating your own cards gives you a quick peak into how Devcards
+works. Devcards keeps track of two major things for each card: a HTML
+node and an atom to hold the data that the card will use.
+
+### Function card API
+
+You can create a card quickly by defining a function that takes a map.
+
+For example this is a card:
+
+```
+(defn silly-card []
+  (fn [{:keys [node data-atom]}]
+    (set! (.-innerHTML node) "<div>I'm a silly card</div>")))
+```
+
+And you can use it like this:
+
+```
+(defcard silly-card-ex (silly-card))
+```
+
+### Protocols API
+
+The protocols API allows you to hook into the devcards lifecycle so
+that you can tear down and rebuild anything that needs to be rebuilt
+when code is reloaded.
+
+```
+(defn super-card [initial-state]
+   (reify     
+     devcards.system/IMount
+     (mount [_ {:keys [node data-atom]}]
+       (render-to (sab/html [:h1 "Super!"]) node))
+     devcards.system/IUnMount
+     (unmount [_ {:keys [node]}]
+       (unmount-react node))
+     devcards.system/IConfig
+     (-options [_]
+       { :unmount-on-reload false
+         :initial-state initial-state })))
+```
+
+In the above example we are using the `IMount` protocol to define the
+cards rendering code.
+
+We are using the `IUnMount` to define any clean up actions that are
+needed before potentially destroying the node.
+
+And the `IConfig` protocol is used to pass options for this card type.
+
+The current options are:
+
+* `:unmount-on-reload` default true; unmount is called on cards after
+  a code reload
+* `:initial-state` default `{}`;  the initial state of the data atom for the card
+* `:heading`  default `true`; whether to deisplay the heading for this card
+* `:padding`  default `true`; whether or not to have css padding around the body of this card
+ 
+
+
 
