@@ -9,15 +9,19 @@ your source files, but it attempts to provide a REPL-like experience
 by allowing developers to quickly try different code examples and
 see how they behave in an actual DOM.
 
-Devcards provides an interface which allows developer navigate to
-different *cards* that they have defined in their code base. When used
-in conjunction with **lein figwheel** the cards can be created and
-edited interactively in the one's ClojureScript source files.
+Devcards is centered around a notion of a *card*. Every card
+represents some code to be displayed. Devcards provides an interface
+which allows the developer navigate to different namespaces and view
+the *cards* that have been defined in that namespace. 
+
+When used in conjunction with **lein figwheel** the cards can be
+created and edited **"live"** in the one's ClojureScript source
+files.
 
 <img src="https://s3.amazonaws.com/bhauman-blog-images/devcards-action-shot.png"/>
 
-For example, the following code will interactively surface a Sablono template
-that you might be working on:
+For example, the following code will create a *card* for a Sablono
+template that you might be working on:
 
 ```clojure
 (defcard two-zero-48-view 
