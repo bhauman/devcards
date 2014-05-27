@@ -37,6 +37,15 @@ When used with
 file that contains this definition will cause this Sablono template to
 be rendered into the Devcards interface.
 
+## Examples
+
+Regardless of which path you take to get started with Devcards please
+see the following examples:
+
+[Examples of all the cards](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/core.cljs)
+
+[An example implementation of 2048](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/two_zero.cljs)
+
 ## Super Quick Start
 
 There is a Devcards Leinigen template to get you up an running quickly.
@@ -75,8 +84,8 @@ lein figwheel
 
 Then visit `http://localhost:3449/devcards/index.html`
 
-The code for cards you see in the devcards interface is located in the
-`example_src` directory.
+The code for the cards you are viewing in the devcards interface is
+located in the `example_src` directory.
 
 Go ahead and edit the code in the examples and see how the devcards
 interface responds.
