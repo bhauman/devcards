@@ -1,0 +1,85 @@
+.rendered-edn .keyval > .keyword {
+   color: rgb(196,33,0);
+   padding-right: 10px;
+}
+
+.rendered-edn .collection {
+    position: relative;
+}
+
+.rendered-edn .vector,
+.rendered-edn .set,
+.rendered-edn .seq  {
+    padding-left: 0.9em;
+    padding-right: 0.9em;
+}
+
+.rendered-edn .set { 
+    padding-left: 1.2em;
+}
+
+.rendered-edn .collection.map {
+    padding: 1.8em;
+    display: inline-block; 
+    vertical-align: top;
+}
+
+.rendered-edn .vector,
+.rendered-edn .set,
+.rendered-edn .seq {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.rendered-edn .vector > .contents {
+    background-color: rgba(0,0,0,0.01);
+}
+
+.rendered-edn .keyval {
+    display: inline-block;
+}
+
+.rendered-edn .collection.map > .contents > .separator  {
+  padding-right: 10px;
+}
+
+.rendered-edn .collection .collection > .contents {
+ /*  background-color: rgba(0,0,0,0.02); */
+}
+
+.rendered-edn .collection .contents > .collection:nth-child(even) {
+  background-color: rgba(0,0,0,0.04);
+}
+
+.rendered-edn .contents {
+    display: inline-block;
+}
+
+.rendered-edn .opener, 
+.rendered-edn .closer {
+   color: #999;  
+}
+
+.rendered-edn .collection.map > .opener,
+.rendered-edn .collection.vector > .opener,
+.rendered-edn .collection.seq > .opener,
+.rendered-edn .collection.set > .opener { 
+   position: absolute;
+   top: 0px;
+   left: 3px;
+}
+.rendered-edn .collection.map > .closer {
+   position: absolute;
+   bottom: 0px;
+   left: 3px;
+   display: block;
+}
+
+.rendered-edn .collection.vector > .closer,  
+.rendered-edn .collection.seq > .closer,  
+.rendered-edn .collection.set > .closer {
+   position: absolute;
+   bottom: 0px;
+   right: 0px;
+   display: block;
+}
