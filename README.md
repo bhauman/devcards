@@ -354,7 +354,7 @@ And the `IConfig` protocol is used to pass options for this card type.
 The current `IConfig` options are:
 
 * `:unmount-on-reload` default `true`; unmount is called on cards after
-  a code reload
+  a code reload and before they are rendered again with new code
 * `:initial-state` default `{}`;  the initial state of the data atom for the card
 * `:heading`  default `true`; whether to deisplay the heading for this card
 * `:padding`  default `true`; whether or not to have css padding around the body of this card
