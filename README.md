@@ -360,6 +360,24 @@ The current `IConfig` options are:
 * `:padding`  default `true`; whether or not to have css padding around the body of this card
 
 
+## FAQ
+
+#### Does Devcards only work with React or OM?
+
+No it doesn't. At its core Devcards manages a raw HTML node and a
+data atom for each card. Devcards works with anything you can put in a
+node.
+
+#### Does Devcards require Figwheel?
+
+No, you can manually reload the browser after changing your code.
+Devcards requires the figwheel client as a dependancy because if you do
+decide to use figwheel it hooks into various events fired by the
+figwheel client.
+
+You could also integrate Devcards into a Browser REPL workflow
+instead of using figwheel.
+
 
 
 
