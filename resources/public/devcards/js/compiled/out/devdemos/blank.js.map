@@ -1,0 +1,7 @@
+{"version":3,
+ "file":
+ "/Users/bhauman/workspace/devcards/resources/public/devcards/js/compiled/out/devdemos/blank.js",
+ "sources":["blank.cljs"],
+ "lineCount":7,
+ "mappings":";AAAA;;AAEA,uBAAA,kBAAA,AAAA,zCAAMA",
+ "names":["devdemos.blank/hello"]}
