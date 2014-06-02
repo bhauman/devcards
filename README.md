@@ -14,7 +14,7 @@ represents some code to be displayed. Devcards provides an interface
 which allows the developer navigate to different namespaces and view
 the *cards* that have been defined in that namespace. 
 
-When used in conjunction with **lein figwheel** the cards can be
+When used in conjunction with [lein figwheel][leinfigwheel] the cards can be
 created and edited **"live"** in the one's ClojureScript source
 files.
 
@@ -34,10 +34,9 @@ template that you might be working on:
                  [:div {:class "cell xpos-1 ypos-3"} 8]]]))
 ```
 
-When used with
-[lein-figwheel](https://github.com/bhauman/lein-figwheel), saving the
-file that contains this definition will cause this Sablono template to
-be rendered into the Devcards interface.
+When used with [lein-figwheel][leinfigwheel], saving the file that
+contains this definition will cause this Sablono template to be
+rendered into the Devcards interface.
 
 ## Examples
 
@@ -379,6 +378,18 @@ figwheel client.
 You could also integrate Devcards into a Browser REPL workflow
 instead of using figwheel.
 
+#### What do I do for deployment?
 
+What pattern to use when working with Devcards is still an open question.
 
+You can move all the cards into a different build similar to that
+pattern used for testing in Clojure right now. Or you could start your
+coding in this seperate build and then move completed code into your
+main build as it matures.  
+
+I have been considering a **no-op** release of devcards so that you
+can leave devcards in your source code. I don't know if this is a good
+idea.  Does it make your code easier to understand or is it more noisy?
+
+[leinfigwheel]: https://github.com/bhauman/lein-figwheel
 
