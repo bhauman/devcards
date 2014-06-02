@@ -18,6 +18,8 @@ When used in conjunction with **lein figwheel** the cards can be
 created and edited **"live"** in the one's ClojureScript source
 files.
 
+[See the introduction video.](https://vimeo.com/97078905)
+
 <img src="https://s3.amazonaws.com/bhauman-blog-images/devcards-action-shot.png"/>
 
 For example, the following code will create a *card* for a Sablono
@@ -359,10 +361,9 @@ The current `IConfig` options are:
 * `:heading`  default `true`; whether to deisplay the heading for this card
 * `:padding`  default `true`; whether or not to have css padding around the body of this card
 
-
 ## FAQ
 
-#### Does Devcards only work with React or OM?
+#### Does Devcards only work with React or Om?
 
 No it doesn't. At its core Devcards manages a raw HTML node and a
 data atom for each card. Devcards works with anything you can put in a
