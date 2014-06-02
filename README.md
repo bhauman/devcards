@@ -382,14 +382,16 @@ instead of using figwheel.
 
 What pattern to use when working with Devcards is still an open question.
 
-You can move all the cards into a different build similar to that
+You can move all the cards into a different build similar to the
 pattern used for testing in Clojure right now. Or you could start your
 coding in this seperate build and then move completed code into your
-main build as it matures.  
+main build as it matures.
 
 I have been considering a **no-op** release of devcards so that you
-can leave devcards in your source code. I don't know if this is a good
-idea.  Does it make your code easier to understand or is it more noisy?
+can leave Devcards in your source code. I don't know if this is a good
+idea but it might be worth a try. Does having the devcards make your
+code easier to understand or is it more noisy with them in there?
+
 
 [leinfigwheel]: https://github.com/bhauman/lein-figwheel
 
