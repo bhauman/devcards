@@ -148,7 +148,7 @@ ClojureScript. If you are using `figwheel` make sure you are using an
 Next you will need to include the Devcards library in your
 ClojureScript source file. 
 
-```
+```clojure
 (ns example.core
   (:require
    [devcards.core :as dc :include-macros true])
@@ -174,7 +174,7 @@ can compose new cards from these base cards.
 
 The `markdown-card` is just there to surface documentation into devcards interface.
 
-```
+```clojure
 (defcard markdown-example
   (dc/markdown-card 
     "### This is markdown yo
@@ -193,7 +193,7 @@ The `markdown-card` is just there to surface documentation into devcards interfa
 The `om-root-card` has the same function signature as `om/root`. You
 can use it to quickly display [Om](https://github.com/swannodette/om) components.
 
-```
+```clojure
 (defn widget [data owner]
   (reify
     om/IRender
@@ -209,7 +209,7 @@ can use it to quickly display [Om](https://github.com/swannodette/om) components
 The `react-card` simply renders a React component. This is the base
 for many cards since React components compose so well.
 
-```
+```clojure
 (defcard react-card-ex
    (dc/react-card (sablono/html [:h1 "I'm a react card."])))
 ```
@@ -218,7 +218,7 @@ for many cards since React components compose so well.
 
 The `sab-card` simply renders Sablono.
 
-```
+```clojure
 (defcard react-card-ex
    (dc/sab-card [:h1 "I'm a react card."]))
 ```
@@ -231,7 +231,7 @@ rerender.
 
 This lets you quickly define React systems that have interactive behavior.
 
-```
+```clojure
 (defn my-react-app [data-atom]
       (sablono/html
        [:div
@@ -246,7 +246,7 @@ This lets you quickly define React systems that have interactive behavior.
 
 The `test-card` lets you define a group of tests.
 
-```
+```clojure
 (defcard my-tests-ex
   (dc/test-card 
     "You can have Markdown in test cards"
@@ -259,7 +259,7 @@ The `test-card` lets you define a group of tests.
 
 The `edn-card` will display formatted EDN for inspection.
 
-```
+```clojure
 (defn my-opaque-func []
    {:this "is"
     :EDN  "yeppers"})
@@ -284,7 +284,7 @@ There is an optional keyword argument `:value-render-func` that can be
 associate with a function that will be passed result of first function
 arg and should return a react component.
 
-```
+```clojure
 (defcard threed-fun
   (dc/slider-card
    identity
@@ -311,7 +311,7 @@ You can create a card quickly by defining a function that takes a map.
 
 For example this is a card:
 
-```
+```clojure
 (defn silly-card []
   (fn [{:keys [node data-atom]}]
     (set! (.-innerHTML node) "<div>I'm a silly card</div>")))
@@ -319,7 +319,7 @@ For example this is a card:
 
 And you can use it like this:
 
-```
+```clojure
 (defcard silly-card-ex (silly-card))
 ```
 
@@ -329,7 +329,7 @@ The protocols API allows you to hook into the devcards lifecycle so
 that you can tear down and rebuild anything that needs to be rebuilt
 when code is reloaded.
 
-```
+```clojure
 (defn super-card [initial-state]
    (reify     
      devcards.system/IMount
