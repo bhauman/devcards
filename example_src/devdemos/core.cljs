@@ -32,7 +32,7 @@
     (defcard first-markdown-card
       (markdown-card "# This is a heading")))
    
-   "Devards are designed to be written inline with your code during
+   "Devcards are designed to be written inline with your code during
     development. They are like fancy `println`s that can hold any
     arbitrary functionality that you want." ))
 
@@ -44,8 +44,8 @@
    `example_src/devdemos/core.cljs`.Please follow along in this file
    to see how these examples are created.
 
-   If you ran `lein figwheel` to get this demo started, if you edit
-   and save the file that this code is in, you will see the changes
+   If you ran `lein figwheel` to get this demo started, you can edit
+   and save the file that this code is in to see the changes
    show up on this page as you save your file.
 
    Go ahead and change this text to see the changes reflected here."))
@@ -209,7 +209,7 @@
   (dc/markdown-card
    "### Hekler Card
    A heckler card is a primitive quick check to help find bugs in a function.
-   You provide a function to test and a generator  which generates vectors
+   You provide a function to test and a generator which generates vectors
    of arguments for that function. "))
 
 (defn to-heckle-f [a b]
@@ -217,7 +217,7 @@
     (throw (js/Error. "Crappers Error Thrown"))
     (+ a b)))
 
-(defcard hekler-card-ex
+(defcard heckler-card-ex
   (dc/heckler-card
    to-heckle-f
    ;; generator
@@ -231,8 +231,8 @@
   (dc/markdown-card
    "## Reduce card
    A **reduce-card** is helpful for testing reduce
-   functions. It takes a reduce function a stargin value and then a vector of
-   arguments and the expected accumulated results in this form
+   functions. It takes a reduce function, a starting value, a vector of
+   arguments, and the expected accumulated results in this form:
    `[arg1 accum1 arg2 accum2 arg3 accum3]`"))
 
 (defcard reduce-card-ex
@@ -245,7 +245,7 @@
   (dc/markdown-card
    "# Creating your own cards"
    "You can easily create your own cards. There are two ways to create
-   devcards. You can simply define a function to be a devcard or you
+   devcards; you can simply define a function to be a devcard, or you
    can reify an instance that implements the devcard protocols.
 
    The devcard system maintains two things for each devcard, an atom
@@ -260,9 +260,9 @@
 
    For example this is a devcard."
 
-   (mkdn-code (fn [{:keys [node data-atom]}] (.innerHTML node "<h2>Awesome?</h2>")))
+   (mkdn-code (fn [{:keys [node data-atom]}] (set! (.-innerHTML node "<h2>Awesome?</h2>"))))
 
-   "and you can use it like so:"
+   "And you can use it like so:"
 
    (mkdn-code (defcard my-first-card
                 (fn [{:keys [node data-atom]}]
@@ -277,7 +277,7 @@
 (defcard advanced-api
   (dc/markdown-card
    "## The Devcard Protocols API"
-   "Creating a devcard with the protocols API looks like this"
+   "Creating a devcard with the protocols API looks like this:"
    (mkdn-code
     (defn super-card [initial-state]
       (reify
