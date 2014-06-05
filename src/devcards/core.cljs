@@ -522,7 +522,6 @@ rerender."
   ([om-comp-fn]
      (om-root-card om-comp-fn {} {} {})))
 
-
 ;; for frontier components don't look down here yet :)
 ;; super alpha 
 
