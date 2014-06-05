@@ -183,7 +183,7 @@ The `markdown-card` is just there to surface documentation into devcards interfa
     
     code blocks have to be delimited like so:
     ```
-    (defn myfunc [] "this is code")
+    (defn myfunc [] :some-code-here)
     ```
     "))
 ```
