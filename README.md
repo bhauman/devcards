@@ -153,7 +153,7 @@ ClojureScript source file.
   (:require
    [devcards.core :as dc :include-macros true])
   (:require-macros
-   [devcards.core :refer [defcard])))
+   [devcards.core :refer [defcard]])))
 
 (dc/start-devcards-ui!)
 
