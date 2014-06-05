@@ -155,7 +155,7 @@ ClojureScript source file.
   (:require-macros
    [devcards.core :refer [defcard]])))
 
-(dc/start-devcards-ui!)
+(dc/start-devcard-ui!)
 
 ;; optional
 (dc/start-figwheel-reloader!)
