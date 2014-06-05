@@ -503,14 +503,20 @@ rerender."
 (defrecord OmRootCard [om-comp initial-state om-options devcard-options]
   IMount
   (mount [_ {:keys [node data-atom]}]
-    (om/root om-comp data-atom {:target node}))
+    (let [da (or (and (map? @data-atom)
+                      (:__devcards-atom-box @data-atom))
+                 data-atom)]
+      (om/root om-comp da {:target node})))
   IUnMount
   (unmount [_ {:keys [node]}]
     (unmount-react node))
   IConfig
   (-options [_]
     (merge { :unmount-on-reload false
-             :initial-state initial-state } devcard-options)))
+            :initial-state
+            (if (satisfies? IAtom initial-state)
+              { :__devcards-atom-box initial-state}
+              initial-state)} devcard-options)))
 
 (defn om-root-card
   ([om-comp-fn initial-state om-options devcard-options]
@@ -521,6 +527,8 @@ rerender."
      (om-root-card om-comp-fn initial-state {} {}))
   ([om-comp-fn]
      (om-root-card om-comp-fn {} {} {})))
+
+
 
 ;; for frontier components don't look down here yet :)
 ;; super alpha 

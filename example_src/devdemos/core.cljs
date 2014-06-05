@@ -1,7 +1,7 @@
 (ns devdemos.core
   (:require
    [devcards.core :as dc :include-macros true]
-   [devcards.system :refer [IMount]]   
+   [devcards.system :refer [IMount IUnMount IConfig]]   
    [om.core :as om :include-macros true]
    [om.dom :as dom :include-macros true]   
    [clojure.string :as string]
@@ -33,20 +33,23 @@
       (markdown-card "# This is a heading")))
    
    "Devcards are designed to be written inline with your code during
-    development. They are like fancy `println`s that can hold any
-    arbitrary functionality that you want." ))
+    development. They are like advanced stateful `println`s that can
+    hold almost any arbitrary functionality that you want." ))
 
 (defcard intro-2
   (dc/markdown-card
    "## Devcards are intended to be interactive
 
-   The cars on this page can be found in the file
-   `example_src/devdemos/core.cljs`.Please follow along in this file
+   The cards on this page can be found in the file
+   **example_src/devdemos/core.cljs**.  Please follow along in this file
    to see how these examples are created.
 
    If you ran `lein figwheel` to get this demo started, you can edit
-   and save the file that this code is in to see the changes
-   show up on this page as you save your file.
+   **example_src/devdemos/core.cljs** and see this page update when you save
+   the file.
+
+   I highly encourage you to poke and prod at the code you find on
+   this page so you can experience how Devcards works.
 
    Go ahead and change this text to see the changes reflected here."))
 
@@ -101,14 +104,45 @@
                  [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] dec))} "dec"]]]]))
    { :initial-state {:count 30 } }))
 
+(defcard om-intro
+  (dc/markdown-card
+   "## Om 
+
+    The `om-root-card` will render Om components, much the way `om/root` does."))
+
 (defn widget [data owner]
-  (reify
-    om/IRender
-    (render [this]
-      (sab/html [:h2 "This is an om card, " (:text data)]))))
+  (om/component
+      (sab/html [:h2 "This is an om card, " (:text data)])))
 
 (defcard omcard-ex
-    (dc/om-root-card widget {:text "yozers"}))
+  (dc/om-root-card widget {:text "yep it is"}))
+
+(defcard om-share-atoms
+  (dc/markdown-card
+   "#### You can share an Atom between `om-root-card`s.
+
+    Interact with the counters below."))
+
+(defonce om-test-atom (atom {:count 20}))
+
+(defn counter [data f s]
+  (om/component
+   (sab/html
+    [:div
+     [:h1 "Counter " (:count data)]
+     [:div [:a {:onClick #(om/transact! data :count f)} s]]
+     (dc/edn->html data)])))
+
+(defn om-counter-inc [data owner] (counter data inc "inc"))
+
+(defcard omcard-shared-ex-1
+  (dc/om-root-card om-counter-inc om-test-atom))
+
+(defn om-counter-dec [data owner] (counter data dec "dec"))
+
+(defcard omcard-shared-ex-2
+  (dc/om-root-card om-counter-dec om-test-atom))
+
 
 (defcard test-card-ex
   (dc/test-card
@@ -248,7 +282,7 @@
    devcards; you can simply define a function to be a devcard, or you
    can reify an instance that implements the devcard protocols.
 
-   The devcard system maintains two things for each devcard, an atom
+   The devcard system maintains two things for each devcard, an Atom
    and a DOM node. The card can then do what it wants, but the idea is
    for all the state to be maintained in the atom and for all the
    rendering to be renderd to the node." ))
@@ -283,10 +317,10 @@
       (reify
         IMount
         (mount [_ {:keys [node data-atom]}]
-          (render-to (sab/html [:h1 "Super!"]) node))
+          (dc/render-to (sab/html [:h1 "Super " (:text @data-atom) "!"]) node))
         IUnMount
         (unmount [_ {:keys [node]}]
-          (unmount-react node))
+          (dc/unmount-react node))
         IConfig
         (-options [_]
           { :unmount-on-reload false
@@ -295,3 +329,18 @@
    (mkdn-code
     (defcard my-card-ex (super-card {})))))
 
+(defn super-card [initial-state]
+  (reify
+    IMount
+    (mount [_ {:keys [node data-atom]}]
+      (dc/render-to (sab/html [:h1 "Super " (:text @data-atom) "!"]) node))
+    IUnMount
+    (unmount [_ {:keys [node]}]
+      (dc/unmount-react node))
+    IConfig
+    (-options [_]
+      { :unmount-on-reload false
+        :initial-state initial-state })))
+
+(defcard protocol-api-example
+  (super-card {:text "cool cat"}))
