@@ -279,18 +279,24 @@
   (dc/markdown-card
    "# Creating your own cards"
    "You can easily create your own cards. There are two ways to create
-   devcards; you can simply define a function to be a devcard, or you
-   can reify an instance that implements the devcard protocols.
+   devcards; you can simply define a callback function, or you can
+   reify an instance that implements the devcard protocols.
 
-   The devcard system maintains two things for each devcard, an Atom
-   and a DOM node. The card can then do what it wants, but the idea is
-   for all the state to be maintained in the atom and for all the
-   rendering to be renderd to the node." ))
+   The Devcard System maintains two things for each devcard, an Atom
+   and a DOM node. The card has to take it from there, but the idea is
+   for all the state to be maintained in the Atom and for all the
+   rendering to be renderd into the node." ))
 
 (defcard base-api
   (dc/markdown-card
-   "## Function API
-   Devcard functions are basically functions that take a DOM node and a data atom.
+   "## Function API Devcard functions are basically functions that
+   take a map that holds a DOM node and a data Atom. This function
+   then side-effects to produce the desired behavior.
+
+   The function API is best used when you want to simply write over
+   the previous contents of the node with each code reload.
+
+   This could work for Canvas and WebGL rendering.
 
    For example this is a devcard."
 
