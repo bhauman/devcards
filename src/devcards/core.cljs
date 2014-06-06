@@ -1,7 +1,7 @@
 (ns devcards.core
   (:require
    [frontier.core  :as fr]
-   [frontier.cards  :as fc]   
+   [frontier.cards  :as fc]
    [devcards.system :refer [devcard-system-start
                             render-base-if-necessary!
                             devcard-renderer
@@ -39,7 +39,7 @@
         ds))))
 
 (defn start-single-card-ui!
-  "Start a devcard UI that allows you to cherry pick which cards to display. 
+  "Start a devcard UI that allows you to cherry pick which cards to display.
    You will need to call render-single-card to put cards into the dom."
   []
   (defonce devcard-single-card-system
@@ -135,7 +135,7 @@
 (defn group-and-trim-code-blocks [xs]
   (cond
    (nil? xs) []
-   (empty? xs) []   
+   (empty? xs) []
    (code-delim? (first xs))
    (-> (group-and-trim-code-block xs)
        group-and-trim-code-blocks)
@@ -177,7 +177,7 @@
 (defn react-raw [raw-html-str]
   "A React component that renders raw html."
   (.div (.-DOM js/React)
-        (clj->js { :dangerouslySetInnerHTML 
+        (clj->js { :dangerouslySetInnerHTML
                    { :__html
                      raw-html-str }})))
 
@@ -209,7 +209,9 @@
 
 (defn edn-card [clj-data]
   "A card that renders EDN."
-  (react-card (edn->html clj-data)))
+  (if (satisfies? IAtom clj-data)
+    (om-root-card #(om/component (edn->html %)) clj-data)
+    (react-card (edn->html clj-data))))
 
 (defrecord ReactRunnerCard [react-component-fn options]
   IMount
@@ -278,7 +280,7 @@ rerender."
                           (dom/span #js {:className "operator"} op)
                           (dom/span #js {:className "result-area"}
                                     (dom/span #js {:className "exp"} (prn-str (:exp1 test)))
-                                    (dom/span #js {:className "exp"} (prn-str (:exp2 test)))                                    
+                                    (dom/span #js {:className "exp"} (prn-str (:exp2 test)))
                                     (error-message test
                                                    (prn-str (:val1 test))
                                                    relation-phrase
@@ -293,7 +295,7 @@ rerender."
 (defn test-card [& assertions]
   (react-card
    (dom/ul #js {:className "list-group devcards-test-group"}
-           (to-array (mapv (fn [t] (render-test t))  
+           (to-array (mapv (fn [t] (render-test t))
                            assertions)))
    {:padding false}))
 
@@ -404,7 +406,7 @@ rerender."
                           :onClick (fn [] (swap! data assoc-in [:gen-arg-list]
                                                 (heckle-values generator)))}
                      "Re-heckle!")
-              (dom/a #js { :className 
+              (dom/a #js { :className
                           (str
                            "btn btn-default navbar-btn devcards-margin-left"
                            (if (:only-errors @data) " active" ""))
@@ -531,13 +533,13 @@ rerender."
 
 
 ;; for frontier components don't look down here yet :)
-;; super alpha 
+;; super alpha
 
 (defrecord FrontierSystemCard [initial-state component initial-inputs devcard-options]
   IMount
   (mount [_ {:keys [node data-atom]}]
     (let [sys (fr/run-with-atom
-               (or (:state-atom @data-atom) (atom nil)) 
+               (or (:state-atom @data-atom) (atom nil))
                initial-state
                component
                (fn [state]
