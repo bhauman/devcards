@@ -183,13 +183,25 @@
                                  position
                                  (atom (or (:initial-state options) {})))))))))
 
+(defn add-navigate-effect [state]
+  (let [path (->> (:current-path state)
+                  (map name)
+                  (string/join "/"))]
+    (add-effects state [:navigate path])))
+
 (defmethod dev-trans :add-to-current-path [[_ {:keys [path]}] state]
   (-> state
       (update-in [:current-path]
-                 (fn [x] (conj x (keyword path))))))
+                 (fn [x] (conj x (keyword path))))
+      add-navigate-effect))
 
 (defmethod dev-trans :current-path [[_ {:keys [path]}] state]
-  (assoc state :current-path (vec path)))
+  (if (not= (:current-path state)
+            (vec path))
+    (-> state
+        (assoc :current-path (vec path))
+        add-navigate-effect)
+    state))
 
 ;; derivatives
 
@@ -263,8 +275,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Hashbang routing
 
-(enable-console-print!)
-
 (def history
   (let [h (History.)]
     (.setEnabled h true)
@@ -274,23 +284,18 @@
 
 (defmethod hashbang-effect :default [_ system data event-chan])
 
-(defmethod hashbang-effect :update-hashbang-token [_ system data event-chan]
-  (pr-str "set token:" data)
+(defmethod hashbang-effect :navigate [_ system data event-chan]
   (.setToken history (str "!/" data)))
 
 (defrecord HashBangRouting []
   IInit
   (-initialize [_ state event-chan]
     (events/listen history EventType/NAVIGATE
-                   #(put! event-chan [:navigate-via-hashbang (.-token %)])))
-  IDerive
-  (-derive [o system]
-    (if-let [path (:current-path system)]
-      ;; this doesn't work
-      (add-effects system [:update-hashbang-token (->> path
-                                                       (map name)
-                                                       (string/join "/"))])
-      system))
+                   #(let [path (string/join ":::"
+                                            (-> (.-token %)
+                                                (string/replace #"!/" "")
+                                                (string/split #"/")))]
+                      (put! event-chan [:set-current-path {:path path}]))))
   IEffect
   (-effect [o [name data] system event-chan effect-chan]
     (hashbang-effect name system data event-chan)))
