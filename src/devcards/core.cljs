@@ -207,6 +207,8 @@
   ([sab-template]
      (react-card (sab/html sab-template) {})))
 
+(declare om-root-card)
+
 (defn edn-card [clj-data]
   "A card that renders EDN."
   (if (satisfies? IAtom clj-data)

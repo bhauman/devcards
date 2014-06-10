@@ -143,6 +143,12 @@
 (defcard omcard-shared-ex-2
   (dc/om-root-card om-counter-dec om-test-atom))
 
+(defcard edn-card-share-atoms
+  (dc/markdown-card
+   "#### You can share an Atom with an `edn-card` too"))
+
+(defcard edn-card-shared
+  (dc/edn-card om-test-atom))
 
 (defcard test-card-ex
   (dc/test-card
