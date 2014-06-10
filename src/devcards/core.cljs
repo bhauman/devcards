@@ -14,6 +14,7 @@
                             IUnMount
                             IConfig]]
    [sablono.core :as sab :include-macros true]
+   [reagent.core :as reagent]
    [devcards.util.edn-renderer :as edn-rend]
    [clojure.string :as string]
    [om.core :as om :include-macros true]
@@ -206,6 +207,15 @@
      (react-card (sab/html sab-template) options))
   ([sab-template]
      (react-card (sab/html sab-template) {})))
+
+(defn reagent-card
+  "Card that renders reagent components."
+  [component]
+  (let [react-component (cond
+                         (map? component) (reagent/create-class component)
+                         (fn? component) (reagent/as-component (component))
+                         :else (reagent/as-component component))]
+    (react-card react-component)))
 
 (declare om-root-card)
 

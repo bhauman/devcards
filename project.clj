@@ -8,6 +8,7 @@
                  [org.clojure/clojurescript "0.0-2202"]
                  [org.clojure/core.async "0.1.278.0-76b25b-alpha"]
                  [sablono "0.2.16"]
+                 [reagent "0.4.2"]
                  [crate "0.2.4"]
                  [jayq "2.5.1"]
                  [om "0.6.2"]
@@ -20,10 +21,10 @@
                              [lein-figwheel "0.1.3-SNAPSHOT"]]
                    }
              }
-  
+
   :source-paths ["src"]
 
-  :cljsbuild { 
+  :cljsbuild {
     :builds [{:id "devcards-demos"
               :source-paths ["src" "example_src"]
               :compiler {

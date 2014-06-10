@@ -1,12 +1,13 @@
 (ns devdemos.core
   (:require
    [devcards.core :as dc :include-macros true]
-   [devcards.system :refer [IMount IUnMount IConfig]]   
+   [devcards.system :refer [IMount IUnMount IConfig]]
    [om.core :as om :include-macros true]
-   [om.dom :as dom :include-macros true]   
+   [om.dom :as dom :include-macros true]
    [clojure.string :as string]
    [sablono.core :as sab :include-macros true]
-   [devdemos.two-zero])
+   [devdemos.two-zero]
+   [devdemos.reagent])
   (:require-macros
    [devcards.core :refer [defcard is are= are-not= format-code format-data mkdn-code mkdn-data]]))
 
@@ -31,7 +32,7 @@
    (mkdn-code
     (defcard first-markdown-card
       (markdown-card "# This is a heading")))
-   
+
    "Devcards are designed to be written inline with your code during
     development. They are like advanced stateful `println`s that can
     hold almost any arbitrary functionality that you want." ))
@@ -106,7 +107,7 @@
 
 (defcard om-intro
   (dc/markdown-card
-   "## Om 
+   "## Om
 
     The `om-root-card` will render Om components, much the way `om/root` does."))
 
