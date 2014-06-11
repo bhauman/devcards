@@ -33,4 +33,5 @@
   (dc/reagent-card [render-fn-with-state]))
 
 (defcard reagent-card-using-react-spec
-  (dc/reagent-card (reagent/create-class {:render (render-fn-with-state)})))
+  (dc/reagent-card {:render (render-fn-with-state)}))
+

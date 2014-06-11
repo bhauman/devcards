@@ -212,7 +212,7 @@
   "Card that renders reagent components."
   [component]
   (let [react-component (cond
-                         (map? component) (reagent/create-class component)
+                         (map? component) (reagent/as-component ((reagent/create-class component)))
                          (fn? component) (reagent/as-component (component))
                          :else (reagent/as-component component))]
     (react-card react-component)))
