@@ -4,18 +4,24 @@
                           ITransform
                           IDerive
                           IInputFilter
+                          IEffect
                           run
                           make-runnable
                           runner-start
-                          compose]]
+                          compose
+                          add-effects]]
    [jayq.core :refer [$]]
    [crate.core :as c]
    [clojure.string :as string]
    [clojure.set :refer [intersection difference]]
    [cljs.core.async :refer [put! chan sliding-buffer timeout]]
-   [cljs.reader :refer [read-string]])
+   [cljs.reader :refer [read-string]]
+   [goog.events :as events])
   (:require-macros
-   [cljs.core.async.macros :refer [go go-loop]]))
+   [cljs.core.async.macros :refer [go go-loop]])
+  (:import
+   [goog History]
+   [goog.history EventType]))
 
 (def devcards-app-element-id "devcards-main")
 (def devcards-controls-element-id "devcards-controls")
@@ -52,7 +58,7 @@
 (defprotocol IConfig
     (-options [o]))
 
-(def default-card-options 
+(def default-card-options
   {:heading           true
    :padding           true
    :unmount-on-reload true
@@ -177,13 +183,25 @@
                                  position
                                  (atom (or (:initial-state options) {})))))))))
 
+(defn add-navigate-effect [state]
+  (let [path (->> (:current-path state)
+                  (map name)
+                  (string/join "/"))]
+    (add-effects state [:navigate path])))
+
 (defmethod dev-trans :add-to-current-path [[_ {:keys [path]}] state]
   (-> state
-      (update-in [:current-path] 
-                 (fn [x] (conj x (keyword path))))))
+      (update-in [:current-path]
+                 (fn [x] (conj x (keyword path))))
+      add-navigate-effect))
 
 (defmethod dev-trans :current-path [[_ {:keys [path]}] state]
-  (assoc state :current-path (vec path)))
+  (if (not= (:current-path state)
+            (vec path))
+    (-> state
+        (assoc :current-path (vec path))
+        add-navigate-effect)
+    state))
 
 ;; derivatives
 
@@ -254,8 +272,44 @@
     (.setItem js/sessionStorage "__devcards__current-path" (prn-str (:current-path state)))
     state))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Hashbang routing
+
+(def history
+  (let [h (History.)]
+    (.setEnabled h true)
+    h))
+
+(defn parse-path-from-token [token]
+  (string/join ":::"
+               (-> token
+                   (string/replace #"!/" "")
+                   (string/split #"/"))))
+
+(defmulti hashbang-effect identity)
+
+(defmethod hashbang-effect :default [_ system data event-chan])
+
+(defmethod hashbang-effect :navigate [_ system data event-chan]
+  (.setToken history (str "!/" data)))
+
+(defrecord HashBangRouting []
+  IInit
+  (-initialize [_ state event-chan]
+    (events/listen history EventType/NAVIGATE
+                   #(let [path (parse-path-from-token (.-token %))]
+                      (put! event-chan [:set-current-path {:path path}])))
+    (when-let [token (.getToken history)]
+      (when-let [path (parse-path-from-token token)]
+        (put! event-chan [:set-current-path {:path path}]))))
+  IEffect
+  (-effect [o [name data] system event-chan effect-chan]
+    (hashbang-effect name system data event-chan)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn naked-card [{:keys [path options]}]
-  [:div 
+  [:div
    {:id (unique-card-id path)
     :class (str "devcard-rendered-card" (if (:padding options) " devcard-padding" "")) }])
 
@@ -273,7 +327,7 @@
     [:span]))
 
 (defn display-cards [cards]
-  (map (comp card-template second) 
+  (map (comp card-template second)
        (sort-by (comp :position second) cards)))
 
 (defn dir-links [dirs]
@@ -306,7 +360,7 @@
      [:div.col-md-9
       (when-let [crumbs (:breadcrumbs data)]
         (breadcrumbs-templ crumbs))
-      (when-let [dir-paths (:display-dir-paths data)] 
+      (when-let [dir-paths (:display-dir-paths data)]
         (dir-links dir-paths))]
      [:div.col-md-3
       ]
@@ -314,7 +368,7 @@
     ]
    ])
 
-(defn cards-templates [data] 
+(defn cards-templates [data]
   [:div.container
    [:div.row
     [:div.col-md-9
@@ -324,7 +378,7 @@
        (naked-card card))]]])
 
 (defn to-node [jq]
-  (aget (.get jq) 0)) 
+  (aget (.get jq) 0))
 
 (defn sel-nodes [sel]
   (mapv to-node ($ sel)))
@@ -368,7 +422,7 @@
 
 (defn create-needed-card-nodes [data]
   (when (:render-cards data)
-    (.html ($ (devcards-cards-node)) 
+    (.html ($ (devcards-cards-node))
            (c/html (cards-templates data)))
     ))
 
@@ -379,7 +433,7 @@
         (when (and (satisfies? IUnMount functionality)
                    (or (:render-cards data)
                        (:unmount-on-reload (:options card))
-                       (:delete-card card))) 
+                       (:delete-card card)))
             (unmount functionality { :node node
                                      :data-atom (:data-atom card)}))))))
 
@@ -432,10 +486,12 @@
 
 (def devcard-comp (compose
                    (DevCards.)
-                   (CurrentPathSessionStorage.)))
+                   (CurrentPathSessionStorage.)
+                   (HashBangRouting.)))
 
 (defn data-to-message [msg-name event-chan]
   (fn [e]
+    (.preventDefault e)
     (let [t (.-currentTarget e)]
       (when-let [data (.data ($ t))]
         (put! event-chan
@@ -473,7 +529,7 @@
   (let [q (chan (sliding-buffer 1))
         tq (throttle-chan q ms)]
     (go-loop []
-             (when-let [v (<! tq)]
-               (f v) (recur)))
+      (when-let [v (<! tq)]
+        (f v) (recur)))
     (fn [x] (put! q x))))
 
