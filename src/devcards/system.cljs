@@ -280,6 +280,12 @@
     (.setEnabled h true)
     h))
 
+(defn parse-path-from-token [token]
+  (string/join ":::"
+               (-> token
+                   (string/replace #"!/" "")
+                   (string/split #"/"))))
+
 (defmulti hashbang-effect identity)
 
 (defmethod hashbang-effect :default [_ system data event-chan])
@@ -291,11 +297,11 @@
   IInit
   (-initialize [_ state event-chan]
     (events/listen history EventType/NAVIGATE
-                   #(let [path (string/join ":::"
-                                            (-> (.-token %)
-                                                (string/replace #"!/" "")
-                                                (string/split #"/")))]
-                      (put! event-chan [:set-current-path {:path path}]))))
+                   #(let [path (parse-path-from-token (.-token %))]
+                      (put! event-chan [:set-current-path {:path path}])))
+    (when-let [token (.getToken history)]
+      (when-let [path (parse-path-from-token token)]
+        (put! event-chan [:set-current-path {:path path}]))))
   IEffect
   (-effect [o [name data] system event-chan effect-chan]
     (hashbang-effect name system data event-chan)))
@@ -485,6 +491,7 @@
 
 (defn data-to-message [msg-name event-chan]
   (fn [e]
+    (.preventDefault e)
     (let [t (.-currentTarget e)]
       (when-let [data (.data ($ t))]
         (put! event-chan
