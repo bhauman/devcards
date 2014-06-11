@@ -275,7 +275,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Hashbang routing
 
-(def history
+(defonce history
   (let [h (History.)]
     (.setEnabled h true)
     h))
@@ -285,13 +285,6 @@
                (-> token
                    (string/replace #"!/" "")
                    (string/split #"/"))))
-
-(defmulti hashbang-effect identity)
-
-(defmethod hashbang-effect :default [_ system data event-chan])
-
-(defmethod hashbang-effect :navigate [_ system data event-chan]
-  (.setToken history (str "!/" data)))
 
 (defrecord HashBangRouting []
   IInit
@@ -303,8 +296,9 @@
       (when-let [path (parse-path-from-token token)]
         (put! event-chan [:set-current-path {:path path}]))))
   IEffect
-  (-effect [o [name data] system event-chan effect-chan]
-    (hashbang-effect name system data event-chan)))
+  (-effect [o [nm data] system event-chan effect-chan]
+    (when (= nm :navigate)
+      (.setToken history (str "!/" data)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
