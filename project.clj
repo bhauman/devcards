@@ -21,10 +21,10 @@
                              [lein-figwheel "0.1.3-SNAPSHOT"]]
                    }
              }
-
+  
   :source-paths ["src"]
 
-  :cljsbuild {
+  :cljsbuild { 
     :builds [{:id "devcards-demos"
               :source-paths ["src" "example_src"]
               :compiler {
