@@ -92,17 +92,53 @@
    (dom/div #js {}
             (dom/h2 #js {} "This is a react card."))))
 
+(defn counter-app-rct [intro data-atom]
+  (sab/html [:div
+             intro
+             [:div "Count: " (:count @data-atom)]
+             [:ul
+              [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]]
+              [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] dec))} "dec"]]]]))
+
 (defcard react-runner-card-example
   (dc/react-runner-card
-   (fn [data-atom]
-     (sab/html [:div
-                [:h3 "This is a " "react-runner-card"]
-                [:p "This card triggers a re-render when it the atom is modified"]
-                [:div "Count: " (:count @data-atom)]
-                [:ul
-                 [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]]
-                 [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] dec))} "dec"]]]]))
+   (partial counter-app-rct
+            (sab/html
+             [:div
+              [:h3 "This is a " "react-runner-card"]
+              [:p "This card triggers a re-render when it the atom is modified"]]))
    { :initial-state {:count 30 } }))
+
+(defcard atom-sharing
+  (dc/markdown-card 
+   "### Sharing an Atom
+
+    If you pass an Atom as the `:initial-state` option to the
+    `react-runner-card` that Atom will be directly used as the state
+    atom instead of the Atom that is provided by the Devcards system.
+    This allows you to share an Atom with several cards.
+
+    If you interact with the counter below you will see the card
+    after it respond to the counter changes."))
+
+(defonce react-shared-atom (atom {:count 3}))
+
+(defcard react-runner-card-shared-1
+  (dc/react-runner-card
+   (partial counter-app-rct
+            (sab/html
+             [:div
+              [:h3 "This counter is sharing state"]
+              [:p "The next card is sharing the same atom as this card."]]))
+   { :initial-state react-shared-atom }))
+
+(defcard react-runner-card-shared-2
+  (dc/react-runner-card
+   (fn [data-atom] (sab/html [:h1 "Count: " (:count @data-atom)]))
+   { :initial-state react-shared-atom }))
+
+
+
 
 (defcard om-intro
   (dc/markdown-card

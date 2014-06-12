@@ -8,7 +8,7 @@
                             register-listeners
                             unmount-card-nodes
                             mount-card-nodes
-                            unique-card-id
+                            path->unique-card-id
                             throttle-function
                             IMount
                             IUnMount
@@ -101,7 +101,7 @@
 (defn render-single-card [card-path node]
   "Declare that a card with a certain path will be rendered to a
    certain node. This is helpful for blog post examples."
-  (let [id (unique-card-id card-path)]
+  (let [id (path->unique-card-id card-path)]
     (when-not (.getElementById js/document id)
       (.html (js/$ node) (str "<div class='devcard-rendered-card' id='" id "'></div>")))))
 
@@ -209,25 +209,38 @@
 
 (declare om-root-card)
 
+(defn box-data-atom [initial-state]
+  (if (and initial-state (satisfies? IAtom initial-state))
+    { :__devcards-atom-box initial-state }
+    initial-state ))
+
+(defn unbox-data-atom [data-atom]
+  (or (and (map? @data-atom)
+           (:__devcards-atom-box @data-atom))
+      data-atom))
+
 (defn edn-card [clj-data]
   "A card that renders EDN."
   (if (satisfies? IAtom clj-data)
     (om-root-card #(om/component (edn->html %)) clj-data)
     (react-card (edn->html clj-data))))
 
-(defrecord ReactRunnerCard [react-component-fn options]
+(defrecord ReactRunnerCard [react-component-fn uniq-key options]
   IMount
   (mount [_ {:keys [node data-atom]}]
-    (add-watch data-atom :react-runner
-               (fn [_ _ _ _] (render-to (react-component-fn data-atom) node)))
-    (reset! data-atom @data-atom))
+    (let [da (unbox-data-atom data-atom)]
+      (add-watch da uniq-key
+                 (fn [_ _ _ _] (render-to (react-component-fn da) node)))
+      (reset! da @da)))
   IUnMount
   (unmount [_ {:keys [node data-atom]}]
-    (remove-watch data-atom :react-runner)
+    (remove-watch (unbox-data-atom data-atom) uniq-key)
     (unmount-react node))
   IConfig
   (-options [_]
-    (merge { :unmount-on-reload false } options )))
+    (merge { :unmount-on-reload false }
+           options
+           {:initial-state (box-data-atom (:initial-state options))})))
 
 ;; another way to do this is to create a runner component and
 ;; pass it to the react card.
@@ -236,7 +249,8 @@
 react component. Any changes to the atom cause the component to
 rerender."
   ([react-component-fn options]
-     (ReactRunnerCard. react-component-fn options))
+     (ReactRunnerCard. react-component-fn (keyword (gensym 'react-runner))
+      options))
   ([react-component-fn]
      (react-runner-card react-component-fn {})))
 
@@ -507,20 +521,15 @@ rerender."
 (defrecord OmRootCard [om-comp initial-state om-options devcard-options]
   IMount
   (mount [_ {:keys [node data-atom]}]
-    (let [da (or (and (map? @data-atom)
-                      (:__devcards-atom-box @data-atom))
-                 data-atom)]
-      (om/root om-comp da {:target node})))
+    (om/root om-comp (unbox-data-atom data-atom) {:target node}))
   IUnMount
   (unmount [_ {:keys [node]}]
     (unmount-react node))
   IConfig
   (-options [_]
     (merge { :unmount-on-reload false
-            :initial-state
-            (if (satisfies? IAtom initial-state)
-              { :__devcards-atom-box initial-state}
-              initial-state)} devcard-options)))
+             :initial-state (box-data-atom initial-state)}
+           devcard-options)))
 
 (defn om-root-card
   ([om-comp-fn initial-state om-options devcard-options]
