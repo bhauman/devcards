@@ -33,7 +33,7 @@
 (defn devcards-controls-node [] (get-element-by-id devcards-controls-element-id))
 (defn devcards-cards-node [] (get-element-by-id devcards-cards-element-id))
 
-(defn unique-card-id [path]
+(defn path->unique-card-id [path]
   (string/join "." (map (fn [x] (str "[" x "]"))
                         (map name (cons :cardpath path)))))
 
@@ -48,6 +48,13 @@
   (and (:current-path data)
        (:cards data)
        (get-in (:cards data) (:current-path data))))
+
+(defn valid-path? [state path]
+  (or (= [] path)
+      (get-in (:cards state) path)))
+
+(defn enforce-valid-path [state path]
+  (vec (if (valid-path? state path) path [])))
 
 (defprotocol IMount
   (mount [o data]))
@@ -87,7 +94,7 @@
 (defmethod ifilter :default [msg state] msg)
 
 (defmethod ifilter :set-current-path [[_ {:keys [path]}] state]
-  [:current-path {:path (vec (map keyword (string/split path ":::")))}])
+  [:current-path {:path (unique-card-id->path path)}])
 
 ;; transforms
 (defmulti dev-trans first)
@@ -183,25 +190,22 @@
                                  position
                                  (atom (or (:initial-state options) {})))))))))
 
-(defn add-navigate-effect [state]
-  (let [path (->> (:current-path state)
-                  (map name)
-                  (string/join "/"))]
-    (add-effects state [:navigate path])))
+(defn add-navigate-effect [{:keys [current-path] :as state}]
+  (add-effects state [:navigate current-path]))
 
-(defmethod dev-trans :add-to-current-path [[_ {:keys [path]}] state]
+(defmethod dev-trans :add-to-current-path [[_ {:keys [path]}] {:keys [current-path] :as state}]
   (-> state
-      (update-in [:current-path]
-                 (fn [x] (conj x (keyword path))))
+      (assoc :current-path
+        (enforce-valid-path state (conj current-path (keyword path))))
       add-navigate-effect))
 
-(defmethod dev-trans :current-path [[_ {:keys [path]}] state]
-  (if (not= (:current-path state)
-            (vec path))
-    (-> state
-        (assoc :current-path (vec path))
-        add-navigate-effect)
-    state))
+(defmethod dev-trans :current-path [[_ {:keys [path]}] {:keys [current-path] :as state}]
+  (let [path (vec path)]
+    (if (not= current-path path)
+      (-> state
+          (assoc :current-path (enforce-valid-path state path))
+          add-navigate-effect)
+      state)))
 
 ;; derivatives
 
@@ -261,17 +265,6 @@
         render-cards?
         breadcrumbs)))
 
-(defrecord CurrentPathSessionStorage []
-  IInit
-  (-initialize [_ state event-chan]
-    (when-let [current-path (.getItem js/sessionStorage "__devcards__current-path")]
-      (when-let [path (try (read-string current-path) (catch js/Error e nil))]
-        (put! event-chan [:current-path {:path path}]))))
-  IDerive
-  (-derive [o state]
-    (.setItem js/sessionStorage "__devcards__current-path" (prn-str (:current-path state)))
-    state))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Hashbang routing
 
@@ -280,31 +273,34 @@
     (.setEnabled h true)
     h))
 
-(defn parse-path-from-token [token]
-  (string/join ":::"
-               (-> token
-                   (string/replace #"!/" "")
-                   (string/split #"/"))))
+(defn path->token [path]
+  (str "!/" (string/join "/" (map name path))))
+
+(defn token->path [token]
+  (vec (map keyword
+            (-> token
+                (string/replace #"!/" "")
+                (string/split #"/")))))
 
 (defrecord HashBangRouting []
   IInit
   (-initialize [_ state event-chan]
     (events/listen history EventType/NAVIGATE
-                   #(let [path (parse-path-from-token (.-token %))]
-                      (put! event-chan [:set-current-path {:path path}])))
+                   #(put! event-chan [:current-path {:path (token->path (.-token %))}]))
     (when-let [token (.getToken history)]
-      (when-let [path (parse-path-from-token token)]
-        (put! event-chan [:set-current-path {:path path}]))))
+      (go
+       (<! (timeout 20)) ;; we need to wait a bit for it to be a valid path :)
+       (put! event-chan [:current-path {:path (token->path token)}]))))
   IEffect
-  (-effect [o [nm data] system event-chan effect-chan]
+  (-effect [o [nm path] system event-chan effect-chan]
     (when (= nm :navigate)
-      (.setToken history (str "!/" data)))))
+      (.setToken history (path->token path)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn naked-card [{:keys [path options]}]
   [:div
-   {:id (unique-card-id path)
+   {:id (path->unique-card-id path)
     :class (str "devcard-rendered-card" (if (:padding options) " devcard-padding" "")) }])
 
 (defn card-template [{:keys [path options] :as card}]
@@ -312,7 +308,7 @@
     (if (:heading options)
       [:div.panel.panel-default.devcard-panel
        [:div.panel-heading.devcards-set-current-path
-        {:data-path (string/join ":::" (map name path))}
+        {:data-path (path->unique-card-id path)}
         [:span.panel-title (name (last path)) " "]]
        (naked-card card)]
       [:div.panel.panel-default.devcard-panel
@@ -339,7 +335,7 @@
    (map (fn [[n path]]
           [:li
            [:a.devcards-set-current-path {:href "#"
-                                          :data-path (string/join ":::" path)}
+                                          :data-path (path->unique-card-id path)}
             n]])
         crumbs)])
 
@@ -447,7 +443,7 @@
 (defn remove-card [card]
   (when-let [node (.getElementById
                    js/document
-                   (unique-card-id (:path card)))]
+                   (path->unique-card-id (:path card)))]
     (remove-node (.-parentNode node))))
 
 (defn delete-deleted-card-nodes [data]
@@ -475,12 +471,11 @@
   (mount-card-nodes state))
 
 (def devcard-initial-data { :current-path []
-                           :position 0
-                           :cards {} })
+                            :position 0
+                            :cards {} })
 
 (def devcard-comp (compose
                    (DevCards.)
-                   (CurrentPathSessionStorage.)
                    (HashBangRouting.)))
 
 (defn data-to-message [msg-name event-chan]
