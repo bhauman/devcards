@@ -97,7 +97,7 @@ First make sure you include the following `:dependencies` in your `project.clj` 
 
 ```clojure
 [org.clojure/clojurescript "0.0-2197"] ;; has to be at least 2197 or greater
-[devcards "0.1.0-SNAPSHOT"]
+[devcards "0.1.1-SNAPSHOT"]
 ```
 
 lein figwheel is not required to use Devcards but ... if you want to
