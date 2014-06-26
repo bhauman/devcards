@@ -161,23 +161,23 @@
 
 (defonce om-test-atom (atom {:count 20}))
 
-(defn counter [data f s]
+(defn counter [owner data f s]
   (om/component
    (sab/html
     [:div
-     [:h1 "Counter " (:count data)]
+     [:h1 (om/get-shared owner :title) (:count data)]
      [:div [:a {:onClick #(om/transact! data :count f)} s]]
      (dc/edn->html data)])))
 
-(defn om-counter-inc [data owner] (counter data inc "inc"))
+(defn om-counter-inc [data owner] (counter owner data inc "inc"))
 
 (defcard omcard-shared-ex-1
-  (dc/om-root-card om-counter-inc om-test-atom))
+  (dc/om-root-card om-counter-inc om-test-atom {:shared {:title "First counter "}}))
 
-(defn om-counter-dec [data owner] (counter data dec "dec"))
+(defn om-counter-dec [data owner] (counter owner data dec "dec"))
 
 (defcard omcard-shared-ex-2
-  (dc/om-root-card om-counter-dec om-test-atom))
+  (dc/om-root-card om-counter-dec om-test-atom {:shared {:title "Second counter "}}))
 
 (defcard edn-card-share-atoms
   (dc/markdown-card

@@ -521,7 +521,7 @@ rerender."
 (defrecord OmRootCard [om-comp initial-state om-options devcard-options]
   IMount
   (mount [_ {:keys [node data-atom]}]
-    (om/root om-comp (unbox-data-atom data-atom) {:target node}))
+    (om/root om-comp (unbox-data-atom data-atom) (merge om-options {:target node})))
   IUnMount
   (unmount [_ {:keys [node]}]
     (unmount-react node))
