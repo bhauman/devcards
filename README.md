@@ -15,7 +15,7 @@ which allows the developer navigate to different namespaces and view
 the *cards* that have been defined in that namespace. 
 
 When used in conjunction with [lein figwheel][leinfigwheel] the cards can be
-created and edited **"live"** in the one's ClojureScript source
+created and edited **"live"** in one's ClojureScript source
 files.
 
 [See the introduction video.](https://vimeo.com/97078905)
@@ -49,9 +49,9 @@ see the following examples:
 
 ## Super Quick Start
 
-There is a Devcards Leinigen template to get you up an running quickly.
+There is a Devcards Leiningen template to get you up an running quickly.
 
-Make sure you have the [latest version of leinigen installed](https://github.com/technomancy/leiningen#installation).
+Make sure you have the [latest version of leiningen installed](https://github.com/technomancy/leiningen#installation).
 
 Type the following to create a fresh project with devcards setup for you:
 
