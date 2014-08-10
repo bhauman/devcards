@@ -16,12 +16,12 @@
    [clojure.set :refer [intersection difference]]
    [cljs.core.async :refer [put! chan sliding-buffer timeout]]
    [cljs.reader :refer [read-string]]
-   [goog.events :as events])
+   [goog.events :as events]
+   [goog.history.EventType :as EventType])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]])
   (:import
-   [goog History]
-   [goog.history EventType]))
+   [goog History]))
 
 (def devcards-app-element-id "devcards-main")
 (def devcards-controls-element-id "devcards-controls")
