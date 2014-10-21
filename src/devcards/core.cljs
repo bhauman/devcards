@@ -161,8 +161,6 @@
 
 (def less-sensitive-markdown (comp markdown-to-html preformat-markdown))
 
-
-
 (defn render-to
   "Render a react component to a node."
   ([react-dom html-node callback]
@@ -540,8 +538,6 @@ rerender."
      (om-root-card om-comp-fn initial-state {} {}))
   ([om-comp-fn]
      (om-root-card om-comp-fn {} {} {})))
-
-
 
 ;; for frontier components don't look down here yet :)
 ;; super alpha
