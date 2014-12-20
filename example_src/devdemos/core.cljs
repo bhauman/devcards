@@ -137,9 +137,6 @@
    (fn [data-atom] (sab/html [:h1 "Count: " (:count @data-atom)]))
    { :initial-state react-shared-atom }))
 
-
-
-
 (defcard om-intro
   (dc/markdown-card
    "## Om 
