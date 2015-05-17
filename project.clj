@@ -31,10 +31,12 @@
                   :source-paths ["src" "example_src"]
                   :figwheel true
                   :compiler {
-                    :output-to "resources/public/devcards/js/compiled/devdemos.js"
-                    :output-dir "resources/public/devcards/js/compiled/out"
-                    :optimizations :none
-                    :source-map true}}]}
+                             :main "devdemos.core"
+                             :asset-path "js/compiled/out"
+                             :output-to "resources/public/devcards/js/compiled/devdemos.js"
+                             :output-dir "resources/public/devcards/js/compiled/out"
+                             :optimizations :none
+                             :source-map true}}]}
                    
       :figwheel { :css-dirs ["resources/public/devcards/css"] }
      }})
