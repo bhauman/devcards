@@ -420,15 +420,7 @@
   (doseq [[card node] (:visible-card-nodes data)]
     (when (:delete-card card) (remove-card card))))
 
-(defn add-css-if-necessary! []
-  (if-let [heads (.getElementsByTagName js/document "head")]
-    (let [head (aget heads 0)]
-      (when-not (.getElementById js/document "bootstrap-min-css")
-        (.appendChild head (c/html [:style#bootstrap-min-css (inline-resouce-file "public/devcards/bootstrap/css/bootstrap.min.css")])))
-      (when-not (.getElementById js/document "devcards-css")
-        (.appendChild head (c/html [:style#devcards-css (inline-resouce-file "public/devcards/css/devcards.css")])))
-      (when-not (.getElementById js/document "rendered-edn-css")
-        (.appendChild head (c/html [:style#rendered-edn-css (inline-resouce-file "public/devcards/css/rendered_edn.css")]))))))
+(declare add-css-if-necessary!)
 
 (defn render-base-if-necessary! []
   (add-css-if-necessary!)
@@ -499,3 +491,13 @@
       (when-let [v (<! tq)]
         (f v) (recur)))
     (fn [x] (put! q x))))
+
+(defn add-css-if-necessary! []
+  (if-let [heads (.getElementsByTagName js/document "head")]
+    (let [head (aget heads 0)]
+      (when-not (.getElementById js/document "bootstrap-min-css")
+        (.appendChild head (c/html [:style#bootstrap-min-css (inline-resouce-file "public/devcards/bootstrap/css/bootstrap.min.css")])))
+      (when-not (.getElementById js/document "devcards-css")
+        (.appendChild head (c/html [:style#devcards-css (inline-resouce-file "public/devcards/css/devcards.css")])))
+      (when-not (.getElementById js/document "rendered-edn-css")
+        (.appendChild head (c/html [:style#rendered-edn-css (inline-resouce-file "public/devcards/css/rendered_edn.css")]))))))
