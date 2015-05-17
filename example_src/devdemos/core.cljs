@@ -12,8 +12,7 @@
 
 (enable-console-print!)
 (devcards.core/start-devcard-ui!)
-(devcards.core/start-figwheel-reloader!
- #_{:websocket-url "ws://localhost:3449/figwheel-ws"})
+
 
 (defcard intro
   (dc/markdown-card

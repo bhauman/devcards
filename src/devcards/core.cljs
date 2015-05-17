@@ -24,8 +24,22 @@
                             default-before-load]]
    [cljs.core.async :refer [put! chan] :as async]))
 
+(enable-console-print!)
+
 ;; oh well
 (defonce devcard-event-chan (chan))
+
+(defn devcard-before-jsload [x]
+  (put! devcard-event-chan [:before-jsload x]) x)
+
+(defn devcard-on-jsload [x]
+  (put! devcard-event-chan [:jsreload x]) x)
+
+(defn register-figwheel-listeners! []
+  (.addEventListener (.-body js/document) "figwheel.js-reload"
+                     (fn [x] (devcard-on-jsload (.-detail x))))
+  (.addEventListener (.-body js/document) "figwheel.before-js-reload"
+                     (fn [x] (devcard-before-jsload (.-detail x)))))
 
 (defn start-devcard-ui!
   "This function starts the full devcard UI."
@@ -36,43 +50,22 @@
       (let [ds (devcard-system-start devcard-event-chan
                                      (throttle-function devcard-renderer 50))]
         (register-listeners devcard-event-chan)
-        ds))))
+        ds)
+      (register-figwheel-listeners!))))
 
 (defn start-single-card-ui!
   "Start a devcard UI that allows you to cherry pick which cards to display.
    You will need to call render-single-card to put cards into the dom."
   []
   (defonce devcard-single-card-system
-    (devcard-system-start devcard-event-chan
-                          (throttle-function
-                           (fn [{:keys [state event-chan]}]
-                            (unmount-card-nodes state)
-                            (mount-card-nodes state))
-                           50))))
-
-(defn devcard-before-jsload [x] (put! devcard-event-chan [:before-jsload x]) x)
-
-(defn devcard-on-jsload [x] (put! devcard-event-chan [:jsreload x]) x)
-
-(defn devcard-on-cssload [x] (put! devcard-event-chan [:cssload]) x)
-
-(defn devcard-on-compile-fail [exception-msg]
-  (put! devcard-event-chan [:compile-fail exception-msg])
-  exception-msg)
-
-(defn start-figwheel-reloader!
-  "Start the figwheel reloader and hook it into devcards so that cards
-   are reloaded on code reloads."
-  ([opts]
-     (watch-and-reload-with-opts (assoc opts
-                                   :before-jsload   (comp devcard-before-jsload
-                                                          default-before-load)
-                                   :on-jsload       devcard-on-jsload
-                                   :on-compile-fail (comp devcard-on-compile-fail
-                                                          default-on-compile-fail)
-                                   :on-cssload (comp devcard-on-cssload
-                                                     default-on-cssload))))
-  ([] (start-figwheel-reloader! {})))
+    (do
+      (register-figwheel-listeners!)
+      (devcard-system-start devcard-event-chan
+                            (throttle-function
+                             (fn [{:keys [state event-chan]}]
+                               (unmount-card-nodes state)
+                               (mount-card-nodes state))
+                             50)))))
 
 ;; Register a new card
 ;; this is normally called from the defcard macro
