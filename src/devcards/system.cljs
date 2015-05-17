@@ -156,19 +156,7 @@
   (mark-all-cards state files))
 
 (defmethod dev-trans :jsreload [[_ files] state]
-  (-> state
-      (sweep files)
-      (assoc :code-loaded :js)
-      (dissoc :compile-failed)))
-
-(defmethod dev-trans :cssload [msg state]
-   (assoc state :code-loaded :css))
-
-(defmethod dev-trans :remove-code-loaded-effect [msg state]
-  (dissoc state :code-loaded))
-
-(defmethod dev-trans :compile-fail [msg state]
-  (assoc state :compile-failed (last msg)))
+  (sweep state files))
 
 (defmethod dev-trans :register-card [[_ {:keys [path options func]}] state]
   (let [position (:position state)]
@@ -389,27 +377,6 @@
               identity)
              card-nodes))))
 
-(defn toggle-background-to-white [data]
-  (if (:display-single-card data)
-    (.addClass (js/$ "body") "devcards-white-background")
-    (.removeClass (js/$ "body") "devcards-white-background")))
-
-(defn compile-failure [state]
-  (if (:compile-failed state)
-    (.addClass (js/$ (devcards-app-node)) "devcards-compile-failed")
-    (.removeClass (js/$ (devcards-app-node)) "devcards-compile-failed")))
-
-(def code-loaded-class {:js "devcards-load-highlight"
-                        :css "devcards-cssload-highlight"})
-
-(defn code-loaded [state event-chan]
-  (when-let [class (code-loaded-class (:code-loaded state))]
-    (.addClass (js/$ (devcards-app-node)) class)
-    (go
-     (<! (timeout 1400))
-     (.removeClass (js/$ (devcards-app-node)) class)
-     (put! event-chan [:remove-code-loaded-effect]))))
-
 (defn create-needed-card-nodes [data]
   (when (:render-cards data)
     (.html ($ (devcards-cards-node))
@@ -465,9 +432,6 @@
   (delete-deleted-card-nodes state)
   (.html ($ (devcards-controls-node)) (c/html (main-template state)))
   (create-needed-card-nodes state)
-  (toggle-background-to-white state)
-  (compile-failure state)
-  (code-loaded state event-chan)
   (mount-card-nodes state))
 
 (def devcard-initial-data { :current-path []

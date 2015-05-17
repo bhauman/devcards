@@ -6,11 +6,6 @@ body {
   background-color: #fff;
 }
 
-.devcards-compile-failed {
-  background-color: #a94442;
-  #_background-color: #f2dede;
-}
-
 .devards-main-navbar {
   background-color: rgb(60,90,153);
   border-color: rgb(50,80,153);
@@ -151,29 +146,4 @@ body {
 
 .devcards-pad-card {
   padding: 14px;
-}
-
-.devcards-load-highlight {
-  -webkit-animation: load-highlight-white 1.3s;
-}
-
-.devcards-cssload-highlight {
-  -webkit-animation: load-highlight-yellow 1.3s;
-}
-
-.devcards-white-background .devcards-load-highlight {
-  -webkit-animation: load-highlight-grey 1.3s;
-}
-
-@-webkit-keyframes load-highlight-white {
-  20%   { background-color: #fff; }
-//  20%   { background-color: rgba(60,118,61,0.1);}
-}
-
-@-webkit-keyframes load-highlight-grey {
-  20%   { background-color: rgb(233,234,237); }
-}
-
-@-webkit-keyframes load-highlight-yellow {
-  20%   { background-color: #fcf8e3;}
 }
