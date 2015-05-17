@@ -2,6 +2,7 @@
   (:require
    [frontier.core  :as fr]
    [frontier.cards  :as fc]
+
    [devcards.system :refer [devcard-system-start
                             render-base-if-necessary!
                             devcard-renderer
@@ -13,15 +14,17 @@
                             IMount
                             IUnMount
                             IConfig]]
+
    [sablono.core :as sab :include-macros true]
    [devcards.util.edn-renderer :as edn-rend]
    [clojure.string :as string]
+
    [om.core :as om :include-macros true]
    [om.dom :as dom :include-macros true]
-   [figwheel.client :refer [watch-and-reload-with-opts
-                            default-on-compile-fail
-                            default-on-cssload
-                            default-before-load]]
+
+   [cljsjs.react]
+   [cljsjs.jquery]
+   [cljsjs.showdown]   
    [cljs.core.async :refer [put! chan] :as async]))
 
 (enable-console-print!)
@@ -157,7 +160,7 @@
 (defn render-to
   "Render a react component to a node."
   ([react-dom html-node callback]
-     (.renderComponent js/React react-dom html-node callback))
+     (.render js/React react-dom html-node callback))
   ([react-dom html-node]
      (render-to react-dom html-node identity)))
 
@@ -544,7 +547,7 @@ rerender."
                component
                (fn [state]
                  (when-let [react-dom (fr/-render component state)]
-                   (.renderComponent js/React (sab/html react-dom) node identity))))]
+                   (.render js/React (sab/html react-dom) node identity))))]
       (if (and (nil? (:state-atom @data-atom))
                (and initial-inputs (pos? (count initial-inputs))))
         (doseq [msg initial-inputs]

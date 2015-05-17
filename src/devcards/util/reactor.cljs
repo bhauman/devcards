@@ -1,4 +1,6 @@
-(ns devcards.util.reactor)
+(ns devcards.util.reactor
+  (:require
+   [cljsjs.react]))
 
 (def Pure
   (.createClass js/React
