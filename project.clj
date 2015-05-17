@@ -4,27 +4,29 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2496"]
+  :dependencies [[org.clojure/clojure "1.7.0-beta3"]
+                 [org.clojure/clojurescript "0.0-3269"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [sablono "0.2.22"]
                  [crate "0.2.5"]
                  [jayq "2.5.2"]
                  [om "0.7.3"]
-                 [frontier "0.1.0-SNAPSHOT"]
-                 [figwheel "0.2.0-SNAPSHOT"]]
+                 [frontier "0.1.0-SNAPSHOT"]]
 
   :source-paths ["src"]
+
+  :clean-targets ^{:protect false} ["resources/public/devcards/js/compiled/devdemos.js"
+                                    "resources/public/devcards/js/compiled/out"
+                                    :target-path]
   
   :profiles {
     :dev {
-      :aliases {"clean" ["do" "cljsbuild" "clean," "clean"]}
-                   
-      :plugins [[lein-cljsbuild "1.0.3"]
-                [lein-figwheel "0.2.0-SNAPSHOT"]]
+      :plugins [[lein-cljsbuild "1.0.5"]
+                [lein-figwheel "0.3.3"]]
       :cljsbuild {
         :builds [{:id "devcards-demos"
                   :source-paths ["src" "example_src"]
+                  :figwheel true
                   :compiler {
                     :output-to "resources/public/devcards/js/compiled/devdemos.js"
                     :output-dir "resources/public/devcards/js/compiled/out"

@@ -15,3 +15,6 @@ config.ru
 resources/public/devcards/js/compiled
 .\#*
 \#*
+
+*-init.clj
+figwheel_server.log
