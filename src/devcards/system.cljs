@@ -19,9 +19,12 @@
    [goog.events :as events]
    [goog.history.EventType :as EventType])
   (:require-macros
-   [cljs.core.async.macros :refer [go go-loop]])
+   [cljs.core.async.macros :refer [go go-loop]]
+   [devcards.system :refer [inline-resouce-file]])
   (:import
    [goog History]))
+
+(prn (inline-resouce-file "public/devcards/css/devcards.css"))
 
 (def devcards-app-element-id "devcards-main")
 (def devcards-controls-element-id "devcards-controls")
@@ -417,7 +420,18 @@
   (doseq [[card node] (:visible-card-nodes data)]
     (when (:delete-card card) (remove-card card))))
 
+(defn add-css-if-necessary! []
+  (if-let [heads (.getElementsByTagName js/document "head")]
+    (let [head (aget heads 0)]
+      (when-not (.getElementById js/document "bootstrap-min-css")
+        (.appendChild head (c/html [:style#bootstrap-min-css (inline-resouce-file "public/devcards/bootstrap/css/bootstrap.min.css")])))
+      (when-not (.getElementById js/document "devcards-css")
+        (.appendChild head (c/html [:style#devcards-css (inline-resouce-file "public/devcards/css/devcards.css")])))
+      (when-not (.getElementById js/document "rendered-edn-css")
+        (.appendChild head (c/html [:style#rendered-edn-css (inline-resouce-file "public/devcards/css/rendered_edn.css")]))))))
+
 (defn render-base-if-necessary! []
+  (add-css-if-necessary!)
   (if-let [devcards-node (devcards-app-node)]
     (do
       (when-not (devcards-controls-node)
