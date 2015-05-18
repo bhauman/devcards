@@ -24,13 +24,16 @@
   (:import
    [goog History]))
 
-(prn (inline-resouce-file "public/devcards/css/devcards.css"))
-
 (def devcards-app-element-id "devcards-main")
 (def devcards-controls-element-id "devcards-controls")
 (def devcards-cards-element-id "devcards-cards")
 
 (defn get-element-by-id [id] (.getElementById js/document id))
+
+(defn prepend-child [node node2]
+  (if-let [first-child (.-firstChild node)]
+    (.insertBefore node node2 first-child)
+    (.appendChild node node2)))
 
 (defn devcards-app-node [] (get-element-by-id devcards-app-element-id))
 (defn devcards-controls-node [] (get-element-by-id devcards-controls-element-id))
@@ -424,6 +427,8 @@
 
 (defn render-base-if-necessary! []
   (add-css-if-necessary!)
+  (when-not (devcards-app-node)
+    (prepend-child (.-body js/document) (c/html [:div#devcards-main])))
   (if-let [devcards-node (devcards-app-node)]
     (do
       (when-not (devcards-controls-node)
@@ -495,9 +500,9 @@
 (defn add-css-if-necessary! []
   (if-let [heads (.getElementsByTagName js/document "head")]
     (let [head (aget heads 0)]
-      (when-not (.getElementById js/document "bootstrap-min-css")
+      (when-not (get-element-by-id "bootstrap-min-css")
         (.appendChild head (c/html [:style#bootstrap-min-css (inline-resouce-file "public/devcards/bootstrap/css/bootstrap.min.css")])))
-      (when-not (.getElementById js/document "devcards-css")
+      (when-not (get-element-by-id "devcards-css")
         (.appendChild head (c/html [:style#devcards-css (inline-resouce-file "public/devcards/css/devcards.css")])))
-      (when-not (.getElementById js/document "rendered-edn-css")
+      (when-not (get-element-by-id "rendered-edn-css")
         (.appendChild head (c/html [:style#rendered-edn-css (inline-resouce-file "public/devcards/css/rendered_edn.css")]))))))
