@@ -44,7 +44,7 @@
   (.addEventListener (.-body js/document) "figwheel.before-js-reload"
                      (fn [x] (devcard-before-jsload (.-detail x)))))
 
-(defn start-devcard-ui!
+(defn start-devcard-ui!*
   "This function starts the full devcard UI."
   []
   (defonce devcard-system
@@ -56,7 +56,8 @@
         ds)
       (register-figwheel-listeners!))))
 
-(defn start-single-card-ui!
+
+(defn start-single-card-ui!*
   "Start a devcard UI that allows you to cherry pick which cards to display.
    You will need to call render-single-card to put cards into the dom."
   []

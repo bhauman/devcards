@@ -5,12 +5,28 @@
    [clojure.java.io :as io])
   (:refer-clojure :exclude (munge defonce)))
 
+(def devcards-active? (atom false))
+
+(defmacro enable-devcards! []
+  (reset! devcards-active? true)
+  nil)
+
+(defmacro start-devcard-ui! []
+  (enable-devcards!)
+  `(devcards.core/start-devcard-ui!*))
+
+(defmacro start-single-card-ui! []
+  (enable-devcards!)
+  `(devcards.core/start-single-card-ui!*))
+
+
 (defmacro defcard
   [vname expr]
-  (let [ns (-> &env :ns :name name munge)]
-    `(devcards.core/register-card  [~(keyword ns) ~(keyword vname)]
-                                   (devcards.system/get-options ~expr)
-                                   (fn [] ~expr))))
+  (when @devcards-active?
+    (let [ns (-> &env :ns :name name munge)]
+      `(devcards.core/register-card  [~(keyword ns) ~(keyword vname)]
+                                     (devcards.system/get-options ~expr)
+                                     (fn [] ~expr)))))
 
 (defmacro is [body]
   `{ :type :is  :body (quote ~body) :passed ~body })
