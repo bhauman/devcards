@@ -19,7 +19,6 @@
   (enable-devcards!)
   `(devcards.core/start-single-card-ui!*))
 
-
 (defmacro defcard
   [vname expr]
   (when @devcards-active?

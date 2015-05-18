@@ -9,8 +9,6 @@
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [sablono "0.3.4"]
                  [crate "0.2.5"]
-                 [jayq "2.5.2"]
-                 [cljsjs/jquery "1.9.1-0"]
                  [cljsjs/react "0.13.1-0"]
                  [cljsjs/showdown "0.4.0-1"]
                  [org.omcljs/om "0.8.8"]

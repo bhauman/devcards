@@ -10,7 +10,6 @@
                           runner-start
                           compose
                           add-effects]]
-   [jayq.core :refer [$]]
    [crate.core :as c]
    [clojure.string :as string]
    [clojure.set :refer [intersection difference]]
@@ -364,8 +363,15 @@
 (defn to-node [jq]
   (aget (.get jq) 0))
 
+(defn node-list->array [nl]
+  (js/Array.prototype.slice.call nl))
+
+;; remove jquery
 (defn sel-nodes [sel]
-  (mapv to-node ($ sel)))
+  (js->clj
+      (node-list->array
+       (.querySelectorAll js/document
+                          sel))))
 
 (defn visible-card-paths []
   (let [card-nodes (sel-nodes ".devcard-rendered-card")]
@@ -383,11 +389,23 @@
               identity)
              card-nodes))))
 
+;; remove jquery
+(defn remove-child-nodes [node]
+  (loop [child (.-firstChild node)]
+    (when child
+      (.removeChild node child)
+      (recur (.-firstChild node))))
+  node)
+
+;; remove jquery
+(defn replace-content [node new-content-node]
+  (set! (.-innerHTML node) "")
+  (.appendChild node new-content-node))
+
 (defn create-needed-card-nodes [data]
   (when (:render-cards data)
-    (.html ($ (devcards-cards-node))
-           (c/html (cards-templates data)))
-    ))
+    (replace-content (devcards-cards-node)
+                     (c/html (cards-templates data)))))
 
 (defn unmount-card-nodes [data]
   (doseq [[card node] (:visible-card-nodes data)]
@@ -441,7 +459,7 @@
 (defn devcard-renderer [{:keys [state event-chan]}]
   (unmount-card-nodes state)
   (delete-deleted-card-nodes state)
-  (.html ($ (devcards-controls-node)) (c/html (main-template state)))
+  (replace-content (devcards-controls-node) (c/html (main-template state)))
   (create-needed-card-nodes state)
   (mount-card-nodes state))
 
@@ -453,21 +471,41 @@
                    (DevCards.)
                    (HashBangRouting.)))
 
-(defn data-to-message [msg-name event-chan]
-  (fn [e]
+(defn data->message [msg-name event-chan]
+  (fn [e target]
     (.preventDefault e)
-    (let [t (.-currentTarget e)]
-      (when-let [data (.data ($ t))]
-        (put! event-chan
-              [msg-name
-               (js->clj data
-                        :keywordize-keys true)])))))
+    (let [t target]
+      (when-let [path (.getAttribute t "data-path")]
+        (let [data {:path path}]
+          (put! event-chan [msg-name data]))))))
+
+;; event delegation
+
+(defn get-classes [node]
+  (set (string/split (.-className node) #"\s+")))
+
+(defn has-class? [node class-str]
+  ((get-classes node) class-str))
+
+(defn get-parent-with-data-path [node ]
+  (loop [n node]
+    (when n
+      (if (.getAttribute n "data-path")
+        n
+        (recur (.-parentNode n))))))
+
+(defn event-delegate [node event-name class-sel f]
+  (.addEventListener node event-name
+                     (fn [e]
+                       (let [target (get-parent-with-data-path (.-target e))]
+                         (when (has-class? target class-sel)
+                           (f e target))))))
 
 (defn register-listeners [event-chan]
-  (.on ($ (devcards-app-node)) "click" "a.devcards-add-to-current-path"
-       (data-to-message :add-to-current-path event-chan))
-  (.on ($ (devcards-app-node)) "click" ".devcards-set-current-path"
-       (data-to-message :set-current-path event-chan)))
+  (event-delegate (devcards-app-node) "click" "devcards-add-to-current-path"
+                  (data->message :add-to-current-path event-chan))
+  (event-delegate (devcards-app-node) "click" "devcards-set-current-path"
+                  (data->message :set-current-path event-chan)))
 
 (defn devcard-system-start [event-chan render-callback]
   (-> (make-runnable devcard-comp devcard-initial-data)

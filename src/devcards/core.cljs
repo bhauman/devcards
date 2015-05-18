@@ -23,7 +23,6 @@
    [om.dom :as dom :include-macros true]
 
    [cljsjs.react]
-   [cljsjs.jquery]
    [cljsjs.showdown]   
    [cljs.core.async :refer [put! chan] :as async]))
 
@@ -55,7 +54,6 @@
         (register-listeners devcard-event-chan)
         ds)
       (register-figwheel-listeners!))))
-
 
 (defn start-single-card-ui!*
   "Start a devcard UI that allows you to cherry pick which cards to display.
