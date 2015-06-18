@@ -108,13 +108,14 @@
   (dc/markdown-card
    "## Checking basic tile movement animation"))
 
-(defcard animation-work
+#_(defcard animation-work
   (dc/slider-card
    identity
    { :left (range 4) }
    :value-render-func
    (fn [{:keys [left]}]
      (one-row-board-static [{:left left :top 0 :v 2 :id :t1}]))))
+
 
 (defcard stored-board-data-structure
   (dc/markdown-card

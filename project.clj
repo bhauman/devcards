@@ -33,8 +33,10 @@
                              :asset-path "js/compiled/out"
                              :output-to "resources/public/devcards/js/compiled/devdemos.js"
                              :output-dir "resources/public/devcards/js/compiled/out"
+                             ;:recompile-dependents true                             
                              :optimizations :none
                              :source-map true}}]}
                    
-      :figwheel { :css-dirs ["resources/public/devcards/css"] }
+          :figwheel { :css-dirs ["resources/public/devcards/css"]
+                      :open-file-command "emacsclient" }
      }})

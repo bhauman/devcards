@@ -1,4 +1,4 @@
-(ns devdemos.core
+(ns ^:figwheel-always devdemos.core
   (:require
    [devcards.core :as dc :include-macros true]
    [devcards.system :refer [IMount IUnMount IConfig]]   
@@ -11,8 +11,41 @@
    [devcards.core :refer [defcard is are= are-not= format-code format-data mkdn-code mkdn-data]]))
 
 (enable-console-print!)
+
 (devcards.core/start-devcard-ui!)
 
+(defcard react-runner-runner
+  (dc/react-card
+   (dc/react-runner-component
+    (fn [owner state-atom]
+      (sab/html [:div
+                 [:div "counter newer : " (prn-str state-atom)]
+                 [:a {:onClick
+                      (fn [] (swap! state-atom update-in [:count] inc))}
+                  "inc"]])) 
+    {:initial-state {:count 6}})))
+
+(defcard react-history-runner-runner
+  (dc/react-card
+   (dc/react-history-runner-component
+
+    (fn [owner state-atom]
+      (sab/html [:div
+                 [:div "counter newer : " (prn-str state-atom)]
+                 [:a {:onClick
+                      (fn [] (swap! state-atom update-in [:count] inc))}
+                  "inc"]]))
+    
+    {:initial-state {:count 6}})))
+
+(defcard node-runner-runner
+  (dc/react-card
+   (dc/node-runner-component
+    (fn [node data-atom]
+      (prn "in HERE" node)
+      (prn data-atom)
+      (set! (.. node -innerHTML) (str "<h1>Hi I'm a crazy nodee " (:wow @data-atom) "</h1>")))
+    {:initial-state {:wow "man"}})))
 
 (defcard intro
   (dc/markdown-card
@@ -197,7 +230,7 @@
   (repeatedly c #(apply str (map (fn [x] (char (rand-int 255)))
                                  (range (rand-int 12))))))
 
-(defcard slider-intro
+#_(defcard slider-intro
   (dc/markdown-card
    "## Slider card"
    "A slider card helps you apply ranges of data to a function and see
@@ -206,7 +239,7 @@
    If you want to render the data arbitrarily you can provide a
    function that returns a React component to named argument `:value-render-func` "))
 
-(defcard slider-card-dev
+#_(defcard slider-card-dev
   (dc/slider-card (fn [{:keys [x y z] :as state}]
                     (assoc state :result (+ x y z)))
                   {:x (rand-strs 255)
@@ -269,49 +302,13 @@
                        :opacity "0.5"
                        :border "10px solid #333"}})])
 
-(defcard threed-fun
+#_(defcard threed-fun
   (dc/slider-card
    identity
    {:rx (range 360)
     :ry (range 360)
     :rz (range 360)}
    :value-render-func cube-template))
-
-(defcard hekler-card-intro
-  (dc/markdown-card
-   "### Hekler Card
-   A heckler card is a primitive quick check to help find bugs in a function.
-   You provide a function to test and a generator which generates vectors
-   of arguments for that function. "))
-
-(defn to-heckle-f [a b]
-  (if (zero? (mod b 10))
-    (throw (js/Error. "Crappers Error Thrown"))
-    (+ a b)))
-
-(defcard heckler-card-ex
-  (dc/heckler-card
-   to-heckle-f
-   ;; generator
-   (fn [] (map vector
-              (repeatedly 30 #(rand-int 300))
-              (repeatedly 30 #(rand-int 300))))
-   :test-func (fn [args x] (< x 350))))
-
-
-(defcard reduce-card-intro
-  (dc/markdown-card
-   "## Reduce card
-   A **reduce-card** is helpful for testing reduce
-   functions. It takes a reduce function, a starting value, a vector of
-   arguments, and the expected accumulated results in this form:
-   `[arg1 accum1 arg2 accum2 arg3 accum3]`"))
-
-(defcard reduce-card-ex
-  (dc/reduce-card + 1 [1 2
-                       1 3
-                       1 4
-                       1 5]))
 
 (defcard creating-your-own-cards
   (dc/markdown-card

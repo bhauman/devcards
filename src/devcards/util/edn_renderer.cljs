@@ -80,8 +80,9 @@
    :else        (literal "literal" x)))
 
 (defn html-edn [e]
-  (dom/div #js { :className "rendered-edn" }
+  (dom/div #js { :className "com-rigsomelight-rendered-edn" }
                      (html e)))
+
 
 (comment
   (enable-console-print!)

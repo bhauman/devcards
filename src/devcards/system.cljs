@@ -23,9 +23,11 @@
   (:import
    [goog History]))
 
-(def devcards-app-element-id "devcards-main")
-(def devcards-controls-element-id "devcards-controls")
-(def devcards-cards-element-id "devcards-cards")
+(def devcards-app-element-id "com-rigsomelight-devcards-main")
+(def devcards-controls-element-id "com-rigsomelight-devcards-controls")
+(def devcards-cards-element-id "com-rigsomelight-devcards-cards")
+
+(def devcards-rendered-card-class "com-rigsomelight-devcards_rendered-card")
 
 (defn get-element-by-id [id] (.getElementById js/document id))
 
@@ -294,19 +296,20 @@
 (defn naked-card [{:keys [path options]}]
   [:div
    {:id (path->unique-card-id path)
-    :class (str "devcard-rendered-card" (if (:padding options) " devcard-padding" "")) }])
+    :class (str devcards-rendered-card-class
+                (if (:padding options)
+                  " com-rigsomelight-devcards-devcard-padding" "")) }])
 
 (defn card-template [{:keys [path options] :as card}]
   (if-not (:hidden options)
     (if (:heading options)
-      [:div.panel.panel-default.devcard-panel
-       [:div.panel-heading.devcards-set-current-path
+      [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
+       [:div.com-rigsomelight-devcards_set-current-path.com-rigsomelight-devcards-panel-heading
         {:data-path (path->unique-card-id path)}
-        [:span.panel-title (name (last path)) " "]]
+        (name (last path)) " "]
        (naked-card card)]
-      [:div.panel.panel-default.devcard-panel
-       (naked-card card)
-       #_[:div.panel-heading ]])
+      [:div.com-rigsomelight-devcards-card-base-no-pad
+       (naked-card card)])
     [:span]))
 
 (defn display-cards [cards]
@@ -314,51 +317,43 @@
        (sort-by (comp :position second) cards)))
 
 (defn dir-links [dirs]
-  [:div.list-group
+  [:div.com-rigsomelight-devcards-card-base-no-pad
    (map (fn [[key child-tree]]
-          [:a.list-group-item.devcards-add-to-current-path
+          [:a.com-rigsomelight-devcards_add-to-current-path.com-rigsomelight-devcards-list-group-item
            {:data-path (name key)}
-           [:span.glyphicon.glyphicon-folder-close]
-           [:span.badge (count child-tree)]
+           [:span.com-rigsomelight-devcards-badge {:style {:float "right"}}  (count child-tree)]
            [:span " " (name key)]])
         (reverse dirs))])
 
 (defn breadcrumbs-templ [crumbs]
-  [:ol.breadcrumb.devcards-breadcrumb
-   (map (fn [[n path]]
-          [:li
-           [:a.devcards-set-current-path {:href "#"
-                                          :data-path (path->unique-card-id path)}
+  [:div.com-rigsomelight-devcards-card-base
+   (interpose
+    [:span.com-rigsomelight-devcards-breadcrumb-sep "/"]
+    (map (fn [[n path]]
+          [:span {:style {:display "inline-block" }}
+           [:a.com-rigsomelight-devcards_set-current-path
+            {:href "#"
+             :data-path (path->unique-card-id path)}
             n]])
-        crumbs)])
+        crumbs))])
 
 (defn main-template [data]
-  [:div
-   [:div.navbar.navbar-default.navbar-static-top.devards-main-navbar
-    [:div.container
-     [:div.navbar-header
-      [:a.navbar-brand "(:devcards ClojureScript)"]]]]
-   [:div.container
-    [:div.row
-     [:div.col-md-9
-      (when-let [crumbs (:breadcrumbs data)]
-        (breadcrumbs-templ crumbs))
-      (when-let [dir-paths (:display-dir-paths data)]
-        (dir-links dir-paths))]
-     [:div.col-md-3
-      ]
-     ]
-    ]
-   ])
+  [:div.com-rigsomelight-devcards-base
+   [:div.com-rigsomelight-devcards-navbar
+    [:div.com-rigsomelight-devcards-container
+     [:span.com-rigsomelight-devcards-brand  "(:devcards ClojureScript)"]]]
+   [:div.com-rigsomelight-devcards-container
+    (when-let [crumbs (:breadcrumbs data)]
+      (breadcrumbs-templ crumbs))
+    (when-not (empty? (:display-dir-paths data))
+      (dir-links (:display-dir-paths data)))]])
 
 (defn cards-templates [data]
-  [:div.container
-   [:div.row
-    [:div.col-md-9
-     (when-let [cards (:display-cards data)]
-       (display-cards cards))
-     (when-let [card (:display-single-card data)]
-       (naked-card card))]]])
+  [:div.com-rigsomelight-devcards-container
+   (when-let [cards (:display-cards data)]
+     (display-cards cards))
+   (when-let [card (:display-single-card data)]
+     (naked-card card))])
 
 (defn to-node [jq]
   (aget (.get jq) 0))
@@ -374,14 +369,14 @@
                           sel))))
 
 (defn visible-card-paths []
-  (let [card-nodes (sel-nodes ".devcard-rendered-card")]
+  (let [card-nodes (sel-nodes (str "." devcards-rendered-card-class))]
     (filter first
             (map
              #(unique-card-id->path (.-id %))
              card-nodes))))
 
 (defn visible-card-nodes [data]
-  (let [card-nodes (sel-nodes ".devcard-rendered-card")]
+  (let [card-nodes (sel-nodes (str "." devcards-rendered-card-class))]
     (filter first
             (map
              (juxt
@@ -446,7 +441,7 @@
 (defn render-base-if-necessary! []
   (add-css-if-necessary!)
   (when-not (devcards-app-node)
-    (prepend-child (.-body js/document) (c/html [:div#devcards-main])))
+    (prepend-child (.-body js/document) (c/html [:div {:id devcards-app-element-id}])))
   (if-let [devcards-node (devcards-app-node)]
     (do
       (when-not (devcards-controls-node)
@@ -487,7 +482,7 @@
 (defn has-class? [node class-str]
   ((get-classes node) class-str))
 
-(defn get-parent-with-data-path [node ]
+(defn get-parent-with-data-path [node]
   (loop [n node]
     (when n
       (if (.getAttribute n "data-path")
@@ -502,9 +497,9 @@
                            (f e target))))))
 
 (defn register-listeners [event-chan]
-  (event-delegate (devcards-app-node) "click" "devcards-add-to-current-path"
+  (event-delegate (devcards-app-node) "click" "com-rigsomelight-devcards_add-to-current-path"
                   (data->message :add-to-current-path event-chan))
-  (event-delegate (devcards-app-node) "click" "devcards-set-current-path"
+  (event-delegate (devcards-app-node) "click" "com-rigsomelight-devcards_set-current-path"
                   (data->message :set-current-path event-chan)))
 
 (defn devcard-system-start [event-chan render-callback]
@@ -538,9 +533,7 @@
 (defn add-css-if-necessary! []
   (if-let [heads (.getElementsByTagName js/document "head")]
     (let [head (aget heads 0)]
-      (when-not (get-element-by-id "bootstrap-min-css")
-        (.appendChild head (c/html [:style#bootstrap-min-css (inline-resouce-file "public/devcards/bootstrap/css/bootstrap.min.css")])))
-      (when-not (get-element-by-id "devcards-css")
-        (.appendChild head (c/html [:style#devcards-css (inline-resouce-file "public/devcards/css/devcards.css")])))
-      (when-not (get-element-by-id "rendered-edn-css")
-        (.appendChild head (c/html [:style#rendered-edn-css (inline-resouce-file "public/devcards/css/rendered_edn.css")]))))))
+      #_(when-not (get-element-by-id "com-rigsomelight-devcards-css")
+        (.appendChild head (c/html [:style#com-rigsomelight-devcards-css (inline-resouce-file "public/devcards/css/com_rigsomelight_devcards.css")])))
+      (when-not (get-element-by-id "com-rigsomelight-edn-css")
+        (.appendChild head (c/html [:style#com-rigsomelight-edn-css (inline-resouce-file "public/devcards/css/com_rigsomelight_edn.css")]))))))

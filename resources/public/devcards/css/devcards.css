@@ -1,5 +1,6 @@
 body {
     background-color: rgb(233,234,237);
+    margin: 0px;
 }
 
 .devcards-white-background {
@@ -7,9 +8,25 @@ body {
 }
 
 .devards-main-navbar {
-  background-color: rgb(60,90,153);
-  border-color: rgb(50,80,153);
+    background-color: rgb(60,90,153);
+    border-color: rgb(50,80,153);
 }
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin: auto; 
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: auto;
+    margin-right: 10px;
+    margin-left: 10px;     
+  }
+}
+
 
 .devards-main-navbar .navbar-brand {
   color: #e8e8e8;

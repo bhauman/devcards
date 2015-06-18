@@ -1,8 +1,5 @@
 (ns devcards.core
   (:require
-   [frontier.core  :as fr]
-   [frontier.cards  :as fc]
-
    [devcards.system :refer [devcard-system-start
                             render-base-if-necessary!
                             devcard-renderer
@@ -15,6 +12,10 @@
                             IUnMount
                             IConfig]]
 
+   [devcards.system-new :as dev]
+   
+   [devcards.util.markdown :refer [less-sensitive-markdown]]
+
    [sablono.core :as sab :include-macros true]
    [devcards.util.edn-renderer :as edn-rend]
    [clojure.string :as string]
@@ -23,7 +24,6 @@
    [om.dom :as dom :include-macros true]
 
    [cljsjs.react]
-   [cljsjs.showdown]   
    [cljs.core.async :refer [put! chan] :as async]))
 
 (enable-console-print!)
@@ -39,11 +39,13 @@
 
 (defn register-figwheel-listeners! []
   (.addEventListener (.-body js/document) "figwheel.js-reload"
-                     (fn [x] (devcard-on-jsload (.-detail x))))
+                     (fn [x]
+                       (devcard-on-jsload (.-detail x))))
   (.addEventListener (.-body js/document) "figwheel.before-js-reload"
-                     (fn [x] (devcard-before-jsload (.-detail x)))))
+                     (fn [x]
+                       (devcard-before-jsload (.-detail x)))))
 
-(defn start-devcard-ui!*
+#_(defn start-devcard-ui!*
   "This function starts the full devcard UI."
   []
   (defonce devcard-system
@@ -53,7 +55,15 @@
                                      (throttle-function devcard-renderer 50))]
         (register-listeners devcard-event-chan)
         ds)
-      (register-figwheel-listeners!))))
+      (register-figwheel-listeners!)
+      true)))
+
+
+(defn start-devcard-ui!* []
+  (dev/start-ui devcard-event-chan)
+  (defonce register-listeners-fig (do   (register-figwheel-listeners!)
+                                        true)))
+
 
 (defn start-single-card-ui!*
   "Start a devcard UI that allows you to cherry pick which cards to display.
@@ -105,57 +115,6 @@
 ;; returns a react component of rendered edn
 (def edn->html edn-rend/html-edn)
 
-;; I am abridging regular markdown here so that we can
-;; handle big long indented strings.
-
-(defn leading-space-count [s]
-  (when-let [ws (second (re-matches #"^([\s]*).*"  s))]
-    (.-length ws)))
-
-(defn code-delim? [s]
-  (and (not (nil? s))
-       (re-matches #"^\s*```.*" s)))
-
-(defn group-and-trim-code-block [xs]
-  (let [opener (first xs)
-        leading-spaces (leading-space-count opener)
-        code-block (take-while (complement code-delim?) (rest xs))
-        after-code-block (rest (drop-while (complement code-delim?) (rest xs)))]
-    (cons (string/join "\n"
-                 (concat [(string/trim opener)]
-                         (map #(subs % leading-spaces) code-block)
-                         ["```"]))
-          after-code-block)))
-
-(defn group-and-trim-code-blocks [xs]
-  (cond
-   (nil? xs) []
-   (empty? xs) []
-   (code-delim? (first xs))
-   (-> (group-and-trim-code-block xs)
-       group-and-trim-code-blocks)
-   :else (cons (first xs) (group-and-trim-code-blocks (rest xs)))))
-
-(defn trim-markdown-string [s]
-  (if (not-empty (re-matches #"^```[\s\S]*" s))
-    s
-    (->> (string/split s "\n")
-         group-and-trim-code-blocks
-         (map string/trim)
-         (string/join "\n"))))
-
-(defn preformat-markdown [mkdn-strs]
-  (string/join "\n" (map trim-markdown-string mkdn-strs)))
-
-(let [conv-class (.-converter js/Showdown)
-      converter (conv-class.)]
-  (defn markdown-to-html
-    "render markdown"
-    [markdown-txt]
-    (.makeHtml converter markdown-txt)))
-
-(def less-sensitive-markdown (comp markdown-to-html preformat-markdown))
-
 (defn render-to
   "Render a react component to a node."
   ([react-dom html-node callback]
@@ -174,14 +133,17 @@
                    { :__html
                      raw-html-str }})))
 
+(def ^:dynamic *data-atom* nil)
+
 (defrecord ReactCard [react-component options]
   IMount
-  (mount [_ {:keys [node]}]
-    #_(println "calling mount")
-    (render-to react-component node))
+  (mount [_ {:keys [node data-atom]}]
+    (println "calling mount")
+    (binding [*data-atom* data-atom]
+      (render-to react-component node)))
   IUnMount
-  (unmount [_ {:keys [node]}]
-    #_(println "calling UNmount")
+  (unmount [_ {:keys [node data-atom]}]
+    (println "calling UNmount")
     (unmount-react node))
   IConfig
   (-options [_]
@@ -190,7 +152,7 @@
 (defn react-card
   "Simple react card. It only renders the react component passed in."
   ([react-component options]
-     (ReactCard. react-component options))
+     (ReactCard. react-component options ))
   ([react-component] (react-card react-component {})))
 
 (defn sab-card
@@ -217,6 +179,171 @@
   (if (satisfies? IAtom clj-data)
     (om-root-card #(om/component (edn->html %)) clj-data)
     (react-card (edn->html clj-data))))
+
+
+(def react-runner-component-class
+  (js/React.createClass
+   #js {:getInitialState
+        (fn [] #js {:unique_id (gensym 'react-runner)})
+        :componentWillMount
+        (fn []
+          (this-as this
+                   (.setState this
+                              (or (and (.. this -state -data_atom) (.. this -state))
+                                  #js {:data_atom
+                                       (let [data (.. this -props -data_atom)]
+                                         (if (satisfies? IAtom data)
+                                           data
+                                           (atom data)))}))))
+        :componentWillUnmount
+        (fn []
+          (this-as
+           this
+           (let [data_atom (.. this -state -data_atom)
+                 id        (.. this -state -unique_id)]
+             (when (and data_atom id)
+               (remove-watch data_atom id)))))        
+        :componentDidMount
+        (fn []
+          (this-as
+           this
+           (let [data_atom (.. this -state -data_atom)
+                 id        (.. this -state -unique_id)]
+             (when (and data_atom id)
+               (add-watch data_atom id (fn [_ _ _ _] (.forceUpdate this)))))))
+        :render
+         (fn []
+           (this-as this
+                    ((.-react_fn (.-props this))
+                     this (.-data_atom (.-state this)))))}))
+
+(def history-component-class
+  (js/React.createClass
+   #js {:getInitialState
+        (fn [] #js {:unique_id    (str (gensym 'devcards-history-runner-))
+                   :history_atom (atom {:history (list) :pointer 0})
+                   :recording    true})
+        :componentDidUpdate
+        (fn [prevP, prevS]
+          (this-as this
+                   (when (and (.. this -props -node_fn)
+                              (not= (.. this -props -node_fn)
+                                    (.. prevP -node_fn)))
+                     #_(prn (str (.. this -props -node_fn)))
+                     #_(prn (str (.. prevP -node_fn)))
+                     (.renderIntoDOM this))))
+        :componentDidMount
+        (fn []
+          (this-as
+           this
+           (let [data_atom (.. this -props -data_atom)
+                 id        (.. this -state -unique_id)
+                 history-atom   (.. this -state -history_atom)]
+             (when (and data_atom id)
+               (add-watch data_atom id
+                          (fn [_ _ _ n]
+                            (when (.. this -state -recording)
+                              (swap! history-atom update-in [:history] 
+                                     (fn [hist] (cons n hist))))))))))
+        :canGoBack
+        (fn []
+          (this-as this
+                   (let [{:keys [history pointer]} @(.. this -state -history_atom)]
+                     (< (inc pointer) (count history)))))
+
+        :canGoForward
+        (fn []
+          (this-as this
+                   (> (:pointer @(.. this -state -history_atom)) 0)))
+        
+        :backInHistory
+        (fn []
+          (this-as this
+                   (let [history-atom   (.. this -state -history_atom)
+                         {:keys [history pointer]} @history-atom]
+                     (when (.. this canGoBack)
+                       (swap! history-atom update-in [:pointer] (fn [p] (inc p)))
+                       (.setState this #js {:recording false} )
+                       (reset! (.. this -props -data_atom) (nth history (inc pointer)))
+                       (.forceUpdate this)))))
+        :forwardInHistory
+        (fn []
+          (this-as this
+                   (let [history-atom   (.. this -state -history_atom)
+                         {:keys [history pointer]} @history-atom]
+                     (when (.. this canGoForward)
+                       (swap! history-atom update-in [:pointer] (fn [p] (dec p)))
+                       (.setState this #js {:recording false} )
+                       (reset! (.. this -props -data_atom) (nth history (dec pointer)))
+                       (.forceUpdate this)))))
+        :render
+         (fn []
+           (this-as this
+                    (sab/html
+                     [:div
+                      [:h2 (str "history " (count (:history @(.. this -state -history_atom))))]
+                      [:a {:onClick (fn [e]
+                                      (.preventDefault e)
+                                      (.. this backInHistory)
+                                      )} "back"] " "
+                      [:a {:onClick (fn [e]
+                                      (.preventDefault e)
+                                      (.. this forwardInHistory)
+                                      )} "forward"]
+                      
+                      [:div ((.. this -props -react_fn)
+                             this
+                             (.. this -props -data_atom))]])))}))
+
+(def node-runner-component-class
+  (js/React.createClass
+   #js {:getInitialState
+        (fn [] #js {:unique_id (str (gensym 'devcards-card-runner-))})
+        :renderIntoDOM
+        (fn []
+          (this-as this
+                   (when-let [node-fn (.. this -props -node_fn)]
+                     (when-let [comp (aget (.. this -refs) (.. this -state -unique_id))]
+                       (when-let [node (js/React.findDOMNode comp)]
+                         (node-fn node (.. this -props -data_atom)))))))
+        :componentDidUpdate
+        (fn [prevP, prevS]
+          (this-as this
+                   (when (and (.. this -props -node_fn)
+                              (not= (.. this -props -node_fn)
+                                    (.. prevP -node_fn)))
+                     #_(prn (str (.. this -props -node_fn)))
+                     #_(prn (str (.. prevP -node_fn)))
+                     (.renderIntoDOM this))))
+        :componentDidMount
+        (fn [] (this-as this (.renderIntoDOM this)))
+        :render
+         (fn []
+           (this-as this
+                    (js/React.DOM.div
+                     #js { :ref (.. this -state -unique_id) }
+                     "Card has not mounted DOM node.")))}))
+
+(defn react-runner-component [react-runner-component-fn options]
+  (js/React.createElement react-runner-component-class
+                          #js {:react_fn react-runner-component-fn
+                               :data_atom (:initial-state options)}))
+
+(defn react-history-runner-component [react-runner-component-fn options]
+  (react-runner-component
+   (fn [owner data-atom]
+     (js/React.createElement history-component-class
+                             #js { :react_fn react-runner-component-fn
+                                   :data_atom data-atom }))
+   options))
+
+(defn node-runner-component [node-component-fn options]
+  (react-runner-component
+   (fn [owner data-atom]
+     (js/React.createElement node-runner-component-class
+                             #js {:node_fn   node-component-fn
+                                  :data_atom data-atom}))
+   options))
 
 (defrecord ReactRunnerCard [react-component-fn uniq-key options]
   IMount
@@ -308,195 +435,6 @@ rerender."
                            assertions)))
    {:padding false}))
 
-;; slider card
-
-(defrecord SliderCard [f arg-seqs]
-  fr/ITransform
-  (-transform [o [msg-name data] state]
-    (condp = msg-name
-      :set-index-for-key (assoc-in state [:keyed-vals (:k data)] (:index data))
-      state))
-  fr/IDerive
-  (-derive [o state]
-    (let [slider-inputs (map (fn [[k seq*]]
-                               (let [i (k (:keyed-vals state))]
-                                 {:k k
-                                  :index i
-                                  :v   (nth seq* i)
-                                  :max (dec (count seq*))}))
-                             arg-seqs)]
-      (assoc state
-        :slider-inputs slider-inputs
-        :result
-        (f (into {} (map (juxt :k :v) slider-inputs)))))))
-
-(defn slider-input-control [{:keys [k v index seq*] :as ic} event-chan]
-  (dom/div #js {:className "slider-control"}
-   (dom/div #js {} (dom/strong #js {} (str k)) " " (prn-str v))
-   (dom/input #js {:type "range"
-                   :onChange (fn [e]
-                               (async/put! event-chan
-                                           [:set-index-for-key
-                                            {:k k,
-                                             :index (.parseInt
-                                                     js/window
-                                                     (.-value (.-target e)))}]))
-                   :defaultValue index
-                   :min 0
-                   :max (:max ic)})))
-
-(defn make-slider-renderer [value-render-func]
-  (fn [{:keys [state event-chan] :as rstate}]
-    (dom/div
-     #js {:className "devcard-padding"}
-     (dom/div
-      #js {:className "col-md-4"}
-      (dom/h4 #js{} "args")
-      (to-array
-       (mapv
-        (fn [slider-in]
-          (slider-input-control slider-in event-chan))
-        (:slider-inputs state))))
-     (dom/div
-      #js {:className "col-md-8"}
-      (dom/h4 #js{} "result")
-      (dom/div #js {} (sab/html (value-render-func (:result state)))))
-     (dom/div
-      #js {:className "clearfix"}))))
-
-(declare frontier-system-card)
-
-(defn slider-card [f arg-seqs & {:keys [value-render-func]}]
-  (frontier-system-card { :keyed-vals (into {}
-                                      (mapv vector (keys arg-seqs) (repeat 0)))}
-                  (fr/make-renderable
-                   (fr/compose (SliderCard. f arg-seqs))
-                   (make-slider-renderer (or value-render-func edn->html)))
-                  []))
-
-;; heckler card
-
-(defn heckle-values [generator]
-  (mapv
-   (fn [args]
-     {:args args })
-   (generator)))
-
-(defn heckle-error? [res-val]
-  (get (meta res-val) :heckle-error))
-
-(defn heckle-derive [data f test-func]
-  (map
-   (fn [args]
-     (let [res (try (apply f (:args args))
-                    (catch :default e (with-meta {} {:heckle-error e})))
-           passed (if (heckle-error? res) true
-                      (test-func args res))]
-       { :args (:args args)
-         :class (if (heckle-error? res)
-                  "danger "
-                  (if (not passed)
-                    "warning "
-                    (if (:only-errors data)
-                      "hidden" "")))
-         :res-val res
-         :passed passed
-         :error (when (heckle-error? res)
-                 (:heckle-error (meta res))) }))
-   (:gen-arg-list data)))
-
-(defn heckle-renderer [f data generator value-render-func test-func]
-  (let [derived-data (heckle-derive @data f test-func)]
-    (dom/div
-     #js {:className "devcards-heckler-card"}
-     (dom/div #js {:className "devcards-pad-left"}
-              (dom/a #js {:type "button"
-                          :className "btn btn-danger navbar-btn"
-                          :onClick (fn [] (swap! data assoc-in [:gen-arg-list]
-                                                (heckle-values generator)))}
-                     "Re-heckle!")
-              (dom/a #js { :className
-                          (str
-                           "btn btn-default navbar-btn devcards-margin-left"
-                           (if (:only-errors @data) " active" ""))
-                          :onClick (fn [] (swap! data update-in [:only-errors] (fn [x] (not x)))) }
-                     "Filter Errors")
-              (dom/span #js {:className  "devcards-pad-left" }
-                        (let [error-count (count (filter :error derived-data))]
-                          (if (pos? error-count)
-                            (dom/span #js {:className "label label-danger"}
-                                      error-count
-                                      " Errors")
-                            (dom/span #js {}))))
-              (dom/span #js {:style #js {:paddingLeft "14px"}}
-                        (let [failed-tests (filter (fn [x] (= false (:passed x))) derived-data)]
-                          (if (pos? (count failed-tests))
-                            (dom/span #js {:className "label label-warning"}
-                                      (count failed-tests)
-                                      " Tests Failed")
-                            (dom/span #js {}))))
-              )
-          (dom/table #js { :className "table table-striped table-hover"}
-                (dom/tr #js {}
-                        (dom/th #js {} "Called")
-                        (dom/th #js {} "Result"))
-                (to-array
-                 (mapv
-                  (fn [{:keys [args error res-val] :as res}]
-                    (let []
-                      (dom/tr #js {:className (str (:class res))}
-                              (let [args' (map #(dom/span #js {} (prn-str %)) args)]
-                                (dom/td #js {}
-                                        (to-array
-                                         (concat
-                                          [(dom/span #js {:className "text-muted"} "(f ")]
-                                          (interleave (butlast args')
-                                                      (repeatedly #(dom/span #js {:className "text-muted"} ",")))
-                                          [(last args')
-                                           (dom/span #js {:className "text-muted"} ")")]))))
-                              (dom/td #js {}
-                                      (if error
-                                        (.-message error)
-                                        (sab/html (value-render-func res-val)))))))
-                  derived-data))))))
-
-(defn heckler-card [f generator & {:keys [test-func
-                                          value-render-func]}]
-  (let [system-func (fn [data]
-                      (when (or (nil? @data)
-                                (zero? (count @data)))
-                        (swap! data assoc-in [:gen-arg-list]
-                               (heckle-values generator)))
-                      (sab/html
-                       (heckle-renderer f data generator
-                                        (or value-render-func edn->html)
-                                        (or test-func (fn [x] true)))))]
-    (react-runner-card system-func {:padding false})))
-
-;; reduce-card
-
-(defn reduce-card->tests [f curr value-expected-vec]
-  (if (empty? value-expected-vec)
-    []
-    (let [val* (first value-expected-vec)
-          res-val  (f curr (first val*))]
-      (cons
-       { :type :are=
-         :exp1 (list 'f curr (first val*))
-         :exp2 (second val*)
-         :passed (= res-val (second val*))}
-       (reduce-card->tests f res-val (rest value-expected-vec))))))
-
-(defn reduce-card [f init value-expected-vec]
-  (let [red-tests (reduce-card->tests f init (partition 2 value-expected-vec))]
-    (apply test-card red-tests)))
-
-(defn reduce-fr-card [fr-comp initial-state & msg-expects-vec]
-  (reduce-card (fn [state msg]
-                 (fr/-transform (SliderCard. 1 1) msg state))
-               initial-state
-               msg-expects-vec))
-
 ;; markdown card
 
 (def markdown-card
@@ -533,51 +471,3 @@ rerender."
      (om-root-card om-comp-fn initial-state {} {}))
   ([om-comp-fn]
      (om-root-card om-comp-fn {} {} {})))
-
-;; for frontier components don't look down here yet :)
-;; super alpha
-
-(defrecord FrontierSystemCard [initial-state component initial-inputs devcard-options]
-  IMount
-  (mount [_ {:keys [node data-atom]}]
-    (let [sys (fr/run-with-atom
-               (or (:state-atom @data-atom) (atom nil))
-               initial-state
-               component
-               (fn [state]
-                 (when-let [react-dom (fr/-render component state)]
-                   (.render js/React (sab/html react-dom) node identity))))]
-      (if (and (nil? (:state-atom @data-atom))
-               (and initial-inputs (pos? (count initial-inputs))))
-        (doseq [msg initial-inputs]
-          (put! (:event-chan sys) msg))
-        (put! (:event-chan sys) [:__system.noop]))
-      (reset! data-atom sys)))
-  IUnMount
-  (unmount [_ {:keys [node data-atom]}]
-    (when (:running @data-atom)
-      (reset! data-atom (fr/runner-stop @data-atom)))
-    (.unmountComponentAtNode js/React node))
-  IConfig
-  (-options [_]
-    (merge { :unmount-on-reload false
-             :padding false }
-           devcard-options)))
-
-(defn frontier-system-card
-  ([initial-state component initial-inputs devcard-options]
-     (FrontierSystemCard. initial-state component initial-inputs devcard-options))
-  ([initial-state component initial-inputs]
-     (frontier-system-card initial-state component initial-inputs {})))
-
-(defn managed-history-card
-  ([initial-state component initial-inputs devcard-options]
-     (let [inputs (mapv (partial fr/msg-prefix [:__history-keeper :state]) initial-inputs)
-           initial-state' (assoc-in {} [:__history-keeper :state] initial-state)]
-       (frontier-system-card initial-state'
-                    (fc/history-manager initial-state
-                                     component)
-                    inputs
-                    devcard-options)))
-  ([initial-state component initial-inputs]
-     (managed-history-card initial-state component initial-inputs {})))
