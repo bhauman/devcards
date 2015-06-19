@@ -447,7 +447,7 @@
 
 (defcard try-game-card
   (dc/react-runner-card
-   (fn [data]
+   (fn [_ data]
      (when (= @data {})
        (reset! data start-data))
      (sab/html
@@ -460,5 +460,6 @@
        [:div [:a {:onClick (fn [] (move :down data))} "down"]]       
        [:div
         [:a {:onClick (fn [] (reset! data start-data))} "reset"]]
-       (dc/edn->html @data)]))))
+       (dc/edn->html @data)]))
+   {}))
 

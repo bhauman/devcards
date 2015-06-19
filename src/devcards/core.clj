@@ -27,6 +27,13 @@
                                      (devcards.system/get-options ~expr)
                                      (fn [] ~expr)))))
 
+(defmacro card [expr]
+  `(devcards.core/defcard cardcard ~expr))
+
+(defmacro doc [& exprs]
+  `(devcards.core/defcard doccard
+     (devcards.core/markdown-card ~@exprs)))
+
 (defmacro is [body]
   `{ :type :is  :body (quote ~body) :passed ~body })
 

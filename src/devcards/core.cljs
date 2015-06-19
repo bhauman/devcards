@@ -65,7 +65,7 @@
                                         true)))
 
 
-(defn start-single-card-ui!*
+#_(defn start-single-card-ui!*
   "Start a devcard UI that allows you to cherry pick which cards to display.
    You will need to call render-single-card to put cards into the dom."
   []
@@ -103,7 +103,7 @@
   (put! devcard-event-chan
         [:register-card {:path path :options options :func func}]))
 
-(defn render-single-card [card-path node]
+#_(defn render-single-card [card-path node]
   "Declare that a card with a certain path will be rendered to a
    certain node. This is helpful for blog post examples."
   (let [id (path->unique-card-id card-path)]

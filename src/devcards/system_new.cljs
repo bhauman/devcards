@@ -79,30 +79,42 @@
        (:position d)
        d))
 
+(defn path-collision [state path]
+  (if-let [c (get (:path-collision-count state) path)]
+    (vec (concat (butlast (vec path))
+                 [(keyword (str (name (last path)) "-" c))]))
+    path))
+
+(defn register-collision [state path]
+  (update-in state [:path-collision-count path] inc))
+
 (defmulti dev-trans first)
 
 (defmethod dev-trans :default [msg state] state)
 
 (defmethod dev-trans :register-card [[_ {:keys [path options func]}] state]
-  (let [position (:position state)]
+  (let [position (:position state)
+        new-path (path-collision state path)]
     (-> state
         (update-in [:position] inc)
-        (update-in (cons :cards path)
+        (update-in (cons :cards new-path)
                    (fn [dc]
-                     (if dc
+                     (if false #_dc
                        (-> dc
                          (assoc
                           :position position
                           :func func)
                          (dissoc :sweep-marker)
                          (dissoc :delete-card))
-                       { :path path
+                       { :path new-path
                          :func func
-                         :position position }))))))
+                         :position position })))
+        (register-collision path))))
 
 (def devcard-initial-data { :current-path []
                             :position 0
-                            :cards {} })
+                            :cards {}
+                            :path-collision-count {} })
 
 (defonce app-state (atom devcard-initial-data))
 
@@ -241,6 +253,7 @@
 ;; enables the deletion of cards
 (defn merge-in-new-data [state new-state]
   (assoc state
+         :path-collision-count {}
          :position (:position new-state)
          :cards    (merge
                     (:cards state)
@@ -248,7 +261,9 @@
 
 (defn off-the-books [channel start-data]
   (let [timer (timeout 3000)
-        initial-data (dissoc start-data :cards)]
+        initial-data (-> start-data
+                       (assoc :path-collision-count {})
+                       (dissoc :cards))]
     (go-loop [data initial-data]
       (prn "here")
       (when-let [[[msg-name payload] ch] (alts! [channel timer])]
@@ -268,10 +283,7 @@
    (devcards-app-node)))
 
 (comment
-  ensure that current cards can work om card etc.
-  ensure that you can delete cards
 
-  nameless cards?
   new card types "dc/doc" "dc/comment" borderless
 
   options mirror om options

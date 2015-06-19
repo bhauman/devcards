@@ -14,6 +14,15 @@
 
 (devcards.core/start-devcard-ui!)
 
+(dc/card
+ (sab/html [:h1 "Hey there"]))
+
+(dc/card
+ (sab/html [:h1 "Hey there 24"]))
+
+(dc/card
+ (sab/html [:h1 "Hey there 3"]))
+
 (defcard react-runner-runner
   (dc/react-card
    (dc/react-runner-component
@@ -67,7 +76,7 @@
     development. They are like advanced stateful `println`s that can
     hold almost any arbitrary functionality that you want." ))
 
-(defcard intro-2
+(defcard intro
   (dc/markdown-card
    "## Devcards are intended to be interactive
 
@@ -326,67 +335,3 @@
    and a DOM node. The card has to take it from there, but the idea is
    for all the state to be maintained in the Atom and for all the
    rendering to be renderd into the node." ))
-
-(defcard base-api
-  (dc/markdown-card
-   "## Function API Devcard functions are basically functions that
-   take a map that holds a DOM node and a data Atom. This function
-   then side-effects to produce the desired behavior.
-
-   The function API is best used when you want to simply write over
-   the previous contents of the node with each code reload.
-
-   This could work for Canvas and WebGL rendering.
-
-   For example this is a devcard."
-
-   (mkdn-code (fn [{:keys [node data-atom]}] (set! (.-innerHTML node "<h2>Awesome?</h2>"))))
-
-   "And you can use it like so:"
-
-   (mkdn-code (defcard my-first-card
-                (fn [{:keys [node data-atom]}]
-                  (set! (.-innerHTML node) "<h2>Awesome?</h2>"))))
-
-   "You can see it rendered below."))
-
-(defcard my-first-card
-  (fn [{:keys [node data-atom]}]
-    (set! (.-innerHTML node) "<h2>Awesome?</h2>")))
-
-(defcard advanced-api
-  (dc/markdown-card
-   "## The Devcard Protocols API"
-   "Creating a devcard with the protocols API looks like this:"
-   (mkdn-code
-    (defn super-card [initial-state]
-      (reify
-        IMount
-        (mount [_ {:keys [node data-atom]}]
-          (dc/render-to (sab/html [:h1 "Super " (:text @data-atom) "!"]) node))
-        IUnMount
-        (unmount [_ {:keys [node]}]
-          (dc/unmount-react node))
-        IConfig
-        (-options [_]
-          { :unmount-on-reload false
-            :initial-state initial-state }))))
-   "You can then use the card like so:"
-   (mkdn-code
-    (defcard my-card-ex (super-card {})))))
-
-(defn super-card [initial-state]
-  (reify
-    IMount
-    (mount [_ {:keys [node data-atom]}]
-      (dc/render-to (sab/html [:h1 "Super " (:text @data-atom) "!"]) node))
-    IUnMount
-    (unmount [_ {:keys [node]}]
-      (dc/unmount-react node))
-    IConfig
-    (-options [_]
-      { :unmount-on-reload false
-        :initial-state initial-state })))
-
-(defcard protocol-api-example
-  (super-card {:text "cool cat"}))
