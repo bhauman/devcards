@@ -20,9 +20,27 @@
 
 (def devcards-app-element-id "com-rigsomelight-devcards-main")
 
+(def devcards-rendered-card-class "com-rigsomelight-devcards_rendered-card")
+
+(defn prevent-> [f]
+  (fn [e]
+    (.preventDefault e)
+    (f e)))
+
 (defn get-element-by-id [id] (.getElementById js/document id))
 
 (defn devcards-app-node [] (get-element-by-id devcards-app-element-id))
+
+(defn path->unique-card-id [path]
+  (string/join "." (map (fn [x] (str "[" x "]"))
+                        (map name (cons :cardpath path)))))
+
+(defn unique-card-id->path [card-id]
+  (mapv keyword
+       (-> (subs card-id 1
+                 (dec (count card-id)))
+           (string/split #"\].\[")
+           rest)))
 
 (defn create-style-element [id style-text]
   (let [el (js/document.createElement "style")]
@@ -53,6 +71,14 @@
       (set! (.-id el) devcards-app-element-id)
       (prepend-child (.-body js/document) el))))
 
+(defn devcard? [d]
+  (and (map? d)
+       #_(:data-atom d)
+       (:func d)
+       (:path d)
+       (:position d)
+       d))
+
 (defmulti dev-trans first)
 
 (defmethod dev-trans :default [msg state] state)
@@ -80,6 +106,139 @@
 
 (defonce app-state (atom devcard-initial-data))
 
+(defn valid-path? [state path]
+  (or (= [] path)
+      (get-in (:cards state) path)))
+
+(defn enforce-valid-path [state path]
+  (vec (if (valid-path? state path) path [])))
+
+(defn add-to-current-path [{:keys [current-path] :as state} path]
+  (assoc state
+         :current-path
+         (enforce-valid-path state (conj current-path (keyword path)))))
+
+(defn set-current-path [{:keys [current-path] :as state} path]
+  (let [path (vec (map keyword path))]
+    (if (not= current-path path)
+      (-> state
+        (assoc :current-path (enforce-valid-path state path))
+        #_add-navigate-effect)
+      state)))
+
+(defn current-page [data]
+  (and (:current-path data)
+       (:cards data)
+       (get-in (:cards data) (:current-path data))))
+
+(defn display-single-card? [state]
+  (devcard? (current-page state)))
+
+(defn display-dir-paths [state]
+  (let [cur (current-page state)]
+    (filter (complement (comp devcard? second)) cur)))
+
+(defn display-cards [state]
+  (let [cur (current-page state)]
+    (filter (comp #(and (not (:delete-card %))
+                        (devcard? %)) second) cur)))
+
+(defn naked-card [{:keys [path options func]}]
+  (sab/html
+   [:div
+    {:id (path->unique-card-id path)
+     :class (str devcards-rendered-card-class
+                 (if true #_(:padding options)
+                   " com-rigsomelight-devcards-devcard-padding" "")) }
+    (let [res (func)]
+      res)]))
+
+(defn card-template [state-atom
+                     {:keys [path options] :as card}]
+  (if-not (:hidden options)
+    (if true #_(:heading options)
+      (sab/html
+       [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
+        [:div.com-rigsomelight-devcards-panel-heading
+         { :onClick
+          (prevent->
+           (fn [e] (swap! state-atom set-current-path path)))}
+         (name (last path)) " "]
+        (naked-card card)])
+      (sab/html
+       [:div.com-rigsomelight-devcards-card-base-no-pad
+       (naked-card card)]))
+    (sab/html [:span])))
+
+(defn render-cards [cards state-atom]
+  (map (comp (partial card-template state-atom) second)
+       (sort-by (comp :position second) cards)))
+
+(defn main-cards-template [state-atom]
+  (let [data @state-atom]
+    (if (display-single-card? data)
+      (naked-card (current-page data))
+      (render-cards (display-cards data) state-atom))))
+
+(defn breadcrumbs [{:keys [current-path] :as state}]
+  (let [cpath (map name (cons :home current-path))
+        crumbs
+        (map (juxt last rest)
+             (rest (map-indexed
+                    (fn [i v] (subvec v 0 i))
+                    (take (inc (count cpath))
+                          (repeat (vec cpath))))))]
+    crumbs))
+
+(defn breadcrumbs-templ [crumbs state-atom]
+  (sab/html
+   [:div.com-rigsomelight-devcards-card-base
+    (interpose
+     (sab/html [:span.com-rigsomelight-devcards-breadcrumb-sep "/"])
+     (map (fn [[n path]]
+            (sab/html
+             [:span {:style {:display "inline-block" }}
+              [:a.com-rigsomelight-devcards_set-current-path
+               {:href "#"
+                :onClick (prevent->
+                          (fn [e] (swap! state-atom set-current-path path)))}
+               n]]))
+          crumbs))]))
+
+(defn dir-links [dirs state-atom]
+  (when-not (empty? dirs)
+    (sab/html
+     [:div.com-rigsomelight-devcards-card-base-no-pad
+      (map (fn [[key child-tree]]
+             (sab/html
+              [:a.com-rigsomelight-devcards-list-group-item
+               {:onClick
+                (prevent->
+                 (fn [e] (swap! state-atom add-to-current-path key)))}
+               [:span.com-rigsomelight-devcards-badge
+                {:style {:float "right"}}
+                (count child-tree)]
+               [:span " " (name key)]]))
+           (reverse dirs))])))
+
+(defn main-template [state-atom]
+  (let [data @state-atom]
+    (sab/html
+     [:div.com-rigsomelight-devcards-base
+      [:div.com-rigsomelight-devcards-navbar
+       [:div.com-rigsomelight-devcards-container
+        [:span.com-rigsomelight-devcards-brand
+         "(:devcards ClojureScript)"]]]
+      [:div.com-rigsomelight-devcards-container
+       (when-let [crumbs (breadcrumbs data)]
+         (breadcrumbs-templ crumbs state-atom))
+       (when-not (display-single-card? data)
+         (let [dir-paths (display-dir-paths data)]
+           (dir-links dir-paths state-atom)))
+       [:div
+        (main-cards-template state-atom)]]])))
+
+
 (defn off-the-books [channel start-data]
   (let [timer (timeout 3000)]
     (go-loop [data start-data]
@@ -87,57 +246,38 @@
       (when-let [[[msg-name payload] ch] (alts! [channel timer])]
         (cond
           (= ch timer) data
-          (= msg-name :js-reload) data
+          (= msg-name :jsreload) data
           :else
           (do
             (recur (dev-trans [msg-name payload] data)  )))))))
 
-;; this throttleing helps prevent tons of renders on load
-(defn throttle-chan [in ms]
-  (let [out (chan)]
-    (go-loop []
-             (let [d (<! in)
-                   timer (timeout ms)]
-               (put! out
-                     (loop [d' d]
-                       (let [[val tc] (alts! [in timer])]
-                         (if (= tc timer)
-                           d'
-                           (recur val)))))
-               (recur)))
-    out))
-
-(defn throttle-function [f ms]
-  (let [q (chan (sliding-buffer 1))
-        tq (throttle-chan q ms)]
-    (go-loop []
-      (when-let [v (<! tq)]
-        (f v) (recur)))
-    (fn [x] (put! q x))))
-
-(defn renderer []
+(defn renderer [state-atom]
   (prn "Rendering")
   (js/React.render
    (sab/html [:div
-              [:h1 "Devcards now"]
-              (edn-rend/html-edn @app-state)])
+              (main-template state-atom)
+              (edn-rend/html-edn @state-atom)])
    (devcards-app-node)))
-
-(add-watch app-state :devcards-render (fn [_ _ _ _] (renderer)))
 
 (defn start-ui [channel]
   (defonce channel-setup
     (do
-      (go-loop []
-        (when-let [v (<! channel)]
-          (prn "hey" v)
-          (if (= (first v) :before-jsload)
-            (let [new-state (<! (off-the-books channel @app-state))]
-              (reset! app-state new-state))
-            (swap! app-state (fn [s] (dev-trans v s)))
-            (renderer))
-          (recur)))
-      true)
-    )
-  (render-base-if-necessary!)
-  (renderer))
+      (render-base-if-necessary!)
+
+      (add-watch app-state :devcards-render
+                 (fn [_ _ _ _] (renderer app-state)))
+      (go
+        (loop  []
+          (when-let [v (<! channel)]
+            (prn "hey" (first v))
+            (if (= (first v) :before-jsload)
+              (let [new-state (<! (off-the-books channel @app-state))]
+                (prn "in the books")
+                (reset! app-state new-state))
+              (swap! app-state (fn [s] (dev-trans v s))))
+            (recur))))
+      
+      (renderer app-state)
+      true)))
+
+

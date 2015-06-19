@@ -152,8 +152,9 @@
 (defn react-card
   "Simple react card. It only renders the react component passed in."
   ([react-component options]
-     (ReactCard. react-component options ))
-  ([react-component] (react-card react-component {})))
+   react-component)
+  ([react-component]
+   react-component))
 
 (defn sab-card
   "Card that renders sablono."
