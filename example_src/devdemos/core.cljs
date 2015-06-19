@@ -15,7 +15,7 @@
 (devcards.core/start-devcard-ui!)
 
 (dc/card
- (sab/html [:h1 "Hey there"]))
+ (dc/base (sab/html [:h1 "Hey there"]) {}))
 
 (dc/card
  (sab/html [:h1 "Hey there 24"]))
@@ -44,7 +44,6 @@
                       (fn [] (swap! state-atom update-in [:count] inc))}
                   "inc"]]))
     {:initial-state {:count 6}})))
-
 
 (defcard node-runner-runner
   (dc/react-card

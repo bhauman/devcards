@@ -113,36 +113,6 @@
 ;;; utils
 
 ;; returns a react component of rendered edn
-(def edn->html edn-rend/html-edn)
-
-(defn react-raw [raw-html-str]
-  "A React component that renders raw html."
-  (.div (.-DOM js/React)
-        (clj->js { :dangerouslySetInnerHTML
-                   { :__html
-                     raw-html-str }})))
-
-(defn react-card
-  "Simple react card. It only renders the react component passed in."
-  ([react-component options]
-   react-component)
-  ([react-component]
-   react-component))
-
-(defn sab-card
-  "Card that renders sablono."
-  ([sab-template options]
-     (react-card (sab/html sab-template) options))
-  ([sab-template]
-     (react-card (sab/html sab-template) {})))
-
-(declare om-root-card)
-
-(defn edn-card [clj-data]
-  "A card that renders EDN."
-  (if (satisfies? IAtom clj-data)
-    (om-root-card #(om/component (edn->html %)) clj-data)
-    (react-card (edn->html clj-data))))
 
 (def react-runner-component-class
   (js/React.createClass
@@ -178,7 +148,8 @@
          (fn []
            (this-as this
                     ((.-react_fn (.-props this))
-                     this (.-data_atom (.-state this)))))}))
+                     this
+                     (.-data_atom (.-state this)))))}))
 
 ;; TODO: much work to do here
 (def history-component-class
@@ -288,10 +259,39 @@
                      #js { :ref (.. this -state -unique_id) }
                      "Card has not mounted DOM node.")))}))
 
+(defn naked-card [children options]
+  (sab/html
+   [:div
+    {:class
+     (str devcards.system-new/devcards-rendered-card-class
+          (if-not (false? (:padding options))
+            " com-rigsomelight-devcards-devcard-padding" "")) }
+    children]))
+
+(defn base [children options]
+  (let [path (:path devcards.system-new/*devcard-data*)]
+    (if-not (:hidden options)
+      (if (false? (:heading options))
+        (sab/html
+         [:div.com-rigsomelight-devcards-card-base-no-pad
+          (naked-card children options)])
+        (sab/html
+         [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
+          [:div.com-rigsomelight-devcards-panel-heading
+           { :onClick
+            (devcards.system-new/prevent->
+             (fn [e] (swap! devcards.system-new/app-state
+                           devcards.system-new/set-current-path path)))}
+           (when path (name (last path)) ) " "]
+          (naked-card children options)]))
+      (sab/html [:span]))))
+
 (defn react-runner-component [react-runner-component-fn options]
-  (js/React.createElement react-runner-component-class
+  (base
+   (js/React.createElement react-runner-component-class
                           #js {:react_fn react-runner-component-fn
-                               :data_atom (:initial-state options)}))
+                               :data_atom (:initial-state options)})
+   options))
 
 (defn react-history-runner-component [react-runner-component-fn options]
   (react-runner-component
@@ -311,6 +311,31 @@
 
 (defn react-runner-card [f options]
   (react-runner-component f options))
+
+(defn react-card
+  "Simple react card. It only renders the react component passed in."
+  ([react-component options]
+   (react-runner-component (fn [_ _] react-component) options))
+  ([react-component]
+   (react-card react-component {})))
+
+(defn sab-card
+  "Card that renders sablono."
+  ([sab-template options]
+     (react-card (sab/html sab-template) options))
+  ([sab-template]
+     (react-card (sab/html sab-template) {})))
+
+
+(def edn->html edn-rend/html-edn)
+
+(declare om-root-card)
+
+(defn edn-card [clj-data]
+  "A card that renders EDN."
+  (if (satisfies? IAtom clj-data)
+    (om-root-card #(om/component (edn->html %)) clj-data)
+    (react-card (edn->html clj-data))))
 
 (defn markdown-card [& mkdn-strs]
   (node-runner-component
@@ -332,8 +357,6 @@
   ([om-comp-fn]
      (om-root-card om-comp-fn {} {} {})))
 
-
-
 ;; testing to be addressed later
 
 (defmulti render-test (fn [x] (cond
@@ -346,6 +369,13 @@
           (dom/span #js { :className (str "devcards-test-icon glyphicon glyphicon-"
                                           (if (:passed test) "ok" "remove")) })
           body))
+
+(defn react-raw [raw-html-str]
+  "A React component that renders raw html."
+  (.div (.-DOM js/React)
+        (clj->js { :dangerouslySetInnerHTML
+                   { :__html
+                     raw-html-str }})))
 
 (defmethod render-test :string [s]
   (dom/li #js {:className "list-group-item"}

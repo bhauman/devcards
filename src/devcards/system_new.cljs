@@ -155,32 +155,39 @@
     (filter (comp #(and (not (:delete-card %))
                         (devcard? %)) second) cur)))
 
-(defn naked-card [{:keys [path options func]}]
+(def ^:dynamic *devcard-data* nil)
+
+#_(defn naked-card [{:keys [path options func] :as devcard}]
   (sab/html
    [:div
     {:id (path->unique-card-id path)
      :class (str devcards-rendered-card-class
                  (if true #_(:padding options)
-                   " com-rigsomelight-devcards-devcard-padding" "")) }
-    (let [res (func)]
-      res)]))
+                     " com-rigsomelight-devcards-devcard-padding" "")) }
+    (binding [*devcard-data* devcard]
+      (func))]))
 
 (defn card-template [state-atom
-                     {:keys [path options] :as card}]
-  (if-not (:hidden options)
-    (if true #_(:heading options)
-      (sab/html
-       [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
-        [:div.com-rigsomelight-devcards-panel-heading
-         { :onClick
-          (prevent->
-           (fn [e] (swap! state-atom set-current-path path)))}
-         (name (last path)) " "]
-        (naked-card card)])
-      (sab/html
-       [:div.com-rigsomelight-devcards-card-base-no-pad
-       (naked-card card)]))
-    (sab/html [:span])))
+                     {:keys [path options func] :as card}]
+      (sab/html [:div {:key (path->unique-card-id path)}
+                 (binding [*devcard-data* card]
+                   (func))               
+                 ])
+
+  #_(if-not (:hidden options)
+      (if true #_(:heading options)
+          (sab/html
+           [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
+            [:div.com-rigsomelight-devcards-panel-heading
+             { :onClick
+              (prevent->
+               (fn [e] (swap! state-atom set-current-path path)))}
+             (name (last path)) " "]
+            (naked-card card)])
+          (sab/html
+           [:div.com-rigsomelight-devcards-card-base-no-pad
+            (naked-card card)]))
+      (sab/html [:span])))
 
 (defn render-cards [cards state-atom]
   (map (comp (partial card-template state-atom) second)
@@ -189,7 +196,7 @@
 (defn main-cards-template [state-atom]
   (let [data @state-atom]
     (if (display-single-card? data)
-      (naked-card (current-page data))
+      (card-template state-atom (current-page data))
       (render-cards (display-cards data) state-atom))))
 
 (defn breadcrumbs [{:keys [current-path] :as state}]
@@ -286,9 +293,18 @@
 
   new card types "dc/doc" "dc/comment" borderless
 
+  move card to a react-class that handles rendering options
+
+  make react funcitonality composable with data and options chained
+  down through
+
+  get hash routing working
+
+  consider web-components for hiding css styling
+  
   options mirror om options
-  store atom in card and pass down through?
-    gives stable state (maybe too stable)
+  ;; store atom in card and pass down through?
+  ;; gives stable state (maybe too stable)
 
   fix edn rendering
 
