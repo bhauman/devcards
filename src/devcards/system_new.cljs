@@ -238,15 +238,23 @@
        [:div
         (main-cards-template state-atom)]]])))
 
+;; enables the deletion of cards
+(defn merge-in-new-data [state new-state]
+  (assoc state
+         :position (:position new-state)
+         :cards    (merge
+                    (:cards state)
+                    (:cards new-state))))
 
 (defn off-the-books [channel start-data]
-  (let [timer (timeout 3000)]
-    (go-loop [data start-data]
+  (let [timer (timeout 3000)
+        initial-data (dissoc start-data :cards)]
+    (go-loop [data initial-data]
       (prn "here")
       (when-let [[[msg-name payload] ch] (alts! [channel timer])]
         (cond
-          (= ch timer) data
-          (= msg-name :jsreload) data
+          (= ch timer)           (merge-in-new-data start-data data)
+          (= msg-name :jsreload) (merge-in-new-data start-data data)
           :else
           (do
             (recur (dev-trans [msg-name payload] data)  )))))))
@@ -256,8 +264,23 @@
   (js/React.render
    (sab/html [:div
               (main-template state-atom)
-              (edn-rend/html-edn @state-atom)])
+              #_(edn-rend/html-edn @state-atom)])
    (devcards-app-node)))
+
+(comment
+  ensure that current cards can work om card etc.
+  ensure that you can delete cards
+
+  nameless cards?
+  new card types "dc/doc" "dc/comment" borderless
+
+  options mirror om options
+  store atom in card and pass down through?
+    gives stable state (maybe too stable)
+
+  fix edn rendering
+
+  )
 
 (defn start-ui [channel]
   (defonce channel-setup

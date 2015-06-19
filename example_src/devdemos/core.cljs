@@ -28,14 +28,12 @@
 (defcard react-history-runner-runner
   (dc/react-card
    (dc/react-history-runner-component
-
     (fn [owner state-atom]
       (sab/html [:div
                  [:div "counter newer : " (prn-str state-atom)]
                  [:a {:onClick
                       (fn [] (swap! state-atom update-in [:count] inc))}
                   "inc"]]))
-    
     {:initial-state {:count 6}})))
 
 
@@ -125,21 +123,25 @@
    (dom/div #js {}
             (dom/h2 #js {} "This is a react card."))))
 
-(defn counter-app-rct [intro data-atom]
-  (sab/html [:div
-             intro
-             [:div "Count: " (:count @data-atom)]
-             [:ul
-              [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]]
-              [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] dec))} "dec"]]]]))
+(defn counter-app-rct [data-atom]
+  (sab/html
+   [:div
+    [:div "Count: " (:count @data-atom)]
+    [:ul
+     [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]]
+     [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] dec))} "dec"]]]]))
+
+
+
 
 (defcard react-runner-card-example
   (dc/react-runner-card
-   (partial counter-app-rct
-            (sab/html
-             [:div
-              [:h3 "This is a " "react-runner-card"]
-              [:p "This card triggers a re-render when it the atom is modified"]]))
+   (fn [_ data-atom]
+     (sab/html
+      [:div
+       [:h3 "This is a " "react-runner-card"]
+       [:p "This card triggers a re-render when it the atom is modified"]
+       (counter-app-rct data-atom)]))
    { :initial-state {:count 30 } }))
 
 (defcard atom-sharing
@@ -158,16 +160,18 @@
 
 (defcard react-runner-card-shared-1
   (dc/react-runner-card
-   (partial counter-app-rct
-            (sab/html
-             [:div
-              [:h3 "This counter is sharing state"]
-              [:p "The next card is sharing the same atom as this card."]]))
+   (fn [_ data-atom]
+     (sab/html
+      [:div
+       [:h3 "This counter is sharing state"]
+       [:p "The next card is sharing the same atom as this card."]
+       (counter-app-rct data-atom)]))  
    { :initial-state react-shared-atom }))
 
 (defcard react-runner-card-shared-2
   (dc/react-runner-card
-   (fn [data-atom] (sab/html [:h1 "Count: " (:count @data-atom)]))
+   (fn [_ data-atom]
+     (sab/html [:h1 "Count: " (:count @data-atom)]))
    { :initial-state react-shared-atom }))
 
 (defcard om-intro

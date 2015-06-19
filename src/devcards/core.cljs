@@ -115,39 +115,12 @@
 ;; returns a react component of rendered edn
 (def edn->html edn-rend/html-edn)
 
-(defn render-to
-  "Render a react component to a node."
-  ([react-dom html-node callback]
-     (.render js/React react-dom html-node callback))
-  ([react-dom html-node]
-     (render-to react-dom html-node identity)))
-
-(defn unmount-react [node]
-  "Unmount a react component from a node."
-  (.unmountComponentAtNode js/React node))
-
 (defn react-raw [raw-html-str]
   "A React component that renders raw html."
   (.div (.-DOM js/React)
         (clj->js { :dangerouslySetInnerHTML
                    { :__html
                      raw-html-str }})))
-
-(def ^:dynamic *data-atom* nil)
-
-(defrecord ReactCard [react-component options]
-  IMount
-  (mount [_ {:keys [node data-atom]}]
-    (println "calling mount")
-    (binding [*data-atom* data-atom]
-      (render-to react-component node)))
-  IUnMount
-  (unmount [_ {:keys [node data-atom]}]
-    (println "calling UNmount")
-    (unmount-react node))
-  IConfig
-  (-options [_]
-    (merge { :unmount-on-reload false } options)))
 
 (defn react-card
   "Simple react card. It only renders the react component passed in."
@@ -165,22 +138,11 @@
 
 (declare om-root-card)
 
-(defn box-data-atom [initial-state]
-  (if (and initial-state (satisfies? IAtom initial-state))
-    { :__devcards-atom-box initial-state }
-    initial-state ))
-
-(defn unbox-data-atom [data-atom]
-  (or (and (map? @data-atom)
-           (:__devcards-atom-box @data-atom))
-      data-atom))
-
 (defn edn-card [clj-data]
   "A card that renders EDN."
   (if (satisfies? IAtom clj-data)
     (om-root-card #(om/component (edn->html %)) clj-data)
     (react-card (edn->html clj-data))))
-
 
 (def react-runner-component-class
   (js/React.createClass
@@ -218,6 +180,7 @@
                     ((.-react_fn (.-props this))
                      this (.-data_atom (.-state this)))))}))
 
+;; TODO: much work to do here
 (def history-component-class
   (js/React.createClass
    #js {:getInitialState
@@ -346,34 +309,32 @@
                                   :data_atom data-atom}))
    options))
 
-(defrecord ReactRunnerCard [react-component-fn uniq-key options]
-  IMount
-  (mount [_ {:keys [node data-atom]}]
-    (let [da (unbox-data-atom data-atom)]
-      (add-watch da uniq-key
-                 (fn [_ _ _ _] (render-to (react-component-fn da) node)))
-      (reset! da @da)))
-  IUnMount
-  (unmount [_ {:keys [node data-atom]}]
-    (remove-watch (unbox-data-atom data-atom) uniq-key)
-    (unmount-react node))
-  IConfig
-  (-options [_]
-    (merge { :unmount-on-reload false }
-           options
-           {:initial-state (box-data-atom (:initial-state options))})))
+(defn react-runner-card [f options]
+  (react-runner-component f options))
 
-;; another way to do this is to create a runner component and
-;; pass it to the react card.
-(defn react-runner-card
-  "This card takes a function which takes a data atom and returns a
-react component. Any changes to the atom cause the component to
-rerender."
-  ([react-component-fn options]
-     (ReactRunnerCard. react-component-fn (keyword (gensym 'react-runner))
-      options))
-  ([react-component-fn]
-     (react-runner-card react-component-fn {})))
+(defn markdown-card [& mkdn-strs]
+  (node-runner-component
+    (fn [node _]
+      (set! (.. node -innerHTML)
+            (less-sensitive-markdown mkdn-strs)))
+    {}))
+
+(defn om-root-card
+  ([om-comp-fn initial-state om-options devcard-options]
+   (node-runner-component
+    (fn [node _]
+      (om/root om-comp-fn initial-state (merge om-options {:target node})))
+    devcard-options))
+  ([om-comp-fn initial-state om-options]
+     (om-root-card om-comp-fn initial-state om-options {}))
+  ([om-comp-fn initial-state]
+     (om-root-card om-comp-fn initial-state {} {}))
+  ([om-comp-fn]
+     (om-root-card om-comp-fn {} {} {})))
+
+
+
+;; testing to be addressed later
 
 (defmulti render-test (fn [x] (cond
                               (map? x) (:type x)
@@ -435,40 +396,3 @@ rerender."
            (to-array (mapv (fn [t] (render-test t))
                            assertions)))
    {:padding false}))
-
-;; markdown card
-
-(def markdown-card
-  (fn [& mkdn-strs]
-    (reify
-      IMount
-      (mount [_ {:keys [node]}]
-        (set! (.-innerHTML node)
-              (less-sensitive-markdown mkdn-strs)))
-      IConfig
-      (-options [_] {:heading false}))))
-
-;; om-card
-
-(defrecord OmRootCard [om-comp initial-state om-options devcard-options]
-  IMount
-  (mount [_ {:keys [node data-atom]}]
-    (om/root om-comp (unbox-data-atom data-atom) (merge om-options {:target node})))
-  IUnMount
-  (unmount [_ {:keys [node]}]
-    (unmount-react node))
-  IConfig
-  (-options [_]
-    (merge { :unmount-on-reload false
-             :initial-state (box-data-atom initial-state)}
-           devcard-options)))
-
-(defn om-root-card
-  ([om-comp-fn initial-state om-options devcard-options]
-     (OmRootCard. om-comp-fn initial-state om-options devcard-options))
-  ([om-comp-fn initial-state om-options]
-     (om-root-card om-comp-fn initial-state om-options {}))
-  ([om-comp-fn initial-state]
-     (om-root-card om-comp-fn initial-state {} {}))
-  ([om-comp-fn]
-     (om-root-card om-comp-fn {} {} {})))
