@@ -27,8 +27,12 @@
                                      (devcards.system/get-options ~expr)
                                      (fn [] ~expr)))))
 
-(defmacro card [expr]
-  `(devcards.core/defcard cardcard ~expr))
+(defmacro card [& expr]
+  (if (instance? clojure.lang.Named (first expr))
+    `(devcards.core/defcard ~(symbol (name (first expr)))
+       (devcards.core/card*
+        ~@(rest expr)))
+    `(devcards.core/defcard card (devcards.core/card* ~@expr))))
 
 (defmacro doc [& exprs]
   `(devcards.core/defcard doccard

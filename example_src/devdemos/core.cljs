@@ -14,45 +14,40 @@
 
 (devcards.core/start-devcard-ui!)
 
-(dc/card
- (dc/base (sab/html [:h1 "Hey there"]) {}))
+(dc/card my-card
+ (sab/html [:h1 "Hey there"]))
+
+(dc/card (sab/html [:h1 "Hey there 2"]))
 
 (dc/card
- (sab/html [:h1 "Hey there 24"]))
+ (fn [_ data]
+   (sab/html [:h1 "Hey there 3" (prn-str data)]))
+ {:counter 5})
 
-(dc/card
- (sab/html [:h1 "Hey there 3"]))
-
-(defcard react-runner-runner
-  (dc/react-card
-   (dc/react-runner-component
-    (fn [owner state-atom]
-      (sab/html [:div
-                 [:div "counter newer : " (prn-str state-atom)]
+(dc/card :react-runner-runner
+         (fn [owner state-atom]
+           (sab/html [:div
+                      [:div "counter newer : " (prn-str state-atom)]
                  [:a {:onClick
                       (fn [] (swap! state-atom update-in [:count] inc))}
                   "inc"]])) 
-    {:initial-state {:count 6}})))
+         {:count 6})
 
 (defcard react-history-runner-runner
-  (dc/react-card
-   (dc/react-history-runner-component
-    (fn [owner state-atom]
-      (sab/html [:div
-                 [:div "counter newer : " (prn-str state-atom)]
-                 [:a {:onClick
-                      (fn [] (swap! state-atom update-in [:count] inc))}
-                  "inc"]]))
-    {:initial-state {:count 6}})))
+  (dc/hist 
+   (fn [owner state-atom]
+     (sab/html [:div
+                [:div "counter newer : " (prn-str state-atom)]
+                [:a {:onClick
+                     (fn [] (swap! state-atom update-in [:count] inc))}
+                 "inc"]]))
+   {:count 6}))
 
 (defcard node-runner-runner
-  (dc/react-card
-   (dc/node-runner-component
+  (dc/dom-node
     (fn [node data-atom]
-      (prn "in HERE" node)
-      (prn data-atom)
       (set! (.. node -innerHTML) (str "<h1>Hi I'm a crazy nodee " (:wow @data-atom) "</h1>")))
-    {:initial-state {:wow "man"}})))
+    {:wow "man"}))
 
 (defcard intro
   (dc/markdown-card
@@ -143,7 +138,7 @@
 
 
 (defcard react-runner-card-example
-  (dc/react-runner-card
+  (dc/runner
    (fn [_ data-atom]
      (sab/html
       [:div
@@ -167,20 +162,20 @@
 (defonce react-shared-atom (atom {:count 3}))
 
 (defcard react-runner-card-shared-1
-  (dc/react-runner-card
+  (dc/runner
    (fn [_ data-atom]
      (sab/html
       [:div
        [:h3 "This counter is sharing state"]
        [:p "The next card is sharing the same atom as this card."]
        (counter-app-rct data-atom)]))  
-   { :initial-state react-shared-atom }))
+   react-shared-atom ))
 
 (defcard react-runner-card-shared-2
-  (dc/react-runner-card
+  (dc/runner
    (fn [_ data-atom]
      (sab/html [:h1 "Count: " (:count @data-atom)]))
-   { :initial-state react-shared-atom }))
+   react-shared-atom))
 
 (defcard om-intro
   (dc/markdown-card

@@ -446,7 +446,7 @@
                  :tile2 { :v 2 :top 0 :left 3 :id :tile2}})
 
 (defcard try-game-card
-  (dc/react-runner-card
+  (dc/runner
    (fn [_ data]
      (when (= @data {})
        (reset! data start-data))

@@ -45,39 +45,10 @@
                      (fn [x]
                        (devcard-before-jsload (.-detail x)))))
 
-#_(defn start-devcard-ui!*
-  "This function starts the full devcard UI."
-  []
-  (defonce devcard-system
-    (do
-      (render-base-if-necessary!)
-      (let [ds (devcard-system-start devcard-event-chan
-                                     (throttle-function devcard-renderer 50))]
-        (register-listeners devcard-event-chan)
-        ds)
-      (register-figwheel-listeners!)
-      true)))
-
-
 (defn start-devcard-ui!* []
   (dev/start-ui devcard-event-chan)
   (defonce register-listeners-fig (do   (register-figwheel-listeners!)
                                         true)))
-
-
-#_(defn start-single-card-ui!*
-  "Start a devcard UI that allows you to cherry pick which cards to display.
-   You will need to call render-single-card to put cards into the dom."
-  []
-  (defonce devcard-single-card-system
-    (do
-      (register-figwheel-listeners!)
-      (devcard-system-start devcard-event-chan
-                            (throttle-function
-                             (fn [{:keys [state event-chan]}]
-                               (unmount-card-nodes state)
-                               (mount-card-nodes state))
-                             50)))))
 
 ;; Register a new card
 ;; this is normally called from the defcard macro
@@ -87,34 +58,21 @@
 ;; options - a map of card rendering options
 ;;           :heading - (default true) rendering a heading on the card
 ;;           :padding - (default true) render padding around the card body
-;;           :unmount-on-reload - (default true) call unmount on the
-;;                                cards functionality on relaod
 ;;           :hidden - (default false) Don't render this card
 ;; func - is a thunk which contains the functionality of the card.
 ;;        The thunk has to be executed to get the functionality of
 ;;        the card.
-;;        The functionality can be either a function that takes a map
-;;        {:node HTMLElement :data-atom Atom } or an object that implements
-;;        the IMount protocol, It can also have the IUnMount and
-;;        IConfig protocols.
 
 (defn register-card [path options func]
   "Register a new card."
   (put! devcard-event-chan
         [:register-card {:path path :options options :func func}]))
 
-#_(defn render-single-card [card-path node]
-  "Declare that a card with a certain path will be rendered to a
-   certain node. This is helpful for blog post examples."
-  (let [id (path->unique-card-id card-path)]
-    (when-not (.getElementById js/document id)
-      (.html (js/$ node) (str "<div class='devcard-rendered-card' id='" id "'></div>")))))
-
 ;;; utils
 
 ;; returns a react component of rendered edn
 
-(def react-runner-component-class
+(def runner-class
   (js/React.createClass
    #js {:getInitialState
         (fn [] #js {:unique_id (gensym 'react-runner)})
@@ -152,7 +110,7 @@
                      (.-data_atom (.-state this)))))}))
 
 ;; TODO: much work to do here
-(def history-component-class
+(def history-class
   (js/React.createClass
    #js {:getInitialState
         (fn [] #js {:unique_id    (str (gensym 'devcards-history-runner-))
@@ -230,7 +188,7 @@
                              this
                              (.. this -props -data_atom))]])))}))
 
-(def node-runner-component-class
+(def dom-node-class
   (js/React.createClass
    #js {:getInitialState
         (fn [] #js {:unique_id (str (gensym 'devcards-card-runner-))})
@@ -268,7 +226,10 @@
             " com-rigsomelight-devcards-devcard-padding" "")) }
     children]))
 
-(defn base [children options]
+(defn frame
+  ([children]
+   (frame children {}))
+  ([children options]
   (let [path (:path devcards.system-new/*devcard-data*)]
     (if-not (:hidden options)
       (if (false? (:heading options))
@@ -284,69 +245,79 @@
                            devcards.system-new/set-current-path path)))}
            (when path (name (last path)) ) " "]
           (naked-card children options)]))
-      (sab/html [:span]))))
+      (sab/html [:span])))))
 
-(defn react-runner-component [react-runner-component-fn options]
-  (base
-   (js/React.createElement react-runner-component-class
+(defn runner* [react-runner-component-fn initial-data]
+  (js/React.createElement runner-class
                           #js {:react_fn react-runner-component-fn
-                               :data_atom (:initial-state options)})
-   options))
+                               :data_atom initial-data}))
 
-(defn react-history-runner-component [react-runner-component-fn options]
-  (react-runner-component
-   (fn [owner data-atom]
-     (js/React.createElement history-component-class
-                             #js { :react_fn react-runner-component-fn
-                                   :data_atom data-atom }))
-   options))
+(defn hist* [react-fn]
+  (fn [owner data-atom]
+    (js/React.createElement history-class
+                            #js { :react_fn react-fn
+                                  :data_atom data-atom })))
 
-(defn node-runner-component [node-component-fn options]
-  (react-runner-component
-   (fn [owner data-atom]
-     (js/React.createElement node-runner-component-class
-                             #js {:node_fn   node-component-fn
-                                  :data_atom data-atom}))
-   options))
+(defn dom-node* [node-fn]
+  (fn [owner data-atom]
+     (js/React.createElement dom-node-class
+                             #js {:node_fn   node-fn
+                                  :data_atom data-atom})))
 
-(defn react-runner-card [f options]
-  (react-runner-component f options))
+(defn runner
+  ([react-fn initial-data]
+   (runner react-fn initial-data {}))
+  ([react-fn initial-data options]
+   (frame (runner* react-fn initial-data) options)))
 
-(defn react-card
-  "Simple react card. It only renders the react component passed in."
-  ([react-component options]
-   (react-runner-component (fn [_ _] react-component) options))
-  ([react-component]
-   (react-card react-component {})))
+(defn hist
+  ([react-fn initial-data] (hist react-fn initial-data {}))
+  ([react-fn initial-data options]
+   (runner (hist* react-fn) initial-data options)))
+
+(defn dom-node
+  ([node-fn]
+   (dom-node node-fn {} {}))
+  ([node-fn initial-data]
+   (dom-node node-fn initial-data {}))
+  ([node-fn initial-data options]
+   (runner (dom-node* node-fn) initial-data options)))
+
+(defn card*
+  ([fn-or-react initial-data-or-opt options]
+   (if (fn? fn-or-react)
+       (runner fn-or-react initial-data-or-opt options)
+       (frame fn-or-react initial-data-or-opt)))
+  ([fn-or-react initial-data-or-opt] (card* fn-or-react initial-data-or-opt {}))
+  ([fn-or-react] (card* fn-or-react {} {})))
+
+(def react-card frame)
 
 (defn sab-card
   "Card that renders sablono."
   ([sab-template options]
-     (react-card (sab/html sab-template) options))
+     (frame (sab/html sab-template) options))
   ([sab-template]
-     (react-card (sab/html sab-template) {})))
-
+     (sab-card sab-template {})))
 
 (def edn->html edn-rend/html-edn)
 
 (declare om-root-card)
 
-(defn edn-card [clj-data]
+(defn edn-card [initial-data]
   "A card that renders EDN."
-  (if (satisfies? IAtom clj-data)
-    (om-root-card #(om/component (edn->html %)) clj-data)
-    (react-card (edn->html clj-data))))
+  (runner (fn [_ data-atom]
+            (edn->html @data-atom)) initial-data))
 
 (defn markdown-card [& mkdn-strs]
-  (node-runner-component
+  (dom-node
     (fn [node _]
       (set! (.. node -innerHTML)
-            (less-sensitive-markdown mkdn-strs)))
-    {}))
+            (less-sensitive-markdown mkdn-strs)))))
 
 (defn om-root-card
   ([om-comp-fn initial-state om-options devcard-options]
-   (node-runner-component
+   (dom-node
     (fn [node _]
       (om/root om-comp-fn initial-state (merge om-options {:target node})))
     devcard-options))
@@ -357,7 +328,7 @@
   ([om-comp-fn]
      (om-root-card om-comp-fn {} {} {})))
 
-;; testing to be addressed later
+;; TODO: testing to be addressed later
 
 (defmulti render-test (fn [x] (cond
                               (map? x) (:type x)
@@ -421,7 +392,7 @@
   (operator-relation-test test "!=" " not to equal "))
 
 (defn test-card [& assertions]
-  (react-card
+  (frame
    (dom/ul #js {:className "list-group devcards-test-group"}
            (to-array (mapv (fn [t] (render-test t))
                            assertions)))
