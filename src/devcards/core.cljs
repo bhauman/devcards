@@ -283,22 +283,22 @@
   ([node-fn initial-data options]
    (runner (dom-node* node-fn) initial-data options)))
 
-(defn card*
-  ([fn-or-react initial-data-or-opt options]
+(defn default-option-card*
+  ([defaults fn-or-react initial-data-or-opt options]
    (if (fn? fn-or-react)
-       (runner fn-or-react initial-data-or-opt options)
-       (frame fn-or-react initial-data-or-opt)))
-  ([fn-or-react initial-data-or-opt] (card* fn-or-react initial-data-or-opt {}))
-  ([fn-or-react] (card* fn-or-react {} {})))
+     (runner fn-or-react initial-data-or-opt (merge defaults options))
+     (frame fn-or-react (merge defaults options))))
+  ([defaults fn-or-react initial-data-or-opt]
+   (default-option-card* defaults fn-or-react initial-data-or-opt {}))
+  ([defaults fn-or-react]
+   (default-option-card* defaults fn-or-react {} {})))
+
+(def card* (partial default-option-card* {}))
+
+(defn reify-comp-fn [comp-fn]
+  (comp-fn {} {}))
 
 (def react-card frame)
-
-(defn sab-card
-  "Card that renders sablono."
-  ([sab-template options]
-     (frame (sab/html sab-template) options))
-  ([sab-template]
-     (sab-card sab-template {})))
 
 (def edn->html edn-rend/html-edn)
 
@@ -306,27 +306,25 @@
 
 (defn edn-card [initial-data]
   "A card that renders EDN."
-  (runner (fn [_ data-atom]
-            (edn->html @data-atom)) initial-data))
+  (runner* (fn [_ data-atom]
+            (edn->html @data-atom))
+          initial-data))
 
 (defn markdown-card [& mkdn-strs]
-  (dom-node
+  (dom-node*
     (fn [node _]
       (set! (.. node -innerHTML)
             (less-sensitive-markdown mkdn-strs)))))
 
 (defn om-root-card
-  ([om-comp-fn initial-state om-options devcard-options]
-   (dom-node
-    (fn [node _]
-      (om/root om-comp-fn initial-state (merge om-options {:target node})))
-    devcard-options))
   ([om-comp-fn initial-state om-options]
-     (om-root-card om-comp-fn initial-state om-options {}))
+   (dom-node*
+    (fn [node _]
+      (om/root om-comp-fn initial-state (merge om-options {:target node})))))
   ([om-comp-fn initial-state]
-     (om-root-card om-comp-fn initial-state {} {}))
+     (om-root-card om-comp-fn initial-state {}))
   ([om-comp-fn]
-     (om-root-card om-comp-fn {} {} {})))
+     (om-root-card om-comp-fn {} {})))
 
 ;; TODO: testing to be addressed later
 

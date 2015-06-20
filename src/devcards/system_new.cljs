@@ -291,23 +291,19 @@
 
 (comment
 
-  new card types "dc/doc" "dc/comment" borderless
-
-  move card to a react-class that handles rendering options
-
-  make react funcitonality composable with data and options chained
-  down through
-
   get hash routing working
 
   consider web-components for hiding css styling
   
-  options mirror om options
-  ;; store atom in card and pass down through?
-  ;; gives stable state (maybe too stable)
-
   fix edn rendering
 
+  fix test cards
+
+  fix padding on top of cards
+  consider global card options
+  consider frame false option
+  consider frame false binding overide
+  
   )
 
 (defn start-ui [channel]

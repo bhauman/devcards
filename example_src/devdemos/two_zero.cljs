@@ -1,6 +1,6 @@
 (ns devdemos.two-zero
   (:require
-   [devcards.core :as dc]
+   [devcards.core :as dc :include-macros true]
    [clojure.string :as string]
    [clojure.set :refer [difference union]]
    [sablono.core :as sab :include-macros true]
@@ -23,20 +23,19 @@
                         (aget (.getElementsByTagName js/document "body") 0))
                        490)))
 
-(defcard intro
-  (dc/markdown-card
-   "# 2048
-    Let's build 2048 interactively with devcards"))
 
-(defcard intro-2
-  (dc/markdown-card
-   "### Board Style
+(dc/doc
+ "# 2048
+  Let's build 2048 interactively with devcards")
+
+(dc/doc
+ "## Board Style
 
    Let's start by creating the style for the board.
 
    The board is a 4x4 board. It will have one container with 16
    absolutely positioned cells in it. These cells will mark where the
-   potential locations for the game tiles."))
+   potential locations for the game tiles.")
 
 (def to-pixel-pos
   (if is-mobile?
@@ -82,31 +81,28 @@
     [:div.cells (map board-cell data)]]))
 
 (defcard board-style
-  (dc/sab-card (game-board [])))
+  (game-board []))
 
-(defcard intro-3
-  (dc/markdown-card
+(dc/doc
    "### Cell Style
    Then we'll work on the style for the cells. The hard part is
-   getting the colors and the font sizes correct."))
+   getting the colors and the font sizes correct.")
 
 (defcard board-with-cells
-  (dc/sab-card
-   (game-board [{ :top 0 :left 0 :v 2 :id :t1}
-                { :top 0 :left 1 :v 4 :id :t2}
-                { :top 0 :left 2 :v 8 :id :t3}
-                { :top 0 :left 3 :v 16 :id :t4}
-                { :top 1 :left 0 :v 32 :id :t5}
-                { :top 1 :left 1 :v 64 :id :t6}
-                { :top 1 :left 2 :v 128 :id :t7}
-                { :top 1 :left 3 :v 256 :id :t8}
-                { :top 2 :left 0 :v 512 :id :t9}
-                { :top 2 :left 1 :v 1024 :id :t10}
-                { :top 2 :left 2 :v 2048 :id :t11}])))
+  (game-board [{ :top 0 :left 0 :v 2 :id :t1}
+               { :top 0 :left 1 :v 4 :id :t2}
+               { :top 0 :left 2 :v 8 :id :t3}
+               { :top 0 :left 3 :v 16 :id :t4}
+               { :top 1 :left 0 :v 32 :id :t5}
+               { :top 1 :left 1 :v 64 :id :t6}
+               { :top 1 :left 2 :v 128 :id :t7}
+               { :top 1 :left 3 :v 256 :id :t8}
+               { :top 2 :left 0 :v 512 :id :t9}
+               { :top 2 :left 1 :v 1024 :id :t10}
+               { :top 2 :left 2 :v 2048 :id :t11}]))
 
-(defcard checking-tile-move-animation
-  (dc/markdown-card
-   "## Checking basic tile movement animation"))
+(dc/doc
+ "## Checking basic tile movement animation")
 
 #_(defcard animation-work
   (dc/slider-card
@@ -117,8 +113,7 @@
      (one-row-board-static [{:left left :top 0 :v 2 :id :t1}]))))
 
 
-(defcard stored-board-data-structure
-  (dc/markdown-card
+(dc/doc
    "## Main data structures
     #### Tile Map
 
@@ -181,7 +176,8 @@
     {:t1 { :top 1 :left 3 :v 2 :id :t1}
      :t2 { :top 0 :left 3 :v 8 :id :t2}
      :t3 { :top 0 :left 3 :v 4 :id :t3 :double true }
-     :t4 { :top 0 :left 3 :v 4 :id :t4 :remove true }})))
+     :t4 { :top 0 :left 3 :v 4 :id :t4 :remove true }}))
+
 
 (defcard basic-data-transformations
   (dc/markdown-card
@@ -446,20 +442,17 @@
                  :tile2 { :v 2 :top 0 :left 3 :id :tile2}})
 
 (defcard try-game-card
-  (dc/runner
-   (fn [_ data]
-     (when (= @data {})
-       (reset! data start-data))
-     (sab/html
+  (fn [_ data]
+    (sab/html
+     [:div
+      (game-board (vals @data))
+      [:div [:a {:onClick (fn [] (move :left data))} "left"]]
       [:div
-       (game-board (vals @data))
-       [:div [:a {:onClick (fn [] (move :left data))} "left"]]
-       [:div
-        [:a {:onClick (fn [] (move :right data))} "right"]]
-       [:div [:a {:onClick (fn [] (move :up data))} "up"]]
-       [:div [:a {:onClick (fn [] (move :down data))} "down"]]       
-       [:div
-        [:a {:onClick (fn [] (reset! data start-data))} "reset"]]
-       (dc/edn->html @data)]))
-   {}))
+       [:a {:onClick (fn [] (move :right data))} "right"]]
+      [:div [:a {:onClick (fn [] (move :up data))} "up"]]
+      [:div [:a {:onClick (fn [] (move :down data))} "down"]]       
+      [:div
+       [:a {:onClick (fn [] (reset! data start-data))} "reset"]]
+      (dc/edn->html @data)]))
+   start-data)
 

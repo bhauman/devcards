@@ -14,43 +14,46 @@
 
 (devcards.core/start-devcard-ui!)
 
-(dc/card my-card
+(defcard marker
+  (dc/markdown-card "# This is a test"))
+
+(defcard my-card
  (sab/html [:h1 "Hey there"]))
 
-(dc/card (sab/html [:h1 "Hey there 2"]))
+(defcard
+ (sab/html [:h1 "Hey there 2"]))
 
-(dc/card
+(defcard
  (fn [_ data]
    (sab/html [:h1 "Hey there 3" (prn-str data)]))
  {:counter 5})
 
-(dc/card :react-runner-runner
-         (fn [owner state-atom]
-           (sab/html [:div
-                      [:div "counter newer : " (prn-str state-atom)]
-                 [:a {:onClick
-                      (fn [] (swap! state-atom update-in [:count] inc))}
-                  "inc"]])) 
-         {:count 6})
+(defcard react-runner-runner
+  (fn [owner state-atom]
+    (sab/html [:div
+               [:div "counter newer : " (prn-str state-atom)]
+               [:a {:onClick
+                    (fn [] (swap! state-atom update-in [:count] inc))}
+                "inc"]])) 
+  {:count 6})
 
 (defcard react-history-runner-runner
-  (dc/hist 
+  (dc/hist* 
    (fn [owner state-atom]
      (sab/html [:div
                 [:div "counter newer : " (prn-str state-atom)]
                 [:a {:onClick
                      (fn [] (swap! state-atom update-in [:count] inc))}
-                 "inc"]]))
-   {:count 6}))
+                 "inc"]])))
+     {:count 6})
 
 (defcard node-runner-runner
-  (dc/dom-node
+  (dc/dom-node*
     (fn [node data-atom]
-      (set! (.. node -innerHTML) (str "<h1>Hi I'm a crazy nodee " (:wow @data-atom) "</h1>")))
-    {:wow "man"}))
+      (set! (.. node -innerHTML) (str "<h1>Hi I'm a crazy nodee " (:wow @data-atom) "</h1>"))))
+  {:wow "man"})
 
-(defcard intro
-  (dc/markdown-card
+(dc/doc
    "## Devcards
 
     ClojureScript Devcards are a tool to help you **quickly** surface what
@@ -68,10 +71,9 @@
    
    "Devcards are designed to be written inline with your code during
     development. They are like advanced stateful `println`s that can
-    hold almost any arbitrary functionality that you want." ))
+    hold almost any arbitrary functionality that you want." )
 
-(defcard intro
-  (dc/markdown-card
+(dc/doc
    "## Devcards are intended to be interactive
 
    The cards on this page can be found in the file
@@ -85,11 +87,10 @@
    I highly encourage you to poke and prod at the code you find on
    this page so you can experience how Devcards works.
 
-   Go ahead and change this text to see the changes reflected here."))
+   Go ahead and change this text to see the changes reflected here.")
 
-(defcard examples-intro
-  (dc/markdown-card
-   "## Devcard examples"))
+(dc/doc
+   "## Devcard examples")
 
 (defcard edn-card-example
   (dc/edn-card
@@ -97,7 +98,7 @@
     :helpful? "It lets you quickly view EDN"}))
 
 (defcard sablono-card-example
-  (dc/sab-card
+  (sab/html
    [:div ;; if you want padding
     [:h2 "This is a Sablono card"]
     [:p "It can help you interactively work on sablono templates like this one:"]
@@ -111,7 +112,7 @@
     [:pre [:code
            (format-code
             (defcard sablono-card-example
-              (sab-card [:div.devcard-padding ;; if you want padding
+              (sab/html [:div.devcard-padding ;; if you want padding
                          [:h2 "This is a Sablono card"]
                          [:p "It can help you interactively work on Sablono templates:"]
                          [:pre [:code (format-code ...)]]])))]]
@@ -121,11 +122,6 @@
     [:p "You can click the heading on this card to get it on a page all to itself."
      " This can reduce the noise of having all the cards on one page."]]))
 
-(defcard react-card-example
-  (dc/react-card
-   (dom/div #js {}
-            (dom/h2 #js {} "This is a react card."))))
-
 (defn counter-app-rct [data-atom]
   (sab/html
    [:div
@@ -134,58 +130,50 @@
      [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]]
      [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] dec))} "dec"]]]]))
 
-
-
-
 (defcard react-runner-card-example
-  (dc/runner
-   (fn [_ data-atom]
-     (sab/html
-      [:div
+  (fn [_ data-atom]
+    (sab/html
+     [:div
        [:h3 "This is a " "react-runner-card"]
-       [:p "This card triggers a re-render when it the atom is modified"]
-       (counter-app-rct data-atom)]))
-   { :initial-state {:count 30 } }))
+      [:p "This card triggers a re-render when it the atom is modified"]
+      (counter-app-rct data-atom)]))
+  {:count 30 })
 
-(defcard atom-sharing
-  (dc/markdown-card 
-   "### Sharing an Atom
+(dc/doc
+ "### Sharing an Atom
 
-    If you pass an Atom as the `:initial-state` option to the
-    `react-runner-card` that Atom will be directly used as the state
-    atom instead of the Atom that is provided by the Devcards system.
-    This allows you to share an Atom with several cards.
+ If you pass an Atom as the `:initial-state` option to the
+ `react-runner-card` that Atom will be directly used as the state
+ atom instead of the Atom that is provided by the Devcards system.
+ This allows you to share an Atom with several cards.
 
-    If you interact with the counter below you will see the card
-    after it respond to the counter changes."))
+ If you interact with the counter below you will see the card
+ after it respond to the counter changes.")
 
 (defonce react-shared-atom (atom {:count 3}))
 
 (defcard react-runner-card-shared-1
-  (dc/runner
-   (fn [_ data-atom]
-     (sab/html
-      [:div
-       [:h3 "This counter is sharing state"]
-       [:p "The next card is sharing the same atom as this card."]
-       (counter-app-rct data-atom)]))  
-   react-shared-atom ))
+  (fn [_ data-atom]
+    (sab/html
+     [:div
+      [:h3 "This counter is sharing state"]
+      [:p "The next card is sharing the same atom as this card."]
+      (counter-app-rct data-atom)]))  
+  react-shared-atom)
 
 (defcard react-runner-card-shared-2
-  (dc/runner
-   (fn [_ data-atom]
-     (sab/html [:h1 "Count: " (:count @data-atom)]))
-   react-shared-atom))
+  (fn [_ data-atom]
+    (sab/html [:h1 "Count: " (:count @data-atom)]))
+  react-shared-atom)
 
-(defcard om-intro
-  (dc/markdown-card
+(dc/doc
    "## Om 
 
-    The `om-root-card` will render Om components, much the way `om/root` does."))
+    The `om-root-card` will render Om components, much the way `om/root` does.")
 
 (defn widget [data owner]
   (om/component
-      (sab/html [:h2 "This is an om card, " (:text data)])))
+   (sab/html [:h2 "This is an om card, " (:text data)])))
 
 (defcard omcard-ex
   (dc/om-root-card widget {:text "yep it is"}))
@@ -216,7 +204,7 @@
 (defcard omcard-shared-ex-2
   (dc/om-root-card om-counter-dec om-test-atom {:shared {:title "Second counter "}}))
 
-(defcard edn-card-share-atoms
+(defcard 
   (dc/markdown-card
    "#### You can share an Atom with an `edn-card` too"))
 

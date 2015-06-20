@@ -19,7 +19,7 @@
   (enable-devcards!)
   `(devcards.core/start-single-card-ui!*))
 
-(defmacro defcard
+(defmacro defcard*
   [vname expr]
   (when @devcards-active?
     (let [ns (-> &env :ns :name name munge)]
@@ -27,16 +27,21 @@
                                      (devcards.system/get-options ~expr)
                                      (fn [] ~expr)))))
 
-(defmacro card [& expr]
+(defmacro defcard [& expr]
   (if (instance? clojure.lang.Named (first expr))
-    `(devcards.core/defcard ~(symbol (name (first expr)))
-       (devcards.core/card*
-        ~@(rest expr)))
-    `(devcards.core/defcard card (devcards.core/card* ~@expr))))
+    `(devcards.core/defcard* ~(symbol (name (first expr)))
+       (devcards.core/card* ~@(rest expr)))
+    `(devcards.core/defcard* card
+       (devcards.core/default-option-card* { :heading false } ~@expr))))
 
 (defmacro doc [& exprs]
-  `(devcards.core/defcard doccard
+  `(devcards.core/defcard 
      (devcards.core/markdown-card ~@exprs)))
+
+(defmacro edn [body]
+  `(devcards.core/defcard 
+     (devcards.core/edn-card ~body)))
+
 
 (defmacro is [body]
   `{ :type :is  :body (quote ~body) :passed ~body })
@@ -78,42 +83,13 @@
 (defmacro mkdn-data [body]
   (wrap-markdown-code (format-data* body)))
 
-(defmacro markdown [name & body]
-  `(devcards.core/defcard ~name
-     (devcards.core/markdown-card ~@body)))
 
-(defmacro sablono
-  ([name body]
-     `(devcards.core/defcard ~name
-        (devcards.core/sab-card ~body)))
-  ([name body options]
-     `(devcards.core/defcard ~name
-        (devcards.core/sab-card ~body ~options))))
-
-(defmacro edn [name body]
-  `(devcards.core/defcard ~name
-     (devcards.core/edn-card ~body)))
-
-(defmacro react
-  ([name body]
-     `(devcards.core/defcard ~name
-        (devcards.core/react-card ~body)))
-  ([name body options]
-     `(devcards.core/defcard ~name
-        (devcards.core/react-card ~body ~options))))
-
-(defmacro react-runner
-  ([name body]
-     `(devcards.core/defcard ~name
-        (devcards.core/react-runner-card ~body)))
-  ([name body options]
-     `(devcards.core/defcard ~name
-        (devcards.core/react-runner-card ~body ~options))))
 
 (defmacro om-root
   ([name om-comp-fn initial-state om-options devcard-options]
      `(devcards.core/defcard ~name
-        (devcards.core/om-root-card ~om-comp-fn ~initial-state ~om-options ~devcard-options)))
+        (devcards.core/om-root-card ~om-comp-fn ~initial-state ~om-options)
+        ~devcard-options))
   ([name om-comp-fn initial-state om-options]
      `(devcards.core/defcard ~name
         (devcards.core/om-root-card ~om-comp-fn ~initial-state ~om-options)))
