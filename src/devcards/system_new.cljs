@@ -1,9 +1,7 @@
 (ns devcards.system-new
   (:require
    [clojure.string :as string]
-   [clojure.set :refer [intersection difference]]
    [cljs.core.async :refer [put! chan sliding-buffer timeout]]
-   [cljs.reader :refer [read-string]]
    [sablono.core :as sab]
    [goog.events :as events]
    [devcards.util.edn-renderer :as edn-rend]
@@ -323,8 +321,6 @@
   turn system into react component?
   
   )
-
-
 
 (defn start-ui [channel]
   (defonce devcards-ui-setup
