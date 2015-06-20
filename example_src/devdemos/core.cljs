@@ -38,7 +38,7 @@
   {:count 6})
 
 (defcard react-history-runner-runner
-  (dc/hist* 
+  (dc/hist 
    (fn [owner state-atom]
      (sab/html [:div
                 [:div "counter newer : " (prn-str state-atom)]
@@ -48,7 +48,7 @@
      {:count 6})
 
 (defcard node-runner-runner
-  (dc/dom-node*
+  (dc/dom-node
     (fn [node data-atom]
       (set! (.. node -innerHTML) (str "<h1>Hi I'm a crazy nodee " (:wow @data-atom) "</h1>"))))
   {:wow "man"})
@@ -96,6 +96,10 @@
   (dc/edn-card
    {:edn-card "This is an edn card"
     :helpful? "It lets you quickly view EDN"}))
+
+(dc/edn
+ {:edn-card "This is an edn card"
+  :helpful? "It lets you quickly view EDN"})
 
 (defcard sablono-card-example
   (sab/html

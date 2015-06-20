@@ -15,17 +15,21 @@
   (enable-devcards!)
   `(devcards.core/start-devcard-ui!*))
 
-(defmacro start-single-card-ui! []
+#_(defmacro start-single-card-ui! []
   (enable-devcards!)
   `(devcards.core/start-single-card-ui!*))
 
+(defmacro do [& exprs]
+  (when @devcards-active? `(do ~@exprs)))
+
 (defmacro defcard*
   [vname expr]
-  (when @devcards-active?
-    (let [ns (-> &env :ns :name name munge)]
-      `(devcards.core/register-card  [~(keyword ns) ~(keyword vname)]
-                                     (devcards.system/get-options ~expr)
-                                     (fn [] ~expr)))))
+  `(devcards.core/do
+     ~(let [ns (-> &env :ns :name name munge)]
+        `(devcards.core/register-card  [~(keyword ns) ~(keyword vname)]
+                                       ;; getting options doesn't work anymore
+                                       nil
+                                       (fn [] ~expr)))))
 
 (defmacro defcard [& expr]
   (if (instance? clojure.lang.Named (first expr))
@@ -35,12 +39,14 @@
        (devcards.core/default-option-card* { :heading false } ~@expr))))
 
 (defmacro doc [& exprs]
-  `(devcards.core/defcard 
-     (devcards.core/markdown-card ~@exprs)))
+  `(devcards.core/defcard* doccard
+     (devcards.core/default-option-card* { :heading false }
+       (devcards.core/markdown-card ~@exprs))))
 
 (defmacro edn [body]
-  `(devcards.core/defcard 
-     (devcards.core/edn-card ~body)))
+  `(devcards.core/defcard* edncard
+     (devcards.core/default-option-card* { :heading false }
+       (devcards.core/edn-card ~body))))
 
 
 (defmacro is [body]

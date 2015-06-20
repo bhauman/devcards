@@ -241,64 +241,61 @@
           [:div.com-rigsomelight-devcards-panel-heading
            { :onClick
             (devcards.system-new/prevent->
-             (fn [e] (swap! devcards.system-new/app-state
-                           devcards.system-new/set-current-path path)))}
+             #(devcards.system-new/set-current-path!
+               devcards.system-new/app-state
+               path))}
            (when path (name (last path)) ) " "]
           (naked-card children options)]))
       (sab/html [:span])))))
 
-(defn runner* [react-runner-component-fn initial-data]
+
+(defn runner-base* [react-runner-component-fn initial-data]
   (js/React.createElement runner-class
                           #js {:react_fn react-runner-component-fn
                                :data_atom initial-data}))
 
-(defn hist* [react-fn]
+(defn hist [react-fn]
   (fn [owner data-atom]
     (js/React.createElement history-class
                             #js { :react_fn react-fn
                                   :data_atom data-atom })))
 
-(defn dom-node* [node-fn]
+(defn dom-node [node-fn]
   (fn [owner data-atom]
      (js/React.createElement dom-node-class
                              #js {:node_fn   node-fn
                                   :data_atom data-atom})))
 
-(defn runner
+(defn runner*
   ([react-fn initial-data]
-   (runner react-fn initial-data {}))
+   (runner* react-fn initial-data {}))
   ([react-fn initial-data options]
-   (frame (runner* react-fn initial-data) options)))
+   (frame (runner-base* react-fn initial-data) options)))
 
-(defn hist
-  ([react-fn initial-data] (hist react-fn initial-data {}))
+(defn hist*
+  ([react-fn initial-data] (hist* react-fn initial-data {}))
   ([react-fn initial-data options]
-   (runner (hist* react-fn) initial-data options)))
+   (runner* (hist react-fn) initial-data options)))
 
-(defn dom-node
+(defn dom-node*
   ([node-fn]
-   (dom-node node-fn {} {}))
+   (dom-node* node-fn {} {}))
   ([node-fn initial-data]
-   (dom-node node-fn initial-data {}))
+   (dom-node* node-fn initial-data {}))
   ([node-fn initial-data options]
-   (runner (dom-node* node-fn) initial-data options)))
+   (runner* (dom-node node-fn) initial-data options)))
 
 (defn default-option-card*
-  ([defaults fn-or-react initial-data-or-opt options]
+  ([defaults fn-or-react initial-data options]
    (if (fn? fn-or-react)
-     (runner fn-or-react initial-data-or-opt (merge defaults options))
+     (runner* fn-or-react initial-data (merge defaults options))
      (frame fn-or-react (merge defaults options))))
-  ([defaults fn-or-react initial-data-or-opt]
-   (default-option-card* defaults fn-or-react initial-data-or-opt {}))
+  ([defaults fn-or-react initial-data]
+   (default-option-card* defaults fn-or-react initial-data {}))
   ([defaults fn-or-react]
    (default-option-card* defaults fn-or-react {} {})))
 
 (def card* (partial default-option-card* {}))
-
-(defn reify-comp-fn [comp-fn]
-  (comp-fn {} {}))
-
-(def react-card frame)
 
 (def edn->html edn-rend/html-edn)
 
@@ -306,25 +303,27 @@
 
 (defn edn-card [initial-data]
   "A card that renders EDN."
-  (runner* (fn [_ data-atom]
-            (edn->html @data-atom))
-          initial-data))
+  (runner-base* (fn [_ data-atom]
+                  (edn->html @data-atom))
+                initial-data))
 
 (defn markdown-card [& mkdn-strs]
-  (dom-node*
+  (dom-node
     (fn [node _]
       (set! (.. node -innerHTML)
             (less-sensitive-markdown mkdn-strs)))))
 
 (defn om-root-card
   ([om-comp-fn initial-state om-options]
-   (dom-node*
+   (dom-node
     (fn [node _]
       (om/root om-comp-fn initial-state (merge om-options {:target node})))))
   ([om-comp-fn initial-state]
      (om-root-card om-comp-fn initial-state {}))
   ([om-comp-fn]
      (om-root-card om-comp-fn {} {})))
+
+
 
 ;; TODO: testing to be addressed later
 

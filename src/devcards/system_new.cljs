@@ -22,10 +22,7 @@
 
 (def devcards-rendered-card-class "com-rigsomelight-devcards_rendered-card")
 
-(defn prevent-> [f]
-  (fn [e]
-    (.preventDefault e)
-    (f e)))
+(defn prevent-> [f] (fn [e] (.preventDefault e) (f e)))
 
 (defn get-element-by-id [id] (.getElementById js/document id))
 
@@ -70,6 +67,39 @@
     (let [el (js/document.createElement "div")]
       (set! (.-id el) devcards-app-element-id)
       (prepend-child (.-body js/document) el))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Hashbang routing
+
+(declare set-current-path)
+
+(defonce history
+  (let [h (History.)]
+    (.setEnabled h true)
+    h))
+
+(defn path->token [path]
+  (str "!/" (string/join "/" (map name path))))
+
+(defn token->path [token]
+  (vec (map keyword
+            (-> token
+                (string/replace #"!/" "")
+                (string/split #"/")))))
+
+(defn hash-navigate [path]
+  (.setToken history (path->token path)))
+
+(defn hash-routing-init [state-atom]
+  (events/listen history EventType/NAVIGATE
+                 #(swap! state-atom set-current-path (token->path (.-token %))))
+  (when-let [token (.getToken history)]
+    (swap! state-atom set-current-path (token->path token))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
 
 (defn devcard? [d]
   (and (map? d)
@@ -138,6 +168,10 @@
         #_add-navigate-effect)
       state)))
 
+(defn set-current-path! [state-atom path]
+  (swap! state-atom set-current-path path)
+  (hash-navigate path))
+
 (defn current-page [data]
   (and (:current-path data)
        (:cards data)
@@ -157,37 +191,9 @@
 
 (def ^:dynamic *devcard-data* nil)
 
-#_(defn naked-card [{:keys [path options func] :as devcard}]
-  (sab/html
-   [:div
-    {:id (path->unique-card-id path)
-     :class (str devcards-rendered-card-class
-                 (if true #_(:padding options)
-                     " com-rigsomelight-devcards-devcard-padding" "")) }
-    (binding [*devcard-data* devcard]
-      (func))]))
-
-(defn card-template [state-atom
-                     {:keys [path options func] :as card}]
-      (sab/html [:div {:key (path->unique-card-id path)}
-                 (binding [*devcard-data* card]
-                   (func))               
-                 ])
-
-  #_(if-not (:hidden options)
-      (if true #_(:heading options)
-          (sab/html
-           [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
-            [:div.com-rigsomelight-devcards-panel-heading
-             { :onClick
-              (prevent->
-               (fn [e] (swap! state-atom set-current-path path)))}
-             (name (last path)) " "]
-            (naked-card card)])
-          (sab/html
-           [:div.com-rigsomelight-devcards-card-base-no-pad
-            (naked-card card)]))
-      (sab/html [:span])))
+(defn card-template [state-atom {:keys [path options func] :as card}]
+  (sab/html [:div {:key (path->unique-card-id path)}
+             (binding [*devcard-data* card] (func))]))
 
 (defn render-cards [cards state-atom]
   (map (comp (partial card-template state-atom) second)
@@ -219,8 +225,7 @@
              [:span {:style {:display "inline-block" }}
               [:a.com-rigsomelight-devcards_set-current-path
                {:href "#"
-                :onClick (prevent->
-                          (fn [e] (swap! state-atom set-current-path path)))}
+                :onClick (prevent-> #(set-current-path! state-atom path))}
                n]]))
           crumbs))]))
 
@@ -233,7 +238,11 @@
               [:a.com-rigsomelight-devcards-list-group-item
                {:onClick
                 (prevent->
-                 (fn [e] (swap! state-atom add-to-current-path key)))}
+                 (fn [e] (swap! state-atom
+                               (fn [s]
+                                 (let [new-s (add-to-current-path s key)]
+                                   (hash-navigate (:current-path new-s))
+                                   new-s)))))}
                [:span.com-rigsomelight-devcards-badge
                 {:style {:float "right"}}
                 (count child-tree)]
@@ -291,29 +300,56 @@
 
 (comment
 
-  get hash routing working
-
-  consider web-components for hiding css styling
+  work on api
+  - do macro
   
   fix edn rendering
 
   fix test cards
 
+  fix history card
+  
   fix padding on top of cards
   consider global card options
   consider frame false option
   consider frame false binding overide
+
+  add pprint to documentation
+  
+  verify small compile size
+
+  consider web-components for hiding css styling
+
+  turn system into react component?
   
   )
 
+
+
 (defn start-ui [channel]
-  (defonce channel-setup
+  (defonce devcards-ui-setup
     (do
       (render-base-if-necessary!)
-
-      (add-watch app-state :devcards-render
-                 (fn [_ _ _ _] (renderer app-state)))
       (go
+        ;; initial load
+        (prn "INITIAL loading")
+        ;; consume all register card messages
+        ;; and then load the accumulated state into the
+        ;; app-state
+        (loop [state @app-state]
+          (let [timer   (timeout 20)
+                [v ch] (alts! [channel timer])]
+            (if (= ch timer)
+              (reset! app-state state)
+              (when v
+                (prn "loading" (first v))
+                (recur (dev-trans v state))))))
+        
+        (hash-routing-init app-state)        
+        (renderer app-state)
+        (add-watch app-state :devcards-render
+                   (fn [_ _ _ _] (renderer app-state)))
+
         (loop  []
           (when-let [v (<! channel)]
             (prn "hey" (first v))
@@ -323,8 +359,4 @@
                 (reset! app-state new-state))
               (swap! app-state (fn [s] (dev-trans v s))))
             (recur))))
-      
-      (renderer app-state)
       true)))
-
-
