@@ -8,11 +8,8 @@
                  [org.clojure/clojurescript "0.0-3269"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [sablono "0.3.4"]
-                 [crate "0.2.5"]
-                 [cljsjs/react "0.13.1-0"]
                  [cljsjs/showdown "0.4.0-1"]
-                 [org.omcljs/om "0.8.8"]
-                 [frontier "0.1.0-SNAPSHOT"]]
+                 [org.omcljs/om "0.8.8"]]
 
   :source-paths ["src"]
 

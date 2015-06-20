@@ -1,7 +1,5 @@
 (ns devcards.util.edn-renderer
   (:require
-   [devcards.util.reactor :as rct :include-macros true]
-   [sablono.core :as sab :include-macros true]
    [om.dom :as dom :include-macros true]))
 
 (declare html)
@@ -83,6 +81,11 @@
   (dom/div #js { :className "com-rigsomelight-rendered-edn" }
                      (html e)))
 
+;;; speed testing sablono is just as fast
+;;; but need a pure component that doesn't fail in om to render this inside om
+
+;;; still haven't checked to see if this isn't faster with straight
+;;; DOM or string based implementation probably is
 
 (comment
   (enable-console-print!)

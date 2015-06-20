@@ -1,7 +1,6 @@
 (ns ^:figwheel-always devdemos.core
   (:require
    [devcards.core :as dc :include-macros true]
-   [devcards.system :refer [IMount IUnMount IConfig]]   
    [om.core :as om :include-macros true]
    [om.dom :as dom :include-macros true]   
    [clojure.string :as string]

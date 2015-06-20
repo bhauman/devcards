@@ -1,18 +1,6 @@
 (ns devcards.core
   (:require
-   [devcards.system :refer [devcard-system-start
-                            render-base-if-necessary!
-                            devcard-renderer
-                            register-listeners
-                            unmount-card-nodes
-                            mount-card-nodes
-                            path->unique-card-id
-                            throttle-function
-                            IMount
-                            IUnMount
-                            IConfig]]
-
-   [devcards.system-new :as dev]
+   [devcards.system :as dev]
    
    [devcards.util.markdown :refer [less-sensitive-markdown]]
 
@@ -221,7 +209,7 @@
   (sab/html
    [:div
     {:class
-     (str devcards.system-new/devcards-rendered-card-class
+     (str devcards.system/devcards-rendered-card-class
           (if-not (false? (:padding options))
             " com-rigsomelight-devcards-devcard-padding" "")) }
     children]))
@@ -230,7 +218,7 @@
   ([children]
    (frame children {}))
   ([children options]
-  (let [path (:path devcards.system-new/*devcard-data*)]
+  (let [path (:path devcards.system/*devcard-data*)]
     (if-not (:hidden options)
       (if (false? (:heading options))
         (sab/html
@@ -240,14 +228,13 @@
          [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
           [:div.com-rigsomelight-devcards-panel-heading
            { :onClick
-            (devcards.system-new/prevent->
-             #(devcards.system-new/set-current-path!
-               devcards.system-new/app-state
+            (devcards.system/prevent->
+             #(devcards.system/set-current-path!
+               devcards.system/app-state
                path))}
            (when path (name (last path)) ) " "]
           (naked-card children options)]))
       (sab/html [:span])))))
-
 
 (defn runner-base* [react-runner-component-fn initial-data]
   (js/React.createElement runner-class
