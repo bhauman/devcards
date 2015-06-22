@@ -27,11 +27,12 @@ template that you might be working on:
 
 ```clojure
 (defcard two-zero-48-view 
-  (sab-card [:div.board 
-              [:div.cells
-                 [:div {:class "cell xpos-1 ypos-1"} 4]
-                 [:div {:class "cell xpos-1 ypos-2"} 2]
-                 [:div {:class "cell xpos-1 ypos-3"} 8]]]))
+  (sab/html
+    [:div.board 
+      [:div.cells
+        [:div {:class "cell xpos-1 ypos-1"} 4]
+        [:div {:class "cell xpos-1 ypos-2"} 2]
+        [:div {:class "cell xpos-1 ypos-3"} 8]]]))
 ```
 
 When used with [lein-figwheel][leinfigwheel], saving the file that

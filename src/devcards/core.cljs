@@ -64,6 +64,10 @@
 
 ;; returns a react component of rendered edn
 
+(def edn->html edn-rend/html-edn)
+
+
+
 (def runner-class
   (js/React.createClass
    #js {:getInitialState
@@ -106,8 +110,7 @@
   (js/React.createClass
    #js {:getInitialState
         (fn [] #js {:unique_id    (str (gensym 'devcards-history-runner-))
-                   :history_atom (atom {:history (list) :pointer 0})
-                   :recording    true})
+                   :history_atom (atom {:history (list) :pointer 0})})
         :componentDidUpdate
         (fn [prevP, prevS]
           (this-as this
@@ -117,6 +120,11 @@
                      #_(prn (str (.. this -props -node_fn)))
                      #_(prn (str (.. prevP -node_fn)))
                      (.renderIntoDOM this))))
+        :componentWillMount
+        (fn []
+          (this-as this
+                   (swap! (.. this -state -history_atom)
+                          assoc-in [:history] (list @(.. this -props -data_atom)))))        
         :componentDidMount
         (fn []
           (this-as
@@ -127,38 +135,62 @@
              (when (and data_atom id)
                (add-watch data_atom id
                           (fn [_ _ _ n]
-                            (when (.. this -state -recording)
-                              (swap! history-atom update-in [:history] 
-                                     (fn [hist] (cons n hist))))))))))
+                            (if (.inTimeMachine this)
+                              (do
+                                (swap! history-atom
+                                       (fn [{:keys [pointer history ignore-click] :as ha}]
+                                         (if ignore-click
+                                           (assoc ha :ignore-click false)
+                                           (assoc ha
+                                                  :history (cons n (drop pointer history))
+                                                  :pointer 0)))))
+                              (swap! history-atom assoc
+                                     :history (let [hist (:history @history-atom)]
+                                                (if (not= n (first hist))
+                                                (cons n hist)
+                                                hist))
+                                     :ignore-click false))))))))
+        
         :canGoBack
         (fn []
           (this-as this
                    (let [{:keys [history pointer]} @(.. this -state -history_atom)]
-                     (< (inc pointer) (count history)))))
+                     (< (inc pointer)
+                        (count history)))))
 
         :canGoForward
         (fn []
           (this-as this
                    (> (:pointer @(.. this -state -history_atom)) 0)))
-        
+
+        :inTimeMachine
+        (fn []
+          (this-as this
+                   (not (zero? (:pointer @(.. this -state -history_atom))))))
+       
         :backInHistory
         (fn []
+          (prn "BACK")
           (this-as this
                    (let [history-atom   (.. this -state -history_atom)
                          {:keys [history pointer]} @history-atom]
                      (when (.. this canGoBack)
-                       (swap! history-atom update-in [:pointer] (fn [p] (inc p)))
-                       (.setState this #js {:recording false} )
+                       (prn "BACK BACK" pointer)
+                       (swap! history-atom assoc
+                              :pointer (inc pointer)
+                              :ignore-click true)
                        (reset! (.. this -props -data_atom) (nth history (inc pointer)))
                        (.forceUpdate this)))))
+
         :forwardInHistory
         (fn []
           (this-as this
                    (let [history-atom   (.. this -state -history_atom)
                          {:keys [history pointer]} @history-atom]
                      (when (.. this canGoForward)
-                       (swap! history-atom update-in [:pointer] (fn [p] (dec p)))
-                       (.setState this #js {:recording false} )
+                       (swap! history-atom assoc
+                              :pointer (dec pointer)
+                              :ignore-click true)
                        (reset! (.. this -props -data_atom) (nth history (dec pointer)))
                        (.forceUpdate this)))))
         :render
@@ -167,18 +199,22 @@
                     (sab/html
                      [:div
                       [:h2 (str "history " (count (:history @(.. this -state -history_atom))))]
-                      [:a {:onClick (fn [e]
-                                      (.preventDefault e)
-                                      (.. this backInHistory)
-                                      )} "back"] " "
-                      [:a {:onClick (fn [e]
-                                      (.preventDefault e)
-                                      (.. this forwardInHistory)
-                                      )} "forward"]
+                      (when (.canGoBack this)
+                        (sab/html
+                         [:a {:onClick (fn [e]
+                                         (.preventDefault e)
+                                         (.. this backInHistory))} "back"])) " "
+                      (when (.canGoForward this)
+                        (sab/html
+                         [:a {:onClick (fn [e]
+                                         (.preventDefault e)
+                                         (.. this forwardInHistory)
+                                         )} "forward"]))
                       
                       [:div ((.. this -props -react_fn)
                              this
-                             (.. this -props -data_atom))]])))}))
+                             (.. this -props -data_atom))]
+                      (edn->html @(.. this -state -history_atom))])))}))
 
 (def dom-node-class
   (js/React.createClass
@@ -288,8 +324,6 @@
    (default-option-card* defaults fn-or-react {} {})))
 
 (def card* (partial default-option-card* {}))
-
-(def edn->html edn-rend/html-edn)
 
 (declare om-root-card)
 
@@ -496,5 +530,4 @@
 
 (defn test-card* [& parts]
   (let [tests (run-test-block (fn [] (doseq [f parts] (f))))]
-    (prn (:report-counters tests))
     (test-frame tests)))

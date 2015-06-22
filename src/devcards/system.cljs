@@ -341,7 +341,7 @@
                 (recur (dev-trans v state))))))
         
         (hash-routing-init app-state)        
-        (renderer app-state)
+        (js/setTimeout #(renderer app-state) 0)
         (add-watch app-state :devcards-render
                    (fn [_ _ _ _] (renderer app-state)))
 
