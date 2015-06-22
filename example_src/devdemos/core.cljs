@@ -5,9 +5,11 @@
    [om.dom :as dom :include-macros true]   
    [clojure.string :as string]
    [sablono.core :as sab :include-macros true]
-   [devdemos.two-zero])
+   [devdemos.two-zero]
+   [devdemos.testing]
+   [cljs.test :as t :include-macros true])
   (:require-macros
-   [devcards.core :refer [defcard is are= are-not= format-code format-data mkdn-code mkdn-data]]))
+   [devcards.core :refer [defcard deftest]]))
 
 (enable-console-print!)
 
@@ -63,10 +65,10 @@
 
     This is a **markdown-card**. You can create a markdown-card like
     this like so:"
-
-   (mkdn-code
-    (defcard first-markdown-card
-      (markdown-card "# This is a heading")))
+   
+   (dc/mkdn-pprint-code
+    '(defcard first-markdown-card
+       (markdown-card "# This is a heading")))
    
    "Devcards are designed to be written inline with your code during
     development. They are like advanced stateful `println`s that can
@@ -106,15 +108,15 @@
     [:h2 "This is a Sablono card"]
     [:p "It can help you interactively work on sablono templates like this one:"]
     [:pre [:code
-           (format-data [:div.devcard-padding ;; if you want padding
-                         [:h2 "This is a Sablono card"]
-                         [:p "It can help you interactively work on Sablono templates:"]
-                         [:pre [:code (format-code ...)]]])
+           (dc/pprint-str '[:div.devcard-padding ;; if you want padding
+                            [:h2 "This is a Sablono card"]
+                            [:p "It can help you interactively work on Sablono templates:"]
+                            [:pre [:code (format-code ...)]]])
            ]]
     [:p "You can create a sablono card like so:"]
     [:pre [:code
-           (format-code
-            (defcard sablono-card-example
+           (dc/pprint-code
+            '(defcard sablono-card-example
               (sab/html [:div.devcard-padding ;; if you want padding
                          [:h2 "This is a Sablono card"]
                          [:p "It can help you interactively work on Sablono templates:"]
@@ -214,16 +216,15 @@
 (defcard edn-card-shared
   (dc/edn-card om-test-atom))
 
-(defcard test-card-ex
-  (dc/test-card
-   "## Test card
+(deftest test-card-ex
+  "## Test card
     Test cards provide interactive testing inline with your code.
     Test cards allow arbitrary markdown in them, this can allow for a
     literate coding style"
-   (is (= 23 (+ 21 2)))
-   (are= (+ 3 4 5) 12)
+   (t/is (= 23 (+ 21 2)))
+   (t/is (= (+ 3 4 5) 12))
    "`(+ 3 4 5)` is definitely equal to `12`"
-   (are-not= (+ 3 4 5) 12)))
+   (t/is (= (+ 3 4 5) 12)))
 
 (defn rand-strs [c]
   (repeatedly c #(apply str (map (fn [x] (char (rand-int 255)))

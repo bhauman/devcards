@@ -1,7 +1,7 @@
 (ns devcards.core
   (:require
-   [devcards.system :as dev]
-   
+   [devcards.system :as dev :refer [prevent->]]
+
    [devcards.util.markdown :refer [less-sensitive-markdown]]
 
    [sablono.core :as sab :include-macros true]
@@ -12,7 +12,11 @@
    [om.dom :as dom :include-macros true]
 
    [cljsjs.react]
-   [cljs.core.async :refer [put! chan] :as async]))
+
+   [cljs.test :as t :refer [report]]   
+   [cljs.pprint :as pprint]
+   [cljs.core.async :refer [put! chan] :as async])
+  (:import [goog.string StringBuffer]))
 
 (enable-console-print!)
 
@@ -227,12 +231,13 @@
         (sab/html
          [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
           [:div.com-rigsomelight-devcards-panel-heading
-           { :onClick
-            (devcards.system/prevent->
+           [:span
+            { :onClick
+             (devcards.system/prevent->
              #(devcards.system/set-current-path!
                devcards.system/app-state
                path))}
-           (when path (name (last path)) ) " "]
+            (when path (name (last path)) ) " "]]
           (naked-card children options)]))
       (sab/html [:span])))))
 
@@ -290,9 +295,29 @@
 
 (defn edn-card [initial-data]
   "A card that renders EDN."
-  (runner-base* (fn [_ data-atom]
-                  (edn->html @data-atom))
-                initial-data))
+  (if (satisfies? IAtom initial-data)
+    (runner-base* (fn [_ data-atom]
+                    (edn->html @data-atom))
+                  initial-data)
+    (edn->html initial-data)))
+
+;; formatters to help with markdown-card
+
+(def mkdn-code #(str "```\n" % "```\n"))
+
+(defn pprint-str [obj]
+  (let [sb (StringBuffer.)]
+    (pprint/pprint obj (StringBufferWriter. sb))
+    (str sb)))
+
+(defn pprint-code [code]
+  (pprint/with-pprint-dispatch pprint/code-dispatch (pprint-str code)))
+
+(def mkdn-pprint-code (comp mkdn-code pprint-code))
+
+(def mkdn-pprint-str (comp mkdn-code pprint-str))
+
+;; end formatting
 
 (defn markdown-card [& mkdn-strs]
   (dom-node
@@ -311,19 +336,43 @@
      (om-root-card om-comp-fn {} {})))
 
 
+;; testing
 
-;; TODO: testing to be addressed later
+(comment
+  mapping to source-maps
+  make event open test in editor
 
-(defmulti render-test (fn [x] (cond
-                              (map? x) (:type x)
-                              (string? x) :string)))
+  )
 
-(defn test-wrapper [test body]
-  (dom/li #js { :className (str "list-group-item list-group-item-"
-                                (if (:passed test) "success" "danger")) }
-          (dom/span #js { :className (str "devcards-test-icon glyphicon glyphicon-"
-                                          (if (:passed test) "ok" "remove")) })
-          body))
+(defn collect-test [m]
+  (cljs.test/update-current-env!
+   [:_devcards_collect_tests] conj
+   (merge (select-keys (cljs.test/get-current-env) [:testing-contexts]) m)))
+
+(defmethod report [:_devcards_test_card_reporter :pass] [m]
+  (cljs.test/inc-report-counter! :pass)
+  (collect-test m)
+  m)
+
+(defmethod report [:_devcards_test_card_reporter :fail] [m]
+  (cljs.test/inc-report-counter! :fail)  
+  (collect-test m)
+  m)
+
+(defmethod report [:_devcards_test_card_reporter :error] [m]
+  (cljs.test/inc-report-counter! :error)
+  (collect-test m)
+  m)
+
+(defmethod report [:_devcards_test_card_reporter :test-doc] [m]
+  (collect-test m)
+  m)
+
+(defn run-test-block [f]
+  (cljs.core/binding [cljs.test/*current-env* (assoc (cljs.test/empty-env)
+                                                     :reporter :_devcards_test_card_reporter)]
+    (f)
+    (cljs.test/get-current-env)))
 
 (defn react-raw [raw-html-str]
   "A React component that renders raw html."
@@ -332,52 +381,120 @@
                    { :__html
                      raw-html-str }})))
 
-(defmethod render-test :string [s]
-  (dom/li #js {:className "list-group-item"}
-          (react-raw (less-sensitive-markdown [s]))))
+(defmulti test-render :type)
 
-(defn error-message [test val1 val-join-msg val2]
-  (if-not (:passed test)
-    (dom/span #js {:className "explain"}
-              "Expected "
-              (dom/span #js {:className "code"} val1)
-              val-join-msg
-              (dom/span #js {:className "code"} val2))
-    (dom/span #js {} "")))
+(defmethod test-render :default [m]
+  (sab/html [:div (prn-str m)]))
 
-(defmethod render-test :is [test]
-  (test-wrapper test
-                (dom/span #js {:className "devcards-test-body"}
-                          (dom/span #js {:className "operator"} "is")
-                          (dom/span #js {:className "result-area"}
-                                    (dom/span #js {:className "exp"}
-                                              (prn-str (:body test)))
-                                    (error-message test
-                                                   (prn-str (:passed test))
-                                                   " to be "
-                                                   "true")))))
+(defn display-message [{:keys [message]} body]
+  (if message
+      (sab/html [:div [:span.com-rigsomelight-devcards-test-message message]
+                 body])
+      body))
 
-(defn operator-relation-test [test op relation-phrase]
-  (test-wrapper test
-                (dom/span #js {:className "devcards-test-body"}
-                          (dom/span #js {:className "operator"} op)
-                          (dom/span #js {:className "result-area"}
-                                    (dom/span #js {:className "exp"} (prn-str (:exp1 test)))
-                                    (dom/span #js {:className "exp"} (prn-str (:exp2 test)))
-                                    (error-message test
-                                                   (prn-str (:val1 test))
-                                                   relation-phrase
-                                                   (prn-str (:val2 test)))))))
+(defn render-pass-fail [{:keys [expected] :as m}]
+  (display-message m (sab/html [:pre [:code (pprint-code expected)]])))
 
-(defmethod render-test :are= [test]
-  (operator-relation-test test "=" " to equal "))
+(defmethod test-render :pass [m]
+  (render-pass-fail m))
 
-(defmethod render-test :are-not= [test]
-  (operator-relation-test test "!=" " not to equal "))
+(defmethod test-render :fail [m]
+  (render-pass-fail m))
 
-(defn test-card [& assertions]
-  (frame
-   (dom/ul #js {:className "list-group devcards-test-group"}
-           (to-array (mapv (fn [t] (render-test t))
-                           assertions)))
-   {:padding false}))
+(defmethod test-render :error [m]
+  (display-message m (sab/html  [:div [:strong "Error: "] [:code (:actual m)]])))
+
+(defmethod test-render :test-doc [m]
+  (sab/html [:div (react-raw (:documentation m))]))
+
+(defmethod test-render :context [{:keys [testing-contexts]}]
+  (sab/html [:div
+             (interpose " / "
+                        (concat (map (fn [t] [:span {:style {:color "#bbb"}} t " "])
+                                     (reverse (rest testing-contexts)))
+                                (list [:span (first testing-contexts)])))]))
+
+(defn test-doc [s]
+  (report {:type :test-doc :documentation (less-sensitive-markdown [s])}))
+
+(defn test-renderer [t]
+  [:div
+   {:className (str "com-rigsomelight-devcards-test-line com-rigsomelight-devcards-" (name (:type t)))}
+   (test-render t)])
+
+
+
+(defn layout-tests [tests]
+  (sab/html
+   [:div.com-rigsomelight-devcards-test-card
+    (:html-list
+     (reduce 
+      (fn [{:keys [last-context html-list]} t]
+        { :last-context (:testing-contexts t)
+         :html-list 
+         (let [res (list (test-renderer t))
+               res (if (= last-context
+                          (:testing-contexts t))
+                     res
+                     (if (not-empty (:testing-contexts t))
+                       (cons (test-renderer (merge {:type :context} (select-keys t [:testing-contexts])))
+                             res)
+                       res))]
+           (concat html-list res ))})
+      {}
+      (reverse tests)))]))
+
+(defn test-frame [test-summary]
+  (let [path (:path devcards.system/*devcard-data*)
+        tests (:_devcards_collect_tests test-summary)
+        some-tests (filter (fn [{:keys [type]}] (not= type :test-doc))
+                      (:_devcards_collect_tests test-summary))
+        total-tests (count some-tests)
+        {:keys [fail pass error]} (:report-counters test-summary)]
+    (runner-base*
+     (fn [owner data-atom]
+       (sab/html
+        [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
+         [:div.com-rigsomelight-devcards-panel-heading
+          [:span
+           { :onClick
+            (prevent->
+             #(devcards.system/set-current-path!
+               devcards.system/app-state
+               path))}
+           (when path (str (name (last path))) )]
+          [:span.com-rigsomelight-devcards-badge
+           {:style {:float "right"
+                    :margin "3px 3px"}
+            :onClick (prevent->
+                       #(swap! data-atom assoc :filter identity))}
+           total-tests]
+          (when-not (zero? (+ fail error))
+            (sab/html
+             [:span.com-rigsomelight-devcards-badge
+              {:style {:float "right"
+                       :backgroundColor "#d9534f"
+                       :color "#fff"
+                       :margin "3px 3px"}
+               :onClick (prevent->
+                         #(swap! data-atom assoc :filter (fn [{:keys [type]}]
+                                                           (#{:fail :error} type))))}
+              (+ fail error)]))          
+          (when-not (zero? pass)
+            (sab/html
+             [:span.com-rigsomelight-devcards-badge
+              {:style {:float "right"
+                       :backgroundColor "#5cb85c"
+                       :color "#fff"
+                       :margin "3px 3px"}
+               :onClick (prevent->
+                         #(swap! data-atom assoc :filter (fn [{:keys [type]}] (= type :pass)))) }
+              pass]))]
+         [:div {:className devcards.system/devcards-rendered-card-class}
+          (layout-tests (filter (:filter @data-atom) tests))]]))
+     {:filter identity})))
+
+(defn test-card* [& parts]
+  (let [tests (run-test-block (fn [] (doseq [f parts] (f))))]
+    (prn (:report-counters tests))
+    (test-frame tests)))

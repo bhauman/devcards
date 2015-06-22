@@ -96,9 +96,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-
-
 (defn devcard? [d]
   (and (map? d)
        #_(:data-atom d)
@@ -300,25 +297,29 @@
 
 (comment
 
-  fix edn rendering
-
-  fix test cards
+  channel event stream can just can just work with :register-card
+  - no need for figwheel events
 
   fix history card
+
+  fix edn rendering
+
+  verify small compile size
   
   consider configuring  global card options
   consider frame false option
   consider frame false binding overide
 
-  add pprint to documentation
-  
-  verify small compile size
-
   consider web-components for hiding css styling
 
   turn system into react component?
+
+  dog food devcards code
   
   )
+
+
+
 
 (defn start-ui [channel]
   (defonce devcards-ui-setup

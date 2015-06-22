@@ -1,5 +1,9 @@
 body { margin: 0px;}
 
+#com-rigsomelight-devcards-main {
+    padding-bottom: 5em;
+}
+
 .com-rigsomelight-devcards-body {
     background-color: rgb(233,234,237);
 }
@@ -146,4 +150,45 @@ body { margin: 0px;}
     padding-left: 14px;
     padding-right: 14px;
     padding-bottom: 14px;
+}
+
+.com-rigsomelight-devcards-test-line {
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  border: none;
+  border-top: solid 1px #fafafa;  
+}
+
+.com-rigsomelight-devcards-test-line pre {
+  margin: 0px;
+}
+
+.com-rigsomelight-devcards-pass {
+  color: #3c763d;
+  background-color: #dff0d8;
+}
+
+.com-rigsomelight-devcards-fail {
+  color: #a94442;
+  background-color: #f2dede;
+}
+
+.com-rigsomelight-devcards-error {
+  color: #a94442;
+  border-left: 2px solid #a94442;    
+  background-color: #f2dede;
+}
+
+.com-rigsomelight-devcards-test-message {
+    display: block;
+    margin-top: -5px;    
+}
+
+.com-rigsomelight-devcards-pass .com-rigsomelight-devcards-test-message {
+    color: #386739;
+}
+
+.com-rigsomelight-devcards-fail .com-rigsomelight-devcards-test-message {
+    color: #994745;
 }

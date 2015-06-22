@@ -8,10 +8,11 @@
    [om.core :as om :include-macros true]
    [om.dom :as dom :include-macros true]
    [cljs.core.async :refer [timeout]]
-   [goog.labs.userAgent.device :as device])
+   [goog.labs.userAgent.device :as device]
+   [cljs.test :as t :include-macros true])
   (:require-macros
    [cljs.core.async.macros :refer [go]]
-   [devcards.core :refer [defcard is are= are-not= format-code format-data mkdn-data mkdn-code]]))
+   [devcards.core :refer [defcard deftest]]))
 
 (defn lh [x] (prn-str x) x)
 
@@ -22,7 +23,6 @@
                     (< (.-offsetWidth
                         (aget (.getElementsByTagName js/document "body") 0))
                        490)))
-
 
 (dc/doc
  "# 2048
@@ -120,7 +120,7 @@
     The only data structure we are going to hold in our atom is a map
     of the tiles on the page. The list will look like this:"
 
-   (mkdn-data
+   (dc/mkdn-pprint-str
     {:t1 { :top 0 :left 0 :v 2 :id :t1}
      :t2 { :top 1 :left 0 :v 4 :id :t2}
      :t3 { :top 2 :left 0 :v 8 :id :t3}
@@ -144,7 +144,7 @@
 
    The tile map will be converted to a board view that will look like this:"
 
-   (mkdn-data
+   (dc/mkdn-pprint-str
     [[{:v 2, :id :t1} :_ :_ :_]
      [{:v 8, :id :t2} :_ :_ :_]
      [{:v 4, :id :t3} :_ :_ :_]
@@ -156,7 +156,7 @@
    `:left`, `:right`, `:up`, or `:down` move. For instance if we move
    the above board to the `:right` it will end up looking like this:"
 
-   (mkdn-data
+   (dc/mkdn-pprint-str
     [[:_ :_ :_ {:v 2, :id :t1}]
      [:_ :_ :_ {:v 8, :id :t2}]
      [:_ :_ :_ {:v 4, :id :t3}]
@@ -164,7 +164,7 @@
    
    "And then if we move it `:down` it will look like this."
 
-   (mkdn-data
+   (dc/mkdn-pprint-str
     [[:_ :_ :_ :_]
      [:_ :_ :_ {:v 2, :id :t1}]
      [:_ :_ :_ {:v 8, :id :t2}]
@@ -172,12 +172,11 @@
    
    "Once we have transformed the board we will turn it back into the tile map."
 
-   (mkdn-data
+   (dc/mkdn-pprint-str
     {:t1 { :top 1 :left 3 :v 2 :id :t1}
      :t2 { :top 0 :left 3 :v 8 :id :t2}
      :t3 { :top 0 :left 3 :v 4 :id :t3 :double true }
      :t4 { :top 0 :left 3 :v 4 :id :t4 :remove true }}))
-
 
 (defcard basic-data-transformations
   (dc/markdown-card
@@ -218,50 +217,48 @@
         (partial reduce tile-reducer [])
         remove-blanks))
 
-(defcard transform-row-tests
-  (dc/test-card
-   
+(deftest transform-row-tests
    "In a move `:left` all the blanks will end up on the right.
    So let's `remove-blanks` first"
+   (t/is (= (remove-blanks [:_ :_ :_ :_]) []))
    
-   (are= (remove-blanks [:_ :_ :_ :_]) [])
-   (are= (remove-blanks [:_ :_ :_ {:v 8}]) [{:v 8}])
+   (t/is (= (remove-blanks [:_ :_ :_ {:v 8}]) [{:v 8}]))
    "We should also be able to `pad-blanks` back to finish the move."
-   (are= (pad-blanks [{:v 8}]) [{:v 8} :_ :_ :_])
+   (t/is (= (pad-blanks [{:v 8}]) [{:v 8} :_ :_ :_]))
    "Next we are going to create a function to reduce the row. And to
    help us we are going to create a predicate `combine?` to tell us if we
    can combine two tiles."
    
-   (is (combine? {:v 2} {:v 2}))
-   (is (not (combine? {:v 2 :double true} {:v 2})))
-   (is (not (combine? {:v 2} {:v 2 :double true})))      
-   (is (not (combine? {:v 2} {:v 4})))
+   (t/is (combine? {:v 2} {:v 2}))
+   (t/is (not (combine? {:v 2 :double true} {:v 2})))
+   (t/is (not (combine? {:v 2} {:v 2 :double true})))
+   (t/is (not (combine? {:v 2} {:v 4})))
    "Then we need a function to help us `combine` the two tiles."
-   (are= (combine {:id :t1 :v 2} {:id :t2 :v 2})
-         {:id :t2, :v 2, :double true, :replaces :t1})
+   (t/is (= (combine {:id :t1 :v 2} {:id :t2 :v 2})
+            {:id :t2, :v 2, :double true, :replaces :t1}))
    "We can then assemble the above functions into `transform-row`
    which will take a row and do a 2048 move to the left."
    
-   (are= (transform-row [:_ :_ :_ :_]) [:_ :_ :_ :_])
-   (are= (transform-row [{:v 8} :_ :_ :_]) [{:v 8} :_ :_ :_])
-   (are= (transform-row [ :_ {:v 8} :_ :_]) [{:v 8} :_ :_ :_])
-   (are= (transform-row [ :_ :_ {:v 8} :_]) [{:v 8} :_ :_ :_])
-   (are= (transform-row [ :_ :_ :_ {:v 8}]) [{:v 8} :_ :_ :_])
-   (are= (transform-row [ {:v 4 :id 1} {:v 4 :id 2} :_ :_])
-         [{:v 4 :id 2 :double true :replaces 1} :_ :_ :_])
-   (are= (transform-row [ {:v 4 :id 1} :_ :_ {:v 4 :id 2}])
-         [{:v 4 :id 2 :double true :replaces 1} :_ :_ :_])
-   (are= (transform-row [ :_ {:v 4 :id 1} :_ {:v 4 :id 2}])
-         [{:v 4 :id 2 :double true :replaces 1} :_ :_ :_])
-   (are= (transform-row [ :_ :_ {:v 4 :id 1} {:v 4 :id 2}])
-         [{:id 2 :v 4 :double true :replaces 1} :_ :_ :_])
-   (are= (transform-row [ :_ {:id 1 :v 4} {:id 2 :v 4} {:id 3 :v 4}])
-         [{:id 2 :v 4 :double true :replaces 1} {:id 3 :v 4} :_ :_])
-   (are= (transform-row [ {:id 1 :v 4} {:id 2 :v 4} {:id 3 :v 4} {:id 4 :v 4}])
-         [{:id 2 :v 4 :double true :replaces 1} {:id 4 :v 4 :double true :replaces 3} :_ :_])
-   (are= (transform-row [ {:id 1 :v 4} {:id 2 :v 8} {:id 3 :v 8} {:id 4 :v 4}])
-         [{:id 1 :v 4} {:id 3 :v 8 :double true :replaces 2 } {:id 4 :v 4} :_])
-   (are= (transform-row [ {:id :a :v 4} { :id :b :v 4}
+   (t/is (= (transform-row [:_ :_ :_ :_]) [:_ :_ :_ :_]))
+   (t/is (= (transform-row [{:v 8} :_ :_ :_]) [{:v 8} :_ :_ :_]))
+   (t/is (= (transform-row [ :_ {:v 8} :_ :_]) [{:v 8} :_ :_ :_]))
+   (t/is (= (transform-row [ :_ :_ {:v 8} :_]) [{:v 8} :_ :_ :_]))
+   (t/is (= (transform-row [ :_ :_ :_ {:v 8}]) [{:v 8} :_ :_ :_]))
+   (t/is (= (transform-row [ {:v 4 :id 1} {:v 4 :id 2} :_ :_])
+               [{:v 4 :id 2 :double true :replaces 1} :_ :_ :_]))
+   (t/is (= (transform-row [ {:v 4 :id 1} :_ :_ {:v 4 :id 2}])
+               [{:v 4 :id 2 :double true :replaces 1} :_ :_ :_]))
+   (t/is (= (transform-row [ :_ {:v 4 :id 1} :_ {:v 4 :id 2}])
+               [{:v 4 :id 2 :double true :replaces 1} :_ :_ :_]))
+   (t/is (= (transform-row [ :_ :_ {:v 4 :id 1} {:v 4 :id 2}])
+               [{:id 2 :v 4 :double true :replaces 1} :_ :_ :_]))
+   (t/is (= (transform-row [ :_ {:id 1 :v 4} {:id 2 :v 4} {:id 3 :v 4}])
+               [{:id 2 :v 4 :double true :replaces 1} {:id 3 :v 4} :_ :_]))
+   (t/is (= (transform-row [ {:id 1 :v 4} {:id 2 :v 4} {:id 3 :v 4} {:id 4 :v 4}])
+               [{:id 2 :v 4 :double true :replaces 1} {:id 4 :v 4 :double true :replaces 3} :_ :_]))
+   (t/is (= (transform-row [ {:id 1 :v 4} {:id 2 :v 8} {:id 3 :v 8} {:id 4 :v 4}])
+               [{:id 1 :v 4} {:id 3 :v 8 :double true :replaces 2 } {:id 4 :v 4} :_]))
+   (t/is (= (transform-row [ {:id :a :v 4} { :id :b :v 4}
                                  {:id :c :v 8} { :id :d :v 8}])
          [{:id :b :v 4 :double true :replaces :a }
           {:id :d :v 8 :double true :replaces :c } :_ :_])))
@@ -273,23 +270,22 @@
                (let [t (get-in board [row col])]
                  (when (not= :_ t) (assoc t :top row :left col)))))))
 
-(defcard convert-to-visible-tiles-card
-  (dc/test-card
-   (are= (convert-to-visible-tiles
-          [[:_ :_ :_ {:v 2 :id "t1"}]
-           [:_ :_ :_ {:v 4 :id "t2"}]
-           [:_ :_ :_ {:v 8 :id "t3"}]
-           [:_ :_ :_ {:v 16 :id "t4"}]])
-         [{:v 2, :id "t1", :top 0, :left 3}
-          {:v 4, :id "t2", :top 1, :left 3}
-          {:v 8, :id "t3", :top 2, :left 3}
-          {:v 16, :id "t4", :top 3, :left 3}])
-   (are= (convert-to-visible-tiles
-          [[:_ :_ :_ :_]
-           [:_ :_ :_ :_]
-           [:_ :_ :_ :_]
-           [:_ :_ :_ :_]])
-         [])))
+(deftest convert-to-visible-tiles-card
+  (t/is (= (convert-to-visible-tiles
+            [[:_ :_ :_ {:v 2 :id "t1"}]
+             [:_ :_ :_ {:v 4 :id "t2"}]
+             [:_ :_ :_ {:v 8 :id "t3"}]
+             [:_ :_ :_ {:v 16 :id "t4"}]])
+           [{:v 2, :id "t1", :top 0, :left 3}
+            {:v 4, :id "t2", :top 1, :left 3}
+            {:v 8, :id "t3", :top 2, :left 3}
+            {:v 16, :id "t4", :top 3, :left 3}]))
+  (t/is (= (convert-to-visible-tiles
+            [[:_ :_ :_ :_]
+             [:_ :_ :_ :_]
+             [:_ :_ :_ :_]
+             [:_ :_ :_ :_]])
+           [])))
 
 (defn select-row-key [row key]
   (keep (fn [x] (when (not= x :_) (key x))) row))
@@ -385,38 +381,36 @@
        ((juxt :id identity)) 
        (apply assoc tiles)))
 
-(defcard transform-row-left-test
-  (dc/test-card
-   (are= (transform-row [{:v 2 :id "t1"} :_ :_ {:v 2 :id "t2"}])
-         [{:v 2 :double true :id "t2" :replaces "t1"} :_ :_ :_])
-   (are= (transform-rows :left [[{:v 2 :id "t6"} :_ :_ {:v 2 :id "t1"}]
-                                [:_ :_ :_ {:v 4 :id "t2"}]
-                                [:_ :_ :_ {:v 8 :id "t3"}]
-                                [{:v 16 :id "t7"} :_ :_ {:v 16 :id "t4"}]])
-         [[{:v 2 :id "t1" :double true :replaces "t6"} :_ :_ :_]
-           [{:v 4 :id "t2"} :_ :_ :_]
-           [{:v 8 :id "t3"} :_ :_ :_]
-           [{:v 16 :id "t4" :double true :replaces "t7"} :_ :_ :_]])
-   (are= (transform-board :left {:t1 {:id :t1 :top 0 :left 0 :v 2}
-                                 :t2 {:id :t2 :top 0 :left 3 :v 2}})
-         {:t1 {:id :t1, :v 2, :top 0, :left 0, :remove true}
-          :t2 {:id :t2, :v 2, :double true, :top 0, :left 0}}
-         )
-   (are= (transform-board :right {:t1 {:id :t1 :top 0 :left 0 :v 2}
-                                 :t2 {:id :t2 :top 0 :left 3 :v 2}})
-         {:t1 {:id :t1, :v 2, :double true, :top 0, :left 3}
-          :t2 {:id :t2, :v 2, :top 0, :left 3, :remove true}}
-         )
-   (are= (transform-board :up {:t1 {:id :t1 :top 0 :left 0 :v 2}
-                               :t2 {:id :t2 :top 3 :left 0 :v 2}})
-         {:t2 {:id :t2, :v 2, :double true, :top 0, :left 0}
-          :t1 {:id :t1, :v 2, :top 0, :left 0, :remove true}}
-         )
-   (are= (transform-board :down {:t1 {:id :t1 :top 0 :left 0 :v 2}
-                                 :t2 {:id :t2 :top 3 :left 0 :v 2}})
-         {:t1 {:id :t1, :v 2, :double true, :top 3, :left 0}
-          :t2 {:id :t2, :v 2, :top 3, :left 0, :remove true}}
-         )))
+(deftest transform-row-left-test
+  (t/is (= (transform-row [{:v 2 :id "t1"} :_ :_ {:v 2 :id "t2"}])
+           [{:v 2 :double true :id "t2" :replaces "t1"} :_ :_ :_]))
+  (t/is (= (transform-rows :left [[{:v 2 :id "t6"} :_ :_ {:v 2 :id "t1"}]
+                            [:_ :_ :_ {:v 4 :id "t2"}]
+                            [:_ :_ :_ {:v 8 :id "t3"}]
+                            [{:v 16 :id "t7"} :_ :_ {:v 16 :id "t4"}]])
+     [[{:v 2 :id "t1" :double true :replaces "t6"} :_ :_ :_]
+      [{:v 4 :id "t2"} :_ :_ :_]
+      [{:v 8 :id "t3"} :_ :_ :_]
+      [{:v 16 :id "t4" :double true :replaces "t7"} :_ :_ :_]]))
+  (t/is (= (transform-board :left {:t1 {:id :t1 :top 0 :left 0 :v 2}
+                             :t2 {:id :t2 :top 0 :left 3 :v 2}})
+     {:t1 {:id :t1, :v 2, :top 0, :left 0, :remove true}
+      :t2 {:id :t2, :v 2, :double true, :top 0, :left 0}}
+     ))
+  (t/is (= (transform-board :right {:t1 {:id :t1 :top 0 :left 0 :v 2}
+                              :t2 {:id :t2 :top 0 :left 3 :v 2}})
+     {:t1 {:id :t1, :v 2, :double true, :top 0, :left 3}
+      :t2 {:id :t2, :v 2, :top 0, :left 3, :remove true}}
+     ))
+  (t/is (= (transform-board :up {:t1 {:id :t1 :top 0 :left 0 :v 2}
+                           :t2 {:id :t2 :top 3 :left 0 :v 2}})
+     {:t2 {:id :t2, :v 2, :double true, :top 0, :left 0}
+      :t1 {:id :t1, :v 2, :top 0, :left 0, :remove true}}
+     ))
+  (t/is (= (transform-board :down {:t1 {:id :t1 :top 0 :left 0 :v 2}
+                             :t2 {:id :t2 :top 3 :left 0 :v 2}})
+     {:t1 {:id :t1, :v 2, :double true, :top 3, :left 0}
+      :t2 {:id :t2, :v 2, :top 3, :left 0, :remove true}})))
 
 (defn move [dir data]
   (let [prev @data]
@@ -455,4 +449,3 @@
        [:a {:onClick (fn [] (reset! data start-data))} "reset"]]
       (dc/edn->html @data)]))
    start-data)
-

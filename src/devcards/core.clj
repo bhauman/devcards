@@ -1,6 +1,7 @@
 (ns devcards.core
   (:require
    [cljs.compiler :refer (munge)]
+   [cljs.test]
    [clojure.pprint :refer [with-pprint-dispatch code-dispatch pprint]]
    [clojure.java.io :as io])
   (:refer-clojure :exclude (munge defonce)))
@@ -48,48 +49,16 @@
      (devcards.core/default-option-card* { :heading false }
        (devcards.core/edn-card ~body))))
 
+(defmacro deftest [vname & parts]
+  (if @devcards-active?
+    `(devcards.core/defcard* ~vname
+       (devcards.core/test-card* ~@(map (fn [p] (if (string? p)
+                                                 `(fn [] (devcards.core/test-doc ~p))
+                                                 `(fn [] ~p))) parts)))
+    `(cljs.test/deftest ~vname
+       ~@parts)))
 
-(defmacro is [body]
-  `{ :type :is  :body (quote ~body) :passed ~body })
-
-(defmacro are= [exp1 exp2]
-  `{ :type :are= :exp1 (quote ~exp1) :exp2 (quote ~exp2) :passed (= ~exp1 ~exp2)
-    :val1 ~exp1 :val2 ~exp2 })
-
-(defmacro are-not= [exp1 exp2]
-  `{ :type :are-not=  :exp1 (quote ~exp1) :exp2 (quote ~exp2) :passed (not= ~exp1 ~exp2)
-    :val1 ~exp1 :val2 ~exp2 })
-
-
-;; formatting macros
-
-(defn wrap-markdown-code [x]
-  (str "```\n" x "```\n"))
-
-(defn format-code* [code]
-  (.toString (let [out (java.io.ByteArrayOutputStream.)]
-               (with-pprint-dispatch code-dispatch
-                 (pprint code (io/writer out)))
-               out)))
-
-(defn format-data* [code]
-  (.toString (let [out (java.io.ByteArrayOutputStream.)]
-               (pprint code (io/writer out))
-               out)))
-
-(defmacro format-code [body]
-  (apply str (butlast (format-code* body))))
-
-(defmacro format-data [body]
-  (apply str (butlast (format-data* body))))
-
-(defmacro mkdn-code [body]
-  (wrap-markdown-code (format-code* body)))
-
-(defmacro mkdn-data [body]
-  (wrap-markdown-code (format-data* body)))
-
-
+;; below this line is gone
 
 (defmacro om-root
   ([name om-comp-fn initial-state om-options devcard-options]
@@ -105,11 +74,3 @@
   ([name om-comp-fn]
      `(devcards.core/defcard ~name
         (devcards.core/om-root-card ~om-comp-fn))))
-
-(defmacro tests [name & body]
-  `(devcards.core/defcard ~name
-     (devcards.core/test-card ~@body)))
-
-(defmacro slider [name f arg-seqs & rest]
-    `(devcards.core/defcard ~name
-       (devcards.core/slider-card ~f ~arg-seqs ~@rest)))
