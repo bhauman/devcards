@@ -105,7 +105,6 @@
                      this
                      (.-data_atom (.-state this)))))}))
 
-;; TODO: much work to do here
 (def history-class
   (js/React.createClass
    #js {:getInitialState
