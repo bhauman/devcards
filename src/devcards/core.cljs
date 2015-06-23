@@ -8,10 +8,9 @@
    [devcards.util.edn-renderer :as edn-rend]
    [clojure.string :as string]
 
+   ;; would be nice to remove hard dependency on om
    [om.core :as om :include-macros true]
    [om.dom :as dom :include-macros true]
-
-   [cljsjs.react]
 
    [cljs.test :as t :refer [report]]   
    [cljs.pprint :as pprint]
@@ -54,9 +53,9 @@
 
 ;;; utils
 
-;; returns a react component of rendered edn
-
 (def edn->html edn-rend/html-edn)
+
+;; returns a react component of rendered edn
 
 (def RunnerComponent
   (js/React.createClass
@@ -94,6 +93,102 @@
                     ((.-react_fn (.-props this))
                      this
                      (.-data_atom (.-state this)))))}))
+
+(def DomComponent
+  (js/React.createClass
+   #js {:getInitialState
+        (fn [] #js {:unique_id (str (gensym 'devcards-card-runner-))})
+        :renderIntoDOM
+        (fn []
+          (this-as this
+                   (when-let [node-fn (.. this -props -node_fn)]
+                     (when-let [comp (aget (.. this -refs) (.. this -state -unique_id))]
+                       (when-let [node (js/React.findDOMNode comp)]
+                         (node-fn node (.. this -props -data_atom)))))))
+        :componentDidUpdate
+        (fn [prevP, prevS]
+          (this-as this
+                   (when (and (.. this -props -node_fn)
+                              (not= (.. this -props -node_fn)
+                                    (.. prevP -node_fn)))
+                     #_(prn (str (.. this -props -node_fn)))
+                     #_(prn (str (.. prevP -node_fn)))
+                     (.renderIntoDOM this))))
+        :componentDidMount
+        (fn [] (this-as this (.renderIntoDOM this)))
+        :render
+         (fn []
+           (this-as this
+                    (js/React.DOM.div
+                     #js { :ref (.. this -state -unique_id) }
+                     "Card has not mounted DOM node.")))}))
+
+(defn naked-card [children options]
+  (sab/html
+   [:div
+    {:class
+     (str devcards.system/devcards-rendered-card-class
+          (if-not (false? (:padding options))
+            " com-rigsomelight-devcards-devcard-padding" "")) }
+    children]))
+
+(defn frame
+  ([children]
+   (frame children {}))
+  ([children options]
+  (let [path (:path devcards.system/*devcard-data*)]
+    (if-not (:hidden options)
+      (if (false? (:heading options))
+        (sab/html
+         [:div.com-rigsomelight-devcards-card-base-no-pad
+          (naked-card children options)])
+        (sab/html
+         [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
+          [:div.com-rigsomelight-devcards-panel-heading
+           [:span
+            { :onClick
+             (devcards.system/prevent->
+             #(devcards.system/set-current-path!
+               devcards.system/app-state
+               path))}
+            (when path (name (last path)) ) " "]]
+          (naked-card children options)]))
+      (sab/html [:span])))))
+
+(defn runner-base* [react-runner-component-fn initial-data]
+  (js/React.createElement RunnerComponent
+                          #js {:react_fn react-runner-component-fn
+                               :data_atom initial-data}))
+
+(defn dom-node [node-fn]
+  (fn [owner data-atom]
+     (js/React.createElement DomComponent
+                             #js {:node_fn   node-fn
+                                  :data_atom data-atom})))
+
+(defn runner*
+  ([react-fn initial-data]
+   (runner* react-fn initial-data {}))
+  ([react-fn initial-data options]
+   (frame (runner-base* react-fn initial-data) options)))
+
+;; these mainly exists to prive support to the defcard macro
+(defn default-option-card*
+  ([defaults fn-or-react initial-data options]
+   (if (fn? fn-or-react)
+     (runner* fn-or-react initial-data (merge defaults options))
+     (frame fn-or-react (merge defaults options))))
+  ([defaults fn-or-react initial-data]
+   (default-option-card* defaults fn-or-react initial-data {}))
+  ([defaults fn-or-react]
+   (default-option-card* defaults fn-or-react {} {})))
+
+(def card* (partial default-option-card* {}))
+
+;; history recorder
+
+(comment
+  would be nice to have a drop down of history diffs)
 
 (def HistoryComponent
   (js/React.createClass
@@ -213,72 +308,6 @@
                                    (.. this forwardInHistory))} ""]
                       #_(edn->html @(.. this -state -history_atom))])))}))
 
-(def DomComponent
-  (js/React.createClass
-   #js {:getInitialState
-        (fn [] #js {:unique_id (str (gensym 'devcards-card-runner-))})
-        :renderIntoDOM
-        (fn []
-          (this-as this
-                   (when-let [node-fn (.. this -props -node_fn)]
-                     (when-let [comp (aget (.. this -refs) (.. this -state -unique_id))]
-                       (when-let [node (js/React.findDOMNode comp)]
-                         (node-fn node (.. this -props -data_atom)))))))
-        :componentDidUpdate
-        (fn [prevP, prevS]
-          (this-as this
-                   (when (and (.. this -props -node_fn)
-                              (not= (.. this -props -node_fn)
-                                    (.. prevP -node_fn)))
-                     #_(prn (str (.. this -props -node_fn)))
-                     #_(prn (str (.. prevP -node_fn)))
-                     (.renderIntoDOM this))))
-        :componentDidMount
-        (fn [] (this-as this (.renderIntoDOM this)))
-        :render
-         (fn []
-           (this-as this
-                    (js/React.DOM.div
-                     #js { :ref (.. this -state -unique_id) }
-                     "Card has not mounted DOM node.")))}))
-
-(defn naked-card [children options]
-  (sab/html
-   [:div
-    {:class
-     (str devcards.system/devcards-rendered-card-class
-          (if-not (false? (:padding options))
-            " com-rigsomelight-devcards-devcard-padding" "")) }
-    children]))
-
-(defn frame
-  ([children]
-   (frame children {}))
-  ([children options]
-  (let [path (:path devcards.system/*devcard-data*)]
-    (if-not (:hidden options)
-      (if (false? (:heading options))
-        (sab/html
-         [:div.com-rigsomelight-devcards-card-base-no-pad
-          (naked-card children options)])
-        (sab/html
-         [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
-          [:div.com-rigsomelight-devcards-panel-heading
-           [:span
-            { :onClick
-             (devcards.system/prevent->
-             #(devcards.system/set-current-path!
-               devcards.system/app-state
-               path))}
-            (when path (name (last path)) ) " "]]
-          (naked-card children options)]))
-      (sab/html [:span])))))
-
-(defn runner-base* [react-runner-component-fn initial-data]
-  (js/React.createElement RunnerComponent
-                          #js {:react_fn react-runner-component-fn
-                               :data_atom initial-data}))
-
 (defn hist-recorder [data-atom]
   (js/React.createElement HistoryComponent
                           #js { :data_atom data-atom }))
@@ -289,44 +318,7 @@
                (hist-recorder data-atom)
                (react-fn owner data-atom)])))
 
-(defn dom-node [node-fn]
-  (fn [owner data-atom]
-     (js/React.createElement DomComponent
-                             #js {:node_fn   node-fn
-                                  :data_atom data-atom})))
-
-(defn runner*
-  ([react-fn initial-data]
-   (runner* react-fn initial-data {}))
-  ([react-fn initial-data options]
-   (frame (runner-base* react-fn initial-data) options)))
-
-(defn hist*
-  ([react-fn initial-data] (hist* react-fn initial-data {}))
-  ([react-fn initial-data options]
-   (runner* (hist react-fn) initial-data options)))
-
-(defn dom-node*
-  ([node-fn]
-   (dom-node* node-fn {} {}))
-  ([node-fn initial-data]
-   (dom-node* node-fn initial-data {}))
-  ([node-fn initial-data options]
-   (runner* (dom-node node-fn) initial-data options)))
-
-(defn default-option-card*
-  ([defaults fn-or-react initial-data options]
-   (if (fn? fn-or-react)
-     (runner* fn-or-react initial-data (merge defaults options))
-     (frame fn-or-react (merge defaults options))))
-  ([defaults fn-or-react initial-data]
-   (default-option-card* defaults fn-or-react initial-data {}))
-  ([defaults fn-or-react]
-   (default-option-card* defaults fn-or-react {} {})))
-
-(def card* (partial default-option-card* {}))
-
-(declare om-root-card)
+;; edn-card
 
 (defn edn-card [initial-data]
   "A card that renders EDN."
@@ -336,7 +328,7 @@
                   initial-data)
     (edn->html initial-data)))
 
-;; formatters to help with markdown-card
+;; markdown card
 
 (def mkdn-code #(str "```\n" % "```\n"))
 
@@ -352,13 +344,13 @@
 
 (def mkdn-pprint-str (comp mkdn-code pprint-str))
 
-;; end formatting
-
 (defn markdown-card [& mkdn-strs]
   (dom-node
     (fn [node _]
       (set! (.. node -innerHTML)
             (less-sensitive-markdown mkdn-strs)))))
+
+;; om-root card
 
 (defn om-root-card
   ([om-comp-fn initial-state om-options]
@@ -371,7 +363,7 @@
      (om-root-card om-comp-fn {} {})))
 
 
-;; testing
+;; Testing via cljs.test
 
 (comment
   mapping to source-maps
