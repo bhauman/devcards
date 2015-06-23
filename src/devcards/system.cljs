@@ -275,14 +275,9 @@
 
 (comment
 
-  channel event stream can just can just work with :register-card
-  - no need for figwheel events
-
-  fix history card
-
-  fix edn rendering
-
   verify small compile size
+
+  move om out of dependencies
   
   consider configuring  global card options
   consider frame false option
@@ -292,6 +287,8 @@
 
   turn system into react component?
 
+  fix edn rendering (use flex? belayed ...)
+  
   dog food devcards code
   
   )
@@ -327,9 +324,7 @@
             (= ch timer)           (merge-in-new-data start-data data)
             ;; this will function without jsreload. but allows us to
             ;; render a tick faster
-            (= msg-name :jsreload) (do
-                                     (prn "Got here")
-                                     (merge-in-new-data start-data data))
+            (= msg-name :jsreload) (merge-in-new-data start-data data)
             :else
             (do
               (recur (dev-trans [msg-name payload] data)))))))))
