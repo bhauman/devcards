@@ -1,6 +1,13 @@
 (ns devcards.util.edn-renderer
   (:require
-   [om.dom :as dom :include-macros true]))
+   [cljs.pprint :as pprint]
+   [sablono.core :as sab])
+  (:import [goog.string StringBuffer]))
+
+(defn pprint-str [obj]
+  (let [sb (StringBuffer.)]
+    (pprint/pprint obj (StringBufferWriter. sb))
+    (str sb)))
 
 (declare html)
 
@@ -9,17 +16,13 @@
        (not (coll? x))))
 
 (defn separator* [s]
-  (dom/span #js { :className "separator"} s))
+  (sab/html [:span.seperator s]))
 
 (defn clearfix-separator* [s]
-  (dom/span #js {}
-            (separator* s)
-            (dom/span #js { :className "clearfix" } "")))
+  (sab/html [:span (separator* s) [:span.clearfix]]))
 
 (defn separate-fn [coll]
-  (if (not (every? literal? coll))
-    clearfix-separator*
-    separator*))
+  (if (not (every? literal? coll)) clearfix-separator* separator*))
 
 (defn interpose-separator [rct-coll s sep-fn]
   (->> (rest rct-coll)
@@ -28,28 +31,28 @@
        to-array))
 
 (defn literal [class x]
-  (dom/span #js { :className class } (prn-str x)))
+  (sab/html [:span { :className class } (pprint-str x)]))
 
 (defn join-html [separator coll]
-  (interpose-separator (mapv html coll) separator
+  (interpose-separator (mapv html coll)
+                       separator
                        (separate-fn coll)))
 
 (defn html-keyval [[k v]]
-  (dom/span #js {:className "keyval"
-                 :key (prn-str k)}
-            (html k)
-            #_(dom/span #js {:className "separator"} " ")
-            (html v)))
+  (sab/html
+   [:span.keyval { :key (prn-str k)} (html k) (html v)]))
 
 (defn html-keyvals [coll]
-  (interpose-separator (mapv html-keyval coll) " "
+  (interpose-separator (mapv html-keyval coll)
+                       " "
                        (separate-fn (vals coll))))
 
 (defn open-close [class-str opener closer rct-coll]
-  (dom/span #js {:className class-str}
-            (dom/span #js { :className "opener"} opener)
-            (dom/span #js { :className "contents" } rct-coll)
-            (dom/span #js { :className "closer"} closer)))
+  (sab/html
+   [:span {:className class-str}
+    [:span.opener opener]
+    [:span.contents  rct-coll]
+    [:span.closer closer]]))
 
 (defn html-collection [class opener closer coll]
   (open-close (str "collection " class ) opener closer (join-html " " coll))
@@ -78,37 +81,4 @@
    :else        (literal "literal" x)))
 
 (defn html-edn [e]
-  (dom/div #js { :className "com-rigsomelight-rendered-edn" }
-                     (html e)))
-
-;;; speed testing sablono is just as fast
-;;; but need a pure component that doesn't fail in om to render this inside om
-
-;;; still haven't checked to see if this isn't faster with straight
-;;; DOM or string based implementation probably is
-
-(comment
-  (enable-console-print!)
-
-  (def test-data
-    (mapcat identity
-            (take 100 (repeat [{ :top 0 :left 0 :v 2 :id :t1}
-                               { :top 0 :left 1 :v 4 :id :t2}
-                               { :top 0 :left 2 :v 8 :id :t3}
-                               { :top 0 :left 3 :v 16 :id :t4}
-                               { :top 1 :left 0 :v 32 :id :t5}
-                               { :top 1 :left 1 :v 64 :id :t6}
-                               { :top 1 :left 2 :v 128 :id :t7}
-                               { :top 1 :left 3 :v 256 :id :t8}
-                               { :top 2 :left 0 :v 512 :id :t9}
-                               { :top 2 :left 1 :v 1024 :id :t10}]))))
-
-  (defn run-time-test [li-fn]
-    (let [now (js/Date.)]
-      (.renderComponent js/React (li-fn test-data)
-                        (.getElementById js/document "test-area") identity)
-      (/ (- (.getTime (js/Date.))
-            (.getTime now)) 1000)))
-
-  (println (run-time-test html-edn))
-  #_(.unmountComponentAtNode js/React (.getElementById js/document "test-area")))
+  (sab/html [:div.com-rigsomelight-rendered-edn (html e)]))
