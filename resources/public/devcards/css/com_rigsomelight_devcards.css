@@ -1,7 +1,11 @@
 body { margin: 0px;}
 
 #com-rigsomelight-devcards-main {
-    padding-bottom: 5em;
+  padding-bottom: 5em;
+}
+
+.com-rigsomelight-devcards_rendered-card {
+  position: relative;
 }
 
 .com-rigsomelight-devcards-body {
@@ -191,4 +195,45 @@ body { margin: 0px;}
 
 .com-rigsomelight-devcards-fail .com-rigsomelight-devcards-test-message {
     color: #994745;
+}
+
+.com-rigsomelight-devcards-history-control-right {
+    display: inline-block;
+    height: 0px;
+    width: 0px;
+    border: 8px solid transparent;
+    border-left-width: 16px;
+    border-left-color: #666;
+}
+
+.com-rigsomelight-devcards-history-control-left {
+    display: inline-block;
+    height: 0px;
+    width: 0px;
+    border: 8px solid transparent;
+    border-right-width: 16px;
+    border-right-color: #666;
+    margin-right: 10px;
+}
+
+.com-rigsomelight-devcards-history-stop {
+    display: inline-block;
+    height: 17px;
+    width: 17px;
+    background-color: #D88282;
+    border-radius: 3px;
+    margin-right: 10px;    
+}
+
+.com-rigsomelight-devcards-history-control-bar {
+    background-color: #f3f3f3;
+    padding-top: 5px;
+    height: 23px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+.com-rigsomelight-devcards-devcard-padding .com-rigsomelight-devcards-history-control-bar {
+    margin-top: -14px;    
 }

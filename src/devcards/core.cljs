@@ -117,8 +117,6 @@
                    (when (and (.. this -props -node_fn)
                               (not= (.. this -props -node_fn)
                                     (.. prevP -node_fn)))
-                     #_(prn (str (.. this -props -node_fn)))
-                     #_(prn (str (.. prevP -node_fn)))
                      (.renderIntoDOM this))))
         :componentWillMount
         (fn []
@@ -170,12 +168,10 @@
        
         :backInHistory
         (fn []
-          (prn "BACK")
           (this-as this
                    (let [history-atom   (.. this -state -history_atom)
                          {:keys [history pointer]} @history-atom]
                      (when (.. this canGoBack)
-                       (prn "BACK BACK" pointer)
                        (swap! history-atom assoc
                               :pointer (inc pointer)
                               :ignore-click true)
@@ -193,28 +189,40 @@
                               :ignore-click true)
                        (reset! (.. this -props -data_atom) (nth history (dec pointer)))
                        (.forceUpdate this)))))
+        :continueOn
+        (fn []
+          (this-as
+           this
+           (let [history-atom (.. this -state -history_atom)
+                 {:keys [history]} @history-atom]
+             (when (.. this canGoForward)
+               (swap! history-atom assoc :pointer 0 :ignore-click true)
+               (reset! (.. this -props -data_atom) (first history))
+               (.forceUpdate this)))))
         :render
          (fn []
            (this-as this
                     (sab/html
-                     [:div
-                      [:h2 (str "history " (count (:history @(.. this -state -history_atom))))]
-                      (when (.canGoBack this)
-                        (sab/html
-                         [:a {:onClick (fn [e]
-                                         (.preventDefault e)
-                                         (.. this backInHistory))} "back"])) " "
-                      (when (.canGoForward this)
-                        (sab/html
-                         [:a {:onClick (fn [e]
-                                         (.preventDefault e)
-                                         (.. this forwardInHistory)
-                                         )} "forward"]))
-                      
-                      [:div ((.. this -props -react_fn)
-                             this
-                             (.. this -props -data_atom))]
-                      (edn->html @(.. this -state -history_atom))])))}))
+                     [:div.com-rigsomelight-devcards-history-control-bar
+                      {:style { :visibility (if (or (.canGoBack this)
+                                                    (.canGoForward this))
+                                              "visible" "hidden")}}
+                      [:a.com-rigsomelight-devcards-history-control-left
+                       {:style { :visibility (if (.canGoBack this) "visible" "hidden")}
+                        :onClick (fn [e]
+                                   (.preventDefault e)
+                                   (.. this backInHistory))} ""]
+                      [:a.com-rigsomelight-devcards-history-stop
+                       {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
+                        :onClick (fn [e]
+                                   (.preventDefault e)
+                                   (.. this continueOn))} ""]                      
+                      [:a.com-rigsomelight-devcards-history-control-right
+                       {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
+                        :onClick (fn [e]
+                                   (.preventDefault e)
+                                   (.. this forwardInHistory))} ""]
+                      #_(edn->html @(.. this -state -history_atom))])))}))
 
 (def dom-node-class
   (js/React.createClass
@@ -282,11 +290,15 @@
                           #js {:react_fn react-runner-component-fn
                                :data_atom initial-data}))
 
+(defn hist-recorder [data-atom]
+  (js/React.createElement history-class
+                          #js { :data_atom data-atom }))
+
 (defn hist [react-fn]
   (fn [owner data-atom]
-    (js/React.createElement history-class
-                            #js { :react_fn react-fn
-                                  :data_atom data-atom })))
+    (sab/html [:div
+               (hist-recorder data-atom)
+               (react-fn owner data-atom)])))
 
 (defn dom-node [node-fn]
   (fn [owner data-atom]
@@ -455,8 +467,6 @@
   [:div
    {:className (str "com-rigsomelight-devcards-test-line com-rigsomelight-devcards-" (name (:type t)))}
    (test-render t)])
-
-
 
 (defn layout-tests [tests]
   (sab/html
