@@ -264,28 +264,6 @@
         (main-cards-template state-atom)]]])))
 
 ;; enables the deletion of cards
-(defn merge-in-new-data [state new-state]
-  (assoc state
-         :path-collision-count {}
-         :position (:position new-state)
-         :cards    (merge
-                    (:cards state)
-                    (:cards new-state))))
-
-(defn off-the-books [channel start-data]
-  (let [timer (timeout 3000)
-        initial-data (-> start-data
-                       (assoc :path-collision-count {})
-                       (dissoc :cards))]
-    (go-loop [data initial-data]
-      (prn "here")
-      (when-let [[[msg-name payload] ch] (alts! [channel timer])]
-        (cond
-          (= ch timer)           (merge-in-new-data start-data data)
-          (= msg-name :jsreload) (merge-in-new-data start-data data)
-          :else
-          (do
-            (recur (dev-trans [msg-name payload] data)  )))))))
 
 (defn renderer [state-atom]
   (prn "Rendering")
@@ -318,8 +296,29 @@
   
   )
 
+(defn merge-in-new-data [state new-state]
+  (assoc state
+         :path-collision-count {}
+         :position (:position new-state)
+         :cards    (merge
+                    (:cards state)
+                    (:cards new-state))))
 
-
+(defn off-the-books [channel start-data]
+  (let [timer (timeout 3000)
+        initial-data (-> start-data
+                       (assoc :path-collision-count {})
+                       (dissoc :cards))]
+    (prn "off the books")
+    (go-loop [data initial-data]
+      (prn "here")
+      (when-let [[[msg-name payload] ch] (alts! [channel timer])]
+        (cond
+          (= ch timer)           (merge-in-new-data start-data data)
+          (= msg-name :jsreload) (merge-in-new-data start-data data)
+          :else
+          (do
+            (recur (dev-trans [msg-name payload] data))))))))
 
 (defn start-ui [channel]
   (defonce devcards-ui-setup
@@ -355,3 +354,4 @@
               (swap! app-state (fn [s] (dev-trans v s))))
             (recur))))
       true)))
+

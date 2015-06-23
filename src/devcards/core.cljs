@@ -20,7 +20,6 @@
 
 (enable-console-print!)
 
-;; oh well
 (defonce devcard-event-chan (chan))
 
 (defn devcard-before-jsload [x]
@@ -37,28 +36,24 @@
                      (fn [x]
                        (devcard-before-jsload (.-detail x)))))
 
-(defn start-devcard-ui!* []
+;; this needs to be private because devcards needs to be turned on
+(defn- start-devcard-ui!* []
   (dev/start-ui devcard-event-chan)
-  (defonce register-listeners-fig (do   (register-figwheel-listeners!)
-                                        true)))
+  (defonce register-listeners-fig (do (register-figwheel-listeners!)
+                                      true)))
 
 ;; Register a new card
 ;; this is normally called from the defcard macro
 ;;
 ;; path - a seq of keywords that describe where this card belongs in
 ;;        the UI. The first key in the list is typically the namespace.
-;; options - a map of card rendering options
-;;           :heading - (default true) rendering a heading on the card
-;;           :padding - (default true) render padding around the card body
-;;           :hidden - (default false) Don't render this card
 ;; func - is a thunk which contains the functionality of the card.
 ;;        The thunk has to be executed to get the functionality of
 ;;        the card.
 
-(defn register-card [path options func]
+(defn register-card [path func]
   "Register a new card."
-  (put! devcard-event-chan
-        [:register-card {:path path :options options :func func}]))
+  (put! devcard-event-chan [:register-card {:path path :func func}]))
 
 ;;; utils
 
@@ -66,9 +61,7 @@
 
 (def edn->html edn-rend/html-edn)
 
-
-
-(def runner-class
+(def RunnerComponent
   (js/React.createClass
    #js {:getInitialState
         (fn [] #js {:unique_id (gensym 'react-runner)})
@@ -105,7 +98,7 @@
                      this
                      (.-data_atom (.-state this)))))}))
 
-(def history-class
+(def HistoryComponent
   (js/React.createClass
    #js {:getInitialState
         (fn [] #js {:unique_id    (str (gensym 'devcards-history-runner-))
@@ -223,7 +216,7 @@
                                    (.. this forwardInHistory))} ""]
                       #_(edn->html @(.. this -state -history_atom))])))}))
 
-(def dom-node-class
+(def DomComponent
   (js/React.createClass
    #js {:getInitialState
         (fn [] #js {:unique_id (str (gensym 'devcards-card-runner-))})
@@ -285,12 +278,12 @@
       (sab/html [:span])))))
 
 (defn runner-base* [react-runner-component-fn initial-data]
-  (js/React.createElement runner-class
+  (js/React.createElement RunnerComponent
                           #js {:react_fn react-runner-component-fn
                                :data_atom initial-data}))
 
 (defn hist-recorder [data-atom]
-  (js/React.createElement history-class
+  (js/React.createElement HistoryComponent
                           #js { :data_atom data-atom }))
 
 (defn hist [react-fn]
@@ -301,7 +294,7 @@
 
 (defn dom-node [node-fn]
   (fn [owner data-atom]
-     (js/React.createElement dom-node-class
+     (js/React.createElement DomComponent
                              #js {:node_fn   node-fn
                                   :data_atom data-atom})))
 

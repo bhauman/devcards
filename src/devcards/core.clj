@@ -27,10 +27,8 @@
   [vname expr]
   `(devcards.core/do
      ~(let [ns (-> &env :ns :name name munge)]
-        `(devcards.core/register-card  [~(keyword ns) ~(keyword vname)]
-                                       ;; getting options doesn't work anymore
-                                       nil
-                                       (fn [] ~expr)))))
+        `(devcards.core/register-card  [~(keyword ns) ~(keyword vname)] (fn [] ~expr)))))
+
 
 (defmacro defcard [& expr]
   (if (instance? clojure.lang.Named (first expr))
