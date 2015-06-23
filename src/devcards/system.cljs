@@ -266,7 +266,7 @@
 ;; enables the deletion of cards
 
 (defn renderer [state-atom]
-  (prn "Rendering")
+  #_(prn "Rendering")
   (js/React.render
    (sab/html [:div
               (main-template state-atom)
@@ -304,21 +304,35 @@
                     (:cards state)
                     (:cards new-state))))
 
-(defn off-the-books [channel start-data]
-  (let [timer (timeout 3000)
+;; the only major potential problem here is that If we only register
+;; some of the cards of a namespace then the other cards in the
+;; namespace will dissapear. If one is doing calculations at the top
+;; level that take more than the wait time this could be a problem
+(defn off-the-books
+  "Run sequential messages off the books outside of the atom and
+   then difference the result so we can only display the new cards 
+   that have arrived. This prevents multiple renders and allows us 
+   to delete cards live."
+  [channel start-data first-message]
+  (let [;timer (timeout 3000)
         initial-data (-> start-data
                        (assoc :path-collision-count {})
                        (dissoc :cards))]
-    (prn "off the books")
-    (go-loop [data initial-data]
-      (prn "here")
-      (when-let [[[msg-name payload] ch] (alts! [channel timer])]
-        (cond
-          (= ch timer)           (merge-in-new-data start-data data)
-          (= msg-name :jsreload) (merge-in-new-data start-data data)
-          :else
-          (do
-            (recur (dev-trans [msg-name payload] data))))))))
+    #_(prn "off the books")
+    (go-loop [data (dev-trans first-message initial-data)]
+      #_(prn "here")
+      (let [timer (timeout 500)]
+        (when-let [[[msg-name payload] ch] (alts! [channel timer])]
+          (cond
+            (= ch timer)           (merge-in-new-data start-data data)
+            ;; this will function without jsreload. but allows us to
+            ;; render a tick faster
+            (= msg-name :jsreload) (do
+                                     (prn "Got here")
+                                     (merge-in-new-data start-data data))
+            :else
+            (do
+              (recur (dev-trans [msg-name payload] data)))))))))
 
 (defn start-ui [channel]
   (defonce devcards-ui-setup
@@ -326,18 +340,12 @@
       (render-base-if-necessary!)
       (go
         ;; initial load
-        (prn "INITIAL loading")
+        #_(prn "INITIAL loading")
         ;; consume all register card messages
         ;; and then load the accumulated state into the
         ;; app-state
-        (loop [state @app-state]
-          (let [timer   (timeout 20)
-                [v ch] (alts! [channel timer])]
-            (if (= ch timer)
-              (reset! app-state state)
-              (when v
-                (prn "loading" (first v))
-                (recur (dev-trans v state))))))
+        (let [new-state (<! (off-the-books channel @app-state []))]
+          (reset! app-state new-state))
         
         (hash-routing-init app-state)        
         (js/setTimeout #(renderer app-state) 0)
@@ -346,12 +354,9 @@
 
         (loop  []
           (when-let [v (<! channel)]
-            (prn "hey" (first v))
-            (if (= (first v) :before-jsload)
-              (let [new-state (<! (off-the-books channel @app-state))]
-                (prn "in the books")
-                (reset! app-state new-state))
-              (swap! app-state (fn [s] (dev-trans v s))))
+            #_(prn "hey" (first v))
+            (let [new-state (<! (off-the-books channel @app-state v))]
+              #_(prn "in the books")
+              (reset! app-state new-state))
             (recur))))
       true)))
-

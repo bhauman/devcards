@@ -16,7 +16,7 @@
 (devcards.core/start-devcard-ui!)
 
 (defcard marker
-  (dc/markdown-card "# This is a test"))
+  (dc/markdown-card "# This is a tester"))
 
 (defcard my-card
  (sab/html [:h1 "Hey there"]))

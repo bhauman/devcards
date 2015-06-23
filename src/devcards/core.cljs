@@ -20,27 +20,24 @@
 
 (enable-console-print!)
 
+;; this channel is only used for card registration notifications
 (defonce devcard-event-chan (chan))
 
-(defn devcard-before-jsload [x]
-  (put! devcard-event-chan [:before-jsload x]) x)
-
-(defn devcard-on-jsload [x]
-  (put! devcard-event-chan [:jsreload x]) x)
-
-(defn register-figwheel-listeners! []
-  (.addEventListener (.-body js/document) "figwheel.js-reload"
-                     (fn [x]
-                       (devcard-on-jsload (.-detail x))))
-  (.addEventListener (.-body js/document) "figwheel.before-js-reload"
-                     (fn [x]
-                       (devcard-before-jsload (.-detail x)))))
+(defn register-figwheel-listeners!
+  "This event doesn't need to be fired for the system to run. It will just render
+   a little faster on reload if it is fired. Figwheel isn't required to run devcards."
+  []
+  (defonce register-listeners-fig
+    (do
+      (.addEventListener (.-body js/document)
+                         "figwheel.js-reload"
+                         #(put! devcard-event-chan [:jsreload (.-detail %)]))
+      true)))
 
 ;; this needs to be private because devcards needs to be turned on
 (defn- start-devcard-ui!* []
   (dev/start-ui devcard-event-chan)
-  (defonce register-listeners-fig (do (register-figwheel-listeners!)
-                                      true)))
+  (register-figwheel-listeners!))
 
 ;; Register a new card
 ;; this is normally called from the defcard macro
@@ -533,3 +530,4 @@
 (defn test-card* [& parts]
   (let [tests (run-test-block (fn [] (doseq [f parts] (f))))]
     (test-frame tests)))
+
