@@ -56,19 +56,10 @@
     `(cljs.test/deftest ~vname
        ~@parts)))
 
-;; below this line is gone
-
-(defmacro om-root
-  ([name om-comp-fn initial-state om-options devcard-options]
-     `(devcards.core/defcard ~name
-        (devcards.core/om-root-card ~om-comp-fn ~initial-state ~om-options)
-        ~devcard-options))
-  ([name om-comp-fn initial-state om-options]
-     `(devcards.core/defcard ~name
-        (devcards.core/om-root-card ~om-comp-fn ~initial-state ~om-options)))
-  ([name om-comp-fn initial-state]
-     `(devcards.core/defcard ~name
-        (devcards.core/om-root-card ~om-comp-fn ~initial-state)))
-  ([name om-comp-fn]
-     `(devcards.core/defcard ~name
-        (devcards.core/om-root-card ~om-comp-fn))))
+(defmacro om-root-card
+  ([om-comp-fn initial-state om-options]
+   `(dom-node
+     (fn [node# _#]
+       (om.core/root ~om-comp-fn ~initial-state (merge ~om-options {:target node#})))))
+  ([om-comp-fn initial-state]
+   `(om-root-card ~om-comp-fn ~initial-state {})))

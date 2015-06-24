@@ -214,7 +214,7 @@
 
 (defn breadcrumbs-templ [crumbs state-atom]
   (sab/html
-   [:div.com-rigsomelight-devcards-card-base
+   [:div.com-rigsomelight-devcards-card-base.com-rigsomelight-devcards-breadcrumbs
     (interpose
      (sab/html [:span.com-rigsomelight-devcards-breadcrumb-sep "/"])
      (map (fn [[n path]]
@@ -275,9 +275,16 @@
 
 (comment
 
+  make sure that this works with reagent
+
   verify small compile size
 
+  make slider component
+
+  flat card style??
+  
   move om out of dependencies
+  - need to get om root card examples out of devdemos.core
   
   consider configuring  global card options
   consider frame false option

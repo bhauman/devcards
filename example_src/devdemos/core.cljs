@@ -180,8 +180,10 @@
   (om/component
    (sab/html [:h2 "This is an om card, " (:text data)])))
 
+(defonce test-om-data test-om-data)
+
 (defcard omcard-ex
-  (dc/om-root-card widget {:text "yep it is"}))
+  (dc/om-root-card widget (atom {:text "yep it is now "})))
 
 (defcard om-share-atoms
   (dc/markdown-card
@@ -214,7 +216,7 @@
    "#### You can share an Atom with an `edn-card` too"))
 
 (defcard edn-card-shared
-  (dc/edn-card om-test-atom))
+  (dc/edn-hist-card om-test-atom))
 
 (deftest test-card-ex
   "## Test card

@@ -8,10 +8,6 @@
    [devcards.util.edn-renderer :as edn-rend]
    [clojure.string :as string]
 
-   ;; would be nice to remove hard dependency on om
-   [om.core :as om :include-macros true]
-   [om.dom :as dom :include-macros true]
-
    [cljs.test :as t :refer [report]]   
    [cljs.pprint :as pprint]
    [cljs.core.async :refer [put! chan] :as async])
@@ -224,7 +220,11 @@
                                          (if ignore-click
                                            (assoc ha :ignore-click false)
                                            (assoc ha
-                                                  :history (cons n (drop pointer history))
+                                                  :history
+                                                  (let [abridged-hist (drop pointer history)]
+                                                    (if (not= n (first abridged-hist))
+                                                      (cons n abridged-hist)
+                                                      abridged-hist))
                                                   :pointer 0)))))
                               (swap! history-atom assoc
                                      :history (let [hist (:history @history-atom)]
@@ -232,7 +232,7 @@
                                                 (cons n hist)
                                                 hist))
                                      :ignore-click false))))))))
-        
+
         :canGoBack
         (fn []
           (this-as this
@@ -300,12 +300,23 @@
                        {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
                         :onClick (fn [e]
                                    (.preventDefault e)
-                                   (.. this continueOn))} ""]                      
+                                   ;; touch the data atom
+                                   (reset! (.. this -props -data_atom)
+                                           @(.. this -props -data_atom)))} ""]
                       [:a.com-rigsomelight-devcards-history-control-right
                        {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
                         :onClick (fn [e]
                                    (.preventDefault e)
                                    (.. this forwardInHistory))} ""]
+                      [:span.com-rigsomelight-devcards-history-control-fast-forward
+                       {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
+                        :onClick (fn [e]
+                                   (.preventDefault e)
+                                   (.. this continueOn))}
+                       [:span.com-rigsomelight-devcards-history-control-small-arrow]
+                       [:span.com-rigsomelight-devcards-history-control-small-arrow]
+                       [:span.com-rigsomelight-devcards-history-control-block]
+                       ]
                       #_(edn->html @(.. this -state -history_atom))])))}))
 
 (defn hist-recorder [data-atom]
@@ -325,6 +336,15 @@
   (if (satisfies? IAtom initial-data)
     (runner-base* (fn [_ data-atom]
                     (edn->html @data-atom))
+                  initial-data)
+    (edn->html initial-data)))
+
+(defn edn-hist-card [initial-data]
+  "A card that renders EDN."
+  (if (satisfies? IAtom initial-data)
+    (runner-base* (hist
+                   (fn [_ data-atom]
+                     (edn->html @data-atom)))
                   initial-data)
     (edn->html initial-data)))
 
@@ -349,19 +369,6 @@
     (fn [node _]
       (set! (.. node -innerHTML)
             (less-sensitive-markdown mkdn-strs)))))
-
-;; om-root card
-
-(defn om-root-card
-  ([om-comp-fn initial-state om-options]
-   (dom-node
-    (fn [node _]
-      (om/root om-comp-fn initial-state (merge om-options {:target node})))))
-  ([om-comp-fn initial-state]
-     (om-root-card om-comp-fn initial-state {}))
-  ([om-comp-fn]
-     (om-root-card om-comp-fn {} {})))
-
 
 ;; Testing via cljs.test
 
@@ -522,4 +529,3 @@
 (defn test-card* [& parts]
   (let [tests (run-test-block (fn [] (doseq [f parts] (f))))]
     (test-frame tests)))
-
