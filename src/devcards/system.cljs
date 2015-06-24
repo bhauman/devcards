@@ -275,14 +275,18 @@
 
 (comment
 
+  the composition structure of the main api
+    needs to copy normal react composition
+    particularly the relationship of
+    hist and dom-node and the passing
+    of the data atom
+  
   make sure that this works with reagent
 
   verify small compile size
 
   make slider component
 
-  flat card style??
-  
   move om out of dependencies
   - need to get om root card examples out of devdemos.core
   
@@ -290,11 +294,11 @@
   consider frame false option
   consider frame false binding overide
 
-  consider web-components for hiding css styling
+  consider web-components for hiding css styling!!!
 
   turn system into react component?
 
-  fix edn rendering (use flex? belayed ...)
+  fix edn rendering (use flex? harder that one might think)
   
   dog food devcards code
   
