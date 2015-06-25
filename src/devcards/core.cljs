@@ -3,15 +3,15 @@
    [devcards.system :as dev :refer [prevent->]]
 
    [devcards.util.markdown :refer [less-sensitive-markdown]]
-
+   [devcards.util.utils :as utils]
+   
    [sablono.core :as sab :include-macros true]
    [devcards.util.edn-renderer :as edn-rend]
+   
    [clojure.string :as string]
 
-   [cljs.test :as t :refer [report]]   
-   [cljs.pprint :as pprint]
-   [cljs.core.async :refer [put! chan] :as async])
-  (:import [goog.string StringBuffer]))
+   [cljs.test]   
+   [cljs.core.async :refer [put! chan] :as async]))
 
 (enable-console-print!)
 
@@ -49,7 +49,7 @@
 
 ;;; utils
 
-(def edn->html edn-rend/html-edn)
+(defn- edn->html* [e] (edn-rend/html-edn e))
 
 ;; returns a react component of rendered edn
 
@@ -119,7 +119,7 @@
                      #js { :ref (.. this -state -unique_id) }
                      "Card has not mounted DOM node.")))}))
 
-(defn naked-card [children options]
+(defn- naked-card [children options]
   (sab/html
    [:div
     {:class
@@ -128,7 +128,7 @@
             " com-rigsomelight-devcards-devcard-padding" "")) }
     children]))
 
-(defn frame
+(defn- frame
   ([children]
    (frame children {}))
   ([children options]
@@ -151,25 +151,25 @@
           (naked-card children options)]))
       (sab/html [:span])))))
 
-(defn runner-base* [react-runner-component-fn initial-data]
+(defn- runner-base* [react-runner-component-fn initial-data]
   (js/React.createElement RunnerComponent
                           #js {:react_fn react-runner-component-fn
                                :data_atom initial-data}))
 
-(defn dom-node [node-fn]
+(defn- dom-node* [node-fn]
   (fn [owner data-atom]
      (js/React.createElement DomComponent
                              #js {:node_fn   node-fn
                                   :data_atom data-atom})))
 
-(defn runner*
+(defn- runner*
   ([react-fn initial-data]
    (runner* react-fn initial-data {}))
   ([react-fn initial-data options]
    (frame (runner-base* react-fn initial-data) options)))
 
 ;; these mainly exists to prive support to the defcard macro
-(defn default-option-card*
+(defn- default-option-card*
   ([defaults fn-or-react initial-data options]
    (if (fn? fn-or-react)
      (runner* fn-or-react initial-data (merge defaults options))
@@ -319,53 +319,41 @@
                        ]
                       #_(edn->html @(.. this -state -history_atom))])))}))
 
-(defn hist-recorder [data-atom]
+(defn- hist-recorder* [data-atom]
   (js/React.createElement HistoryComponent
                           #js { :data_atom data-atom }))
 
-(defn hist [react-fn]
+(defn- hist* [react-fn]
   (fn [owner data-atom]
     (sab/html [:div
-               (hist-recorder data-atom)
+               (hist-recorder* data-atom)
                (react-fn owner data-atom)])))
 
 ;; edn-card
 
-(defn edn-card [initial-data]
+(defn- edn* [initial-data]
   "A card that renders EDN."
   (if (satisfies? IAtom initial-data)
     (runner-base* (fn [_ data-atom]
-                    (edn->html @data-atom))
+                    (edn->html* @data-atom))
                   initial-data)
-    (edn->html initial-data)))
+    (edn->html* initial-data)))
 
-(defn edn-hist-card [initial-data]
+(defn- edn-hist* [initial-data]
   "A card that renders EDN."
   (if (satisfies? IAtom initial-data)
-    (runner-base* (hist
+    (runner-base* (hist*
                    (fn [_ data-atom]
-                     (edn->html @data-atom)))
+                     (edn->html* @data-atom)))
                   initial-data)
-    (edn->html initial-data)))
+    (edn* initial-data)))
 
 ;; markdown card
 
 (def mkdn-code #(str "```\n" % "```\n"))
 
-(defn pprint-str [obj]
-  (let [sb (StringBuffer.)]
-    (pprint/pprint obj (StringBufferWriter. sb))
-    (str sb)))
-
-(defn pprint-code [code]
-  (pprint/with-pprint-dispatch pprint/code-dispatch (pprint-str code)))
-
-(def mkdn-pprint-code (comp mkdn-code pprint-code))
-
-(def mkdn-pprint-str (comp mkdn-code pprint-str))
-
-(defn markdown-card [& mkdn-strs]
-  (dom-node
+(defn- doc* [& mkdn-strs]
+  (dom-node*
     (fn [node _]
       (set! (.. node -innerHTML)
             (less-sensitive-markdown mkdn-strs)))))
@@ -378,37 +366,37 @@
 
   )
 
-(defn collect-test [m]
+(defn- collect-test [m]
   (cljs.test/update-current-env!
    [:_devcards_collect_tests] conj
    (merge (select-keys (cljs.test/get-current-env) [:testing-contexts]) m)))
 
-(defmethod report [:_devcards_test_card_reporter :pass] [m]
+(defmethod cljs.test/report [:_devcards_test_card_reporter :pass] [m]
   (cljs.test/inc-report-counter! :pass)
   (collect-test m)
   m)
 
-(defmethod report [:_devcards_test_card_reporter :fail] [m]
+(defmethod cljs.test/report [:_devcards_test_card_reporter :fail] [m]
   (cljs.test/inc-report-counter! :fail)  
   (collect-test m)
   m)
 
-(defmethod report [:_devcards_test_card_reporter :error] [m]
+(defmethod cljs.test/report [:_devcards_test_card_reporter :error] [m]
   (cljs.test/inc-report-counter! :error)
   (collect-test m)
   m)
 
-(defmethod report [:_devcards_test_card_reporter :test-doc] [m]
+(defmethod cljs.test/report [:_devcards_test_card_reporter :test-doc] [m]
   (collect-test m)
   m)
 
-(defn run-test-block [f]
+(defn- run-test-block [f]
   (cljs.core/binding [cljs.test/*current-env* (assoc (cljs.test/empty-env)
                                                      :reporter :_devcards_test_card_reporter)]
     (f)
     (cljs.test/get-current-env)))
 
-(defn react-raw [raw-html-str]
+(defn- react-raw [raw-html-str]
   "A React component that renders raw html."
   (.div (.-DOM js/React)
         (clj->js { :dangerouslySetInnerHTML
@@ -420,14 +408,14 @@
 (defmethod test-render :default [m]
   (sab/html [:div (prn-str m)]))
 
-(defn display-message [{:keys [message]} body]
+(defn- display-message [{:keys [message]} body]
   (if message
       (sab/html [:div [:span.com-rigsomelight-devcards-test-message message]
                  body])
       body))
 
 (defn render-pass-fail [{:keys [expected] :as m}]
-  (display-message m (sab/html [:pre [:code (pprint-code expected)]])))
+  (display-message m (sab/html [:pre [:code (utils/pprint-code expected)]])))
 
 (defmethod test-render :pass [m]
   (render-pass-fail m))
@@ -448,15 +436,16 @@
                                      (reverse (rest testing-contexts)))
                                 (list [:span (first testing-contexts)])))]))
 
-(defn test-doc [s]
-  (report {:type :test-doc :documentation (less-sensitive-markdown [s])}))
+(defn- test-doc [s]
+  (cljs.test/report {:type :test-doc :documentation (less-sensitive-markdown [s])}))
 
-(defn test-renderer [t]
+(defn- test-renderer [t]
   [:div
-   {:className (str "com-rigsomelight-devcards-test-line com-rigsomelight-devcards-" (name (:type t)))}
+   {:className (str "com-rigsomelight-devcards-test-line com-rigsomelight-devcards-"
+                    (name (:type t)))}
    (test-render t)])
 
-(defn layout-tests [tests]
+(defn- layout-tests [tests]
   (sab/html
    [:div.com-rigsomelight-devcards-test-card
     (:html-list
@@ -469,14 +458,15 @@
                           (:testing-contexts t))
                      res
                      (if (not-empty (:testing-contexts t))
-                       (cons (test-renderer (merge {:type :context} (select-keys t [:testing-contexts])))
+                       (cons (test-renderer (merge {:type :context}
+                                                   (select-keys t [:testing-contexts])))
                              res)
                        res))]
            (concat html-list res ))})
       {}
       (reverse tests)))]))
 
-(defn test-frame [test-summary]
+(defn- test-frame [test-summary]
   (let [path (:path devcards.system/*devcard-data*)
         tests (:_devcards_collect_tests test-summary)
         some-tests (filter (fn [{:keys [type]}] (not= type :test-doc))
@@ -526,6 +516,6 @@
           (layout-tests (filter (:filter @data-atom) tests))]]))
      {:filter identity})))
 
-(defn test-card* [& parts]
+(defn- test-card* [& parts]
   (let [tests (run-test-block (fn [] (doseq [f parts] (f))))]
     (test-frame tests)))

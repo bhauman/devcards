@@ -1,6 +1,5 @@
 (ns devdemos.two-zero
   (:require
-   [devcards.core :as dc :include-macros true]
    [clojure.string :as string]
    [clojure.set :refer [difference union]]
    [sablono.core :as sab :include-macros true]
@@ -12,7 +11,7 @@
    [cljs.test :as t :include-macros true])
   (:require-macros
    [cljs.core.async.macros :refer [go]]
-   [devcards.core :refer [defcard deftest]]))
+   [devcards.core :as dc :refer [defcard deftest]]))
 
 (defn lh [x] (prn-str x) x)
 
@@ -24,11 +23,11 @@
                         (aget (.getElementsByTagName js/document "body") 0))
                        490)))
 
-(dc/doc
+(dc/doc-card
  "# 2048
   Let's build 2048 interactively with devcards")
 
-(dc/doc
+(dc/doc-card
  "## Board Style
 
    Let's start by creating the style for the board.
@@ -83,7 +82,7 @@
 (defcard board-style
   (game-board []))
 
-(dc/doc
+(dc/doc-card
    "### Cell Style
    Then we'll work on the style for the cells. The hard part is
    getting the colors and the font sizes correct.")
@@ -101,7 +100,7 @@
                { :top 2 :left 1 :v 1024 :id :t10}
                { :top 2 :left 2 :v 2048 :id :t11}]))
 
-(dc/doc
+(dc/doc-card
  "## Checking basic tile movement animation")
 
 #_(defcard animation-work
@@ -113,7 +112,7 @@
      (one-row-board-static [{:left left :top 0 :v 2 :id :t1}]))))
 
 
-(dc/doc
+(dc/doc-card
    "## Main data structures
     #### Tile Map
 
@@ -179,7 +178,7 @@
      :t4 { :top 0 :left 3 :v 4 :id :t4 :remove true }}))
 
 (defcard basic-data-transformations
-  (dc/markdown-card
+  (dc/doc
    "### Transforming one row
 
    We need to get a transformation for one row. From there we can get

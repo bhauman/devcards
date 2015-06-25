@@ -1,10 +1,9 @@
 (ns ^:figwheel-load devdemos.testing
   (:require
-   [devcards.core :as dc :include-macros true]
    [cljs.test :as t :refer [report] :include-macros true]
    [sablono.core :as sab])
   (:require-macros
-   [devcards.core :refer [defcard]]
+   [devcards.core :as dc :refer [defcard]]
    [cljs.test :refer [is testing]]))
 
 (enable-console-print!)

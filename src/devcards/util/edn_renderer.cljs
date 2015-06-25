@@ -1,13 +1,7 @@
 (ns devcards.util.edn-renderer
   (:require
-   [cljs.pprint :as pprint]
-   [sablono.core :as sab])
-  (:import [goog.string StringBuffer]))
-
-(defn pprint-str [obj]
-  (let [sb (StringBuffer.)]
-    (pprint/pprint obj (StringBufferWriter. sb))
-    (str sb)))
+   [devcards.util.utils :refer [pprint-str]]
+   [sablono.core :as sab]))
 
 (declare html)
 
