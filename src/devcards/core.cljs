@@ -1,8 +1,8 @@
 (ns devcards.core
   (:require
-   [devcards.system :as dev :refer [prevent->]]
+   [devcards.system :as dev]
 
-   [devcards.util.markdown :refer [less-sensitive-markdown]]
+   [devcards.util.markdown :as mark]
    [devcards.util.utils :as utils]
    
    [sablono.core :as sab :include-macros true]
@@ -356,7 +356,7 @@
   (dom-node*
     (fn [node _]
       (set! (.. node -innerHTML)
-            (less-sensitive-markdown mkdn-strs)))))
+            (mark/less-sensitive-markdown mkdn-strs)))))
 
 ;; Testing via cljs.test
 
@@ -437,13 +437,14 @@
                                 (list [:span (first testing-contexts)])))]))
 
 (defn- test-doc [s]
-  (cljs.test/report {:type :test-doc :documentation (less-sensitive-markdown [s])}))
+  (cljs.test/report {:type :test-doc :documentation (mark/less-sensitive-markdown [s])}))
 
 (defn- test-renderer [t]
   [:div
    {:className (str "com-rigsomelight-devcards-test-line com-rigsomelight-devcards-"
                     (name (:type t)))}
    (test-render t)])
+
 
 (defn- layout-tests [tests]
   (sab/html
@@ -480,7 +481,7 @@
          [:div.com-rigsomelight-devcards-panel-heading
           [:span
            { :onClick
-            (prevent->
+            (dev/prevent->
              #(devcards.system/set-current-path!
                devcards.system/app-state
                path))}
@@ -488,7 +489,7 @@
           [:span.com-rigsomelight-devcards-badge
            {:style {:float "right"
                     :margin "3px 3px"}
-            :onClick (prevent->
+            :onClick (dev/prevent->
                        #(swap! data-atom assoc :filter identity))}
            total-tests]
           (when-not (zero? (+ fail error))
@@ -498,7 +499,7 @@
                        :backgroundColor "#d9534f"
                        :color "#fff"
                        :margin "3px 3px"}
-               :onClick (prevent->
+               :onClick (dev/prevent->
                          #(swap! data-atom assoc :filter (fn [{:keys [type]}]
                                                            (#{:fail :error} type))))}
               (+ fail error)]))          
@@ -509,7 +510,7 @@
                        :backgroundColor "#5cb85c"
                        :color "#fff"
                        :margin "3px 3px"}
-               :onClick (prevent->
+               :onClick (dev/prevent->
                          #(swap! data-atom assoc :filter (fn [{:keys [type]}] (= type :pass)))) }
               pass]))]
          [:div {:className devcards.system/devcards-rendered-card-class}

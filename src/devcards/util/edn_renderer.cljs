@@ -1,7 +1,8 @@
 (ns devcards.util.edn-renderer
   (:require
-   [devcards.util.utils :refer [pprint-str]]
-   [sablono.core :as sab]))
+   [sablono.core :as sab]
+   [devcards.util.utils :as utils]))
+
 
 (declare html)
 
@@ -25,7 +26,7 @@
        to-array))
 
 (defn literal [class x]
-  (sab/html [:span { :className class } (pprint-str x)]))
+  (sab/html [:span { :className class } (utils/pprint-str x)]))
 
 (defn join-html [separator coll]
   (interpose-separator (mapv html coll)

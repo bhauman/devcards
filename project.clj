@@ -24,7 +24,7 @@
                 [lein-figwheel "0.3.3"]]
       :cljsbuild {
         :builds [{:id "devcards-demos"
-                  :source-paths ["src" "example_src"]
+                  :source-paths ["example_src" "src"]
                   :figwheel true
                   :compiler {
                              :main "devdemos.core"
@@ -33,7 +33,8 @@
                              :output-dir "resources/public/devcards/js/compiled/out"
                              ;:recompile-dependents true                             
                              :optimizations :none
-                             :source-map true}}]}
+                             :devcards   true
+                             :source-map-timestamp true}}]}
                    
           :figwheel { :css-dirs ["resources/public/devcards/css"]
                       :open-file-command "emacsclient" }

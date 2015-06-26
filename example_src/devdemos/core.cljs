@@ -1,6 +1,6 @@
 (ns ^:figwheel-always devdemos.core
     (:require
-     [devcards.core]
+     [devcards.core :as devcards]
      [om.core :as om :include-macros true]
      [om.dom :as dom :include-macros true]   
      [clojure.string :as string]
@@ -183,7 +183,7 @@
 (defonce test-om-data test-om-data)
 
 (defcard omcard-ex
-  (dc/om-root-card widget (atom {:text "yep it is now "})))
+  (dc/om-root widget (atom {:text "yep it is now "})))
 
 (defcard om-share-atoms
   (dc/doc
@@ -204,12 +204,12 @@
 (defn om-counter-inc [data owner] (counter owner data inc "inc"))
 
 (defcard omcard-shared-ex-1
-  (dc/om-root-card om-counter-inc om-test-atom {:shared {:title "First counter "}}))
+  (dc/om-root om-counter-inc om-test-atom {:shared {:title "First counter "}}))
 
 (defn om-counter-dec [data owner] (counter owner data dec "dec"))
 
 (defcard omcard-shared-ex-2
-  (dc/om-root-card om-counter-dec om-test-atom {:shared {:title "Second counter "}}))
+  (dc/om-root om-counter-dec om-test-atom {:shared {:title "Second counter "}}))
 
 (defcard 
   (dc/doc
