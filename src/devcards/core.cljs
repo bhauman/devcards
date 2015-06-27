@@ -43,12 +43,14 @@
 ;;        The thunk has to be executed to get the functionality of
 ;;        the card.
 
+;; could move into macros
 (defn register-card [path func]
   "Register a new card."
   (put! devcard-event-chan [:register-card {:path path :func func}]))
 
 ;;; utils
 
+;; could move to macros
 (defn- edn->html* [e] (edn-rend/html-edn e))
 
 ;; returns a react component of rendered edn
@@ -444,7 +446,6 @@
    {:className (str "com-rigsomelight-devcards-test-line com-rigsomelight-devcards-"
                     (name (:type t)))}
    (test-render t)])
-
 
 (defn- layout-tests [tests]
   (sab/html
