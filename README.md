@@ -2,7 +2,7 @@
 
 # Devcards is currently under heavy development
 
-> Expect a new release with many breaking changes soon
+> Expect a new release with many breaking changes within the week :)
 > 6/28/15
 
 Devcards aims to provide ClojureScript developers with an interactive
