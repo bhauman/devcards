@@ -44,97 +44,35 @@
 ;;        the card.
 
 ;; could move into macros
-(defn register-card [path func]
+(defn register-card [path func options]
   "Register a new card."
-  (put! devcard-event-chan [:register-card {:path path :func func}]))
+  (put! devcard-event-chan [:register-card {:path path :func func :options options}]))
 
-;;; utils
+(defn- react-raw [raw-html-str]
+  "A React component that renders raw html."
+  (.div (.-DOM js/React)
+        (clj->js { :dangerouslySetInnerHTML
+                   { :__html
+                     raw-html-str }})))
 
-;; could move to macros
-(defn- edn->html* [e] (edn-rend/html-edn e))
+(defn markdown->react [& strs]
+  (react-raw (mark/less-sensitive-markdown strs)) )
 
 ;; returns a react component of rendered edn
-
-(def RunnerComponent
-  (js/React.createClass
-   #js {:getInitialState
-        (fn [] #js {:unique_id (gensym 'react-runner)})
-        :componentWillMount
-        (fn []
-          (this-as this
-                   (.setState this
-                              (or (and (.. this -state -data_atom) (.. this -state))
-                                  #js {:data_atom
-                                       (let [data (.. this -props -data_atom)]
-                                         (if (satisfies? IAtom data)
-                                           data
-                                           (atom data)))}))))
-        :componentWillUnmount
-        (fn []
-          (this-as
-           this
-           (let [data_atom (.. this -state -data_atom)
-                 id        (.. this -state -unique_id)]
-             (when (and data_atom id)
-               (remove-watch data_atom id)))))        
-        :componentDidMount
-        (fn []
-          (this-as
-           this
-           (let [data_atom (.. this -state -data_atom)
-                 id        (.. this -state -unique_id)]
-             (when (and data_atom id)
-               (add-watch data_atom id (fn [_ _ _ _] (.forceUpdate this)))))))
-        :render
-         (fn []
-           (this-as this
-                    ((.-react_fn (.-props this))
-                     this
-                     (.-data_atom (.-state this)))))}))
-
-(def DomComponent
-  (js/React.createClass
-   #js {:getInitialState
-        (fn [] #js {:unique_id (str (gensym 'devcards-card-runner-))})
-        :renderIntoDOM
-        (fn []
-          (this-as this
-                   (when-let [node-fn (.. this -props -node_fn)]
-                     (when-let [comp (aget (.. this -refs) (.. this -state -unique_id))]
-                       (when-let [node (js/React.findDOMNode comp)]
-                         (node-fn node (.. this -props -data_atom)))))))
-        :componentDidUpdate
-        (fn [prevP, prevS]
-          (this-as this
-                   (when (and (.. this -props -node_fn)
-                              (not= (.. this -props -node_fn)
-                                    (.. prevP -node_fn)))
-                     #_(prn (str (.. this -props -node_fn)))
-                     #_(prn (str (.. prevP -node_fn)))
-                     (.renderIntoDOM this))))
-        :componentDidMount
-        (fn [] (this-as this (.renderIntoDOM this)))
-        :render
-         (fn []
-           (this-as this
-                    (js/React.DOM.div
-                     #js { :ref (.. this -state -unique_id) }
-                     "Card has not mounted DOM node.")))}))
 
 (defn- naked-card [children options]
   (sab/html
    [:div
     {:class
      (str devcards.system/devcards-rendered-card-class
-          (if-not (false? (:padding options))
-            " com-rigsomelight-devcards-devcard-padding" "")) }
+          (if (:padding options) " com-rigsomelight-devcards-devcard-padding" "")) }
     children]))
 
 (defn- frame
   ([children]
    (frame children {}))
   ([children options]
-  (let [path (:path devcards.system/*devcard-data*)]
+  (let [path (:path options)]
     (if-not (:hidden options)
       (if (false? (:heading options))
         (sab/html
@@ -153,41 +91,114 @@
           (naked-card children options)]))
       (sab/html [:span])))))
 
-(defn- runner-base* [react-runner-component-fn initial-data]
-  (js/React.createElement RunnerComponent
-                          #js {:react_fn react-runner-component-fn
-                               :data_atom initial-data}))
+(declare hist-recorder*)
 
+(def RunnerComponent
+  (js/React.createClass
+   #js {:getInitialState
+        (fn [] #js {:unique_id (gensym 'react-runner)})
+        :componentWillMount
+        (fn []
+          (this-as this
+                   (.setState this
+                              (or (and (.. this -state -data_atom) (.. this -state))
+                                  #js {:data_atom
+                                       (let [data (or (.. this -props -data_atom) ;; TODO: legacy get rid of this 
+                                                      (when-let [{:keys [data-atom initial-data]} (.. this -props -options)]
+                                                        (or data-atom initial-data)))]
+                                         (if (satisfies? IAtom data)
+                                           data
+                                           (atom data)))}))))
+        :componentWillUnmount
+        (fn []
+          (this-as
+           this
+           (let [data_atom (.. this -state -data_atom)
+                 id        (.. this -state -unique_id)]
+             (when (and data_atom id)
+               (remove-watch data_atom id)))))
+        :componentDidMount
+        (fn []
+          (this-as
+           this
+           (let [options (.. this -props -options)]
+             (when-not (false? (:watch-atom options))
+               (let [data_atom (.. this -state -data_atom)
+                     id        (.. this -state -unique_id)]
+                 (when (and data_atom id)
+                   (add-watch data_atom id (fn [_ _ _ _] (.forceUpdate this)))))))))
+        :render
+        (fn []
+          (this-as this
+                   (let [options (.. this -props -options)
+                         children ((.-react_fn (.-props this))
+                                   this
+                                   (.-data_atom (.-state this)))
+                         children (if-let [docu (:documentation options)]
+                                    (sab/html [:div
+                                               (markdown->react docu)
+                                               children])
+                                    children)
+                         children (if (:history options)
+                                    (sab/html [:div
+                                               (hist-recorder* (.-data_atom (.-state this)))
+                                               children])
+                                    children)]
+                     (if (:frame options)
+                       (frame children options) ;; make component and forward options
+                       children))))}))
+
+(def DomComponent
+  (js/React.createClass
+   #js {:getInitialState
+        (fn [] #js {:unique_id (str (gensym 'devcards-card-runner-))})
+        :renderIntoDOM
+        (fn []
+          (this-as this
+                   (when-let [node-fn (.. this -props -node_fn)]
+                     (when-let [comp (aget (.. this -refs) (.. this -state -unique_id))]
+                       (when-let [node (js/React.findDOMNode comp)]
+                         (node-fn node (.. this -props -data_atom)))))))
+        :componentDidUpdate
+        (fn [prevP, prevS]
+          (this-as this
+                   (when (and (.. this -props -node_fn)
+                              (not= (.. this -props -node_fn)
+                                    (.. prevP -node_fn)))
+                     (.renderIntoDOM this))))
+        :componentDidMount
+        (fn [] (this-as this (.renderIntoDOM this)))
+        :render
+         (fn []
+           (this-as this
+                    (js/React.DOM.div
+                     #js { :ref (.. this -state -unique_id) }
+                     "Card has not mounted DOM node.")))}))
+
+(defn convert-to-react-fn [obj]
+  (if (fn? obj) obj (fn [_ _] obj)))
+
+(defn card-base
+  ([opts react-or-fn]
+   (js/React.createElement RunnerComponent
+                           #js {:react_fn (convert-to-react-fn react-or-fn)
+                                :options  opts}))
+  ([react-or-fn]
+   (card-base devcards.system/*devcard-data* react-or-fn)))
+
+;; keep
 (defn- dom-node* [node-fn]
   (fn [owner data-atom]
      (js/React.createElement DomComponent
                              #js {:node_fn   node-fn
                                   :data_atom data-atom})))
 
-(defn- runner*
-  ([react-fn initial-data]
-   (runner* react-fn initial-data {}))
-  ([react-fn initial-data options]
-   (frame (runner-base* react-fn initial-data) options)))
-
-;; these mainly exists to prive support to the defcard macro
-(defn- default-option-card*
-  ([defaults fn-or-react initial-data options]
-   (if (fn? fn-or-react)
-     (runner* fn-or-react initial-data (merge defaults options))
-     (frame fn-or-react (merge defaults options))))
-  ([defaults fn-or-react initial-data]
-   (default-option-card* defaults fn-or-react initial-data {}))
-  ([defaults fn-or-react]
-   (default-option-card* defaults fn-or-react {} {})))
-
-(def card* (partial default-option-card* {}))
-
 ;; history recorder
 
 (comment
   would be nice to have a drop down of history diffs)
 
+;; keep
 (def HistoryComponent
   (js/React.createClass
    #js {:getInitialState
@@ -321,52 +332,15 @@
                        ]
                       #_(edn->html @(.. this -state -history_atom))])))}))
 
+;; keep
 (defn- hist-recorder* [data-atom]
   (js/React.createElement HistoryComponent
-                          #js { :data_atom data-atom }))
-
-(defn- hist* [react-fn]
-  (fn [owner data-atom]
-    (sab/html [:div
-               (hist-recorder* data-atom)
-               (react-fn owner data-atom)])))
-
-;; edn-card
-
-(defn- edn* [initial-data]
-  "A card that renders EDN."
-  (if (satisfies? IAtom initial-data)
-    (runner-base* (fn [_ data-atom]
-                    (edn->html* @data-atom))
-                  initial-data)
-    (edn->html* initial-data)))
-
-(defn- edn-hist* [initial-data]
-  "A card that renders EDN."
-  (if (satisfies? IAtom initial-data)
-    (runner-base* (hist*
-                   (fn [_ data-atom]
-                     (edn->html* @data-atom)))
-                  initial-data)
-    (edn* initial-data)))
-
-;; markdown card
-
-(def mkdn-code #(str "```\n" % "```\n"))
-
-(defn- doc* [& mkdn-strs]
-  (dom-node*
-    (fn [node _]
-      (set! (.. node -innerHTML)
-            (mark/less-sensitive-markdown mkdn-strs)))))
+                         #js { :data_atom data-atom }))
 
 ;; Testing via cljs.test
-
 (comment
   mapping to source-maps
-  make event open test in editor
-
-  )
+  make event open test in editor)
 
 (defn- collect-test [m]
   (cljs.test/update-current-env!
@@ -398,12 +372,7 @@
     (f)
     (cljs.test/get-current-env)))
 
-(defn- react-raw [raw-html-str]
-  "A React component that renders raw html."
-  (.div (.-DOM js/React)
-        (clj->js { :dangerouslySetInnerHTML
-                   { :__html
-                     raw-html-str }})))
+
 
 (defmulti test-render :type)
 
@@ -468,14 +437,18 @@
       {}
       (reverse tests)))]))
 
+;; RE-VISIT
+
 (defn- test-frame [test-summary]
-  (let [path (:path devcards.system/*devcard-data*)
+  (let [options devcards.system/*devcard-data*
+        path (:path options)
         tests (:_devcards_collect_tests test-summary)
         some-tests (filter (fn [{:keys [type]}] (not= type :test-doc))
                       (:_devcards_collect_tests test-summary))
         total-tests (count some-tests)
         {:keys [fail pass error]} (:report-counters test-summary)]
-    (runner-base*
+    (card-base
+     (assoc options :frame false)
      (fn [owner data-atom]
        (sab/html
         [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
@@ -491,7 +464,7 @@
            {:style {:float "right"
                     :margin "3px 3px"}
             :onClick (dev/prevent->
-                       #(swap! data-atom assoc :filter identity))}
+                      #(swap! data-atom assoc :filter identity))}
            total-tests]
           (when-not (zero? (+ fail error))
             (sab/html
@@ -515,8 +488,7 @@
                          #(swap! data-atom assoc :filter (fn [{:keys [type]}] (= type :pass)))) }
               pass]))]
          [:div {:className devcards.system/devcards-rendered-card-class}
-          (layout-tests (filter (:filter @data-atom) tests))]]))
-     {:filter identity})))
+          (layout-tests (filter (:filter @data-atom) tests))]])))))
 
 (defn- test-card* [& parts]
   (let [tests (run-test-block (fn [] (doseq [f parts] (f))))]

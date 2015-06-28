@@ -124,22 +124,26 @@
         (update-in [:position] inc)
         (update-in (cons :cards new-path)
                    (fn [dc]
-                     (if false #_dc
-                       (-> dc
-                         (assoc
-                          :position position
-                          :func func)
-                         (dissoc :sweep-marker)
-                         (dissoc :delete-card))
-                       { :path new-path
-                         :func func
-                         :position position })))
+                     (merge (:base-card-options state)
+                            options
+                            { :path new-path
+                              :func func
+                              :position position }
+                            #_(when-not dc
+                                ;; initial data atom here TODO when dc
+                                ;; is nil
+                              ))))
         (register-collision path))))
 
 (def devcard-initial-data { :current-path []
                             :position 0
                             :cards {}
-                            :path-collision-count {} })
+                            :path-collision-count {}
+                            :base-card-options { :frame true
+                                                 :heading true
+                                                 :padding true
+                                                 :watch-atom true
+                                                 :history false } })
 
 (defonce app-state (atom devcard-initial-data))
 

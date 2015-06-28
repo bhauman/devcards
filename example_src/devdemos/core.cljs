@@ -15,6 +15,19 @@
 
 (devcards.core/start-devcard-ui!)
 
+(dc/defcard hithere (sab/html [:div [:h1 "Hey"]]))
+
+(dc/defcard react-runner-runner
+  "#This is cool"
+  (fn [owner state-atom]
+    (sab/html [:div
+               [:div "counter newer : " (prn-str state-atom)]
+               [:a {:onClick
+                    (fn [] (swap! state-atom update-in [:count] inc))}
+                "inc"]])) 
+  {:count 6}
+  {:history true})
+
 (defcard marker
   (dc/doc "# This is a tester"))
 
@@ -39,14 +52,14 @@
   {:count 6})
 
 (defcard react-history-runner-runner
-  (dc/hist 
-   (fn [owner state-atom]
-     (sab/html [:div
-                [:div "counter newer : " (prn-str state-atom)]
-                [:a {:onClick
-                     (fn [] (swap! state-atom update-in [:count] inc))}
-                 "inc"]])))
-     {:count 6})
+  (fn [owner state-atom]
+    (sab/html [:div
+               [:div "counter newer : " (prn-str state-atom)]
+               [:a {:onClick
+                    (fn [] (swap! state-atom update-in [:count] inc))}
+                "inc"]]))
+  {:count 6}
+  {:history true})
 
 (defcard node-runner-runner
   (dc/dom-node
@@ -55,24 +68,24 @@
   {:wow "man"})
 
 (dc/doc-card
-   "## Devcards
+ "## Devcards
 
-    ClojureScript Devcards are a tool to help you **quickly** surface what
-    you are working on. This page holds an quick introduction to
-    devcards.
+  ClojureScript Devcards are a tool to help you **quickly** surface what
+  you are working on. This page holds an quick introduction to
+  devcards.
 
-    #### This is a devcard
+  #### This is a devcard
 
-    This is a **markdown-card**. You can create a markdown-card like
-    this like so:"
+  This is a **markdown-card**. You can create a markdown-card like
+  this like so:"
    
-   (dc/mkdn-pprint-code
-    '(defcard first-markdown-card
-       (markdown-card "# This is a heading")))
+ (dc/mkdn-pprint-code
+  '(defcard first-markdown-card
+     (markdown-card "# This is a heading")))
    
-   "Devcards are designed to be written inline with your code during
-    development. They are like advanced stateful `println`s that can
-    hold almost any arbitrary functionality that you want." )
+ "Devcards are designed to be written inline with your code during
+  development. They are like advanced stateful `println`s that can
+  hold almost any arbitrary functionality that you want.")
 
 (dc/doc-card
    "## Devcards are intended to be interactive
@@ -199,7 +212,7 @@
     [:div
      [:h1 (om/get-shared owner :title) (:count data)]
      [:div [:a {:onClick #(om/transact! data :count f)} s]]
-     (dc/edn->html data)])))
+     (dc/edn data)])))
 
 (defn om-counter-inc [data owner] (counter owner data inc "inc"))
 
@@ -215,8 +228,9 @@
   (dc/doc
    "#### You can share an Atom with an `edn-card` too"))
 
-(defcard edn-card-shared
-  (dc/edn-hist om-test-atom))
+(dc/edn-card "Some data"
+ om-test-atom
+ {:history true})
 
 (deftest test-card-ex
   "## Test card

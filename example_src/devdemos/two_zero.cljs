@@ -434,6 +434,7 @@
 (def start-data {:tile1 { :v 2 :top 0 :left 0 :id :tile1}
                  :tile2 { :v 2 :top 0 :left 3 :id :tile2}})
 
+
 (defcard try-game-card
   (fn [_ data]
     (sab/html
@@ -446,5 +447,5 @@
       [:div [:a {:onClick (fn [] (move :down data))} "down"]]       
       [:div
        [:a {:onClick (fn [] (reset! data start-data))} "reset"]]
-      (dc/edn->html @data)]))
+      (dc/edn @data)]))
    start-data)

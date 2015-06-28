@@ -21,95 +21,94 @@
         `(do ~@exprs)))
 
 (defmacro defcard*
-  [vname expr]
-  (when (utils/devcards-active?)
+  ([vname expr options]
+   (when (utils/devcards-active?)
      (let [ns (-> &env :ns :name name munge)]
-       `(devcards.core/register-card  [~(keyword ns) ~(keyword vname)] (fn [] ~expr)))))
+       `(devcards.core/register-card  [~(keyword ns) ~(keyword vname)] (fn [] ~expr) ~options))))
+  ([vname expr]
+   `(defcard* ~vname ~expr {})))
 
-;; TODO: cleanup repetition
+(defn card
+  ([vname docu main-obj initial-data options]
+   `(devcards.core/defcard* ~(symbol (name vname))
+      (devcards.core/card-base ~main-obj)
+      (assoc ~options
+             :initial-data ~initial-data
+             :documentation ~docu)))
+  ([vname docu main-obj initial-data]
+   (card vname docu main-obj initial-data {}))
+  ([vname docu main-obj]
+   (card vname docu main-obj {} {}))
+  ([vname docu]
+   (card vname docu `(fn [_ _] (sablono.core/html [:div])) {} {})))
+
+(defn optional-name [exprs default-name]
+  (if (instance? clojure.lang.Named (first exprs)) [(first exprs) (rest exprs)]
+      [default-name exprs]))
+
+(defn optional-doc [xs]
+  (if (string? (first xs)) [(first xs) (rest xs)] [nil xs]))
+
 (defmacro defcard [& expr]
   (when (utils/devcards-active?)
-    (if (instance? clojure.lang.Named (first expr))
-      `(devcards.core/defcard* ~(symbol (name (first expr)))
-         (devcards.core/card* ~@(rest expr)))
-      `(devcards.core/defcard* card
-         (devcards.core/default-option-card* { :heading false } ~@expr)))))
+    (let [[vname xs] (optional-name expr 'card)
+          [docu xs] (optional-doc xs)]
+      (apply devcards.core/card (concat [vname docu] xs)))))
+
+(defmacro doc [& body]
+  (when (utils/devcards-active?)
+    `(devcards.core/markdown->react ~@body)))
+
+(defmacro edn [body]
+  (when (utils/devcards-active?)
+    `(devcards.util.edn-renderer/html-edn ~body)))
 
 (defmacro doc-card [& exprs]
   (when (utils/devcards-active?)
-    `(devcards.core/defcard* doc-card
-       (devcards.core/default-option-card* { :heading false }
-         (devcards.core/doc* ~@exprs)))))
+    `(devcards.core/defcard doc-card
+       (devcards.core/doc ~@exprs)
+       {}
+       {:heading false})))
 
-(defmacro edn-card
-  ([body]
-   (when (utils/devcards-active?)
-     `(devcards.core/defcard* edn-card
-        (devcards.core/default-option-card* { :heading false }
-          (devcards.core/edn* ~body)))))
-  ([vname body]
-   (when (utils/devcards-active?)
-     `(devcards.core/defcard* ~vname
-        (devcards.core/card*  (devcards.core/edn* ~body))))))
-
-(defmacro edn-hist-card
-  ([body]
-   (when (utils/devcards-active?)
-     `(devcards.core/defcard* edn-card
-        (devcards.core/default-option-card* { :heading false }
-          (devcards.core/edn-hist* ~body)))))
-  ([vname body]
-   (when (utils/devcards-active?)
-     `(devcards.core/defcard* ~vname
-        (devcards.core/card* {}
-          (devcards.core/edn-hist* ~body))))))
+(defmacro edn-card [& exprs]
+  (let [[docu [body options]] (optional-doc exprs)]
+    (devcards.core/card
+     'edn-card
+     docu 
+     `(fn [something# data-atom#]
+        (devcards.util.edn-renderer/html-edn @data-atom#))
+     body
+     `(merge {:heading false
+              :history true}
+             ~options))))
 
 (defmacro deftest [vname & parts]
   (if (utils/devcards-active?)
     `(devcards.core/defcard* ~vname
        (devcards.core/test-card* ~@(map (fn [p] (if (string? p)
                                                  `(fn [] (devcards.core/test-doc ~p))
-                                                 `(fn [] ~p))) parts)))
+                                                 `(fn [] ~p))) parts))
+       { :initial-data {:filter identity } })
     `(cljs.test/deftest ~vname
        ~@parts)))
-
-(defmacro edn->html [body]
-  (when (utils/devcards-active?)
-    `(devcards.core/edn->html* ~body)))
 
 (defmacro dom-node [body]
   (when (utils/devcards-active?)
     `(devcards.core/dom-node* ~body)))
 
-(defmacro hist [body]
-  (when (utils/devcards-active?)
-    `(devcards.core/hist* ~body)))
-
 (defmacro hist-recorder [body]
   (when (utils/devcards-active?)
     `(devcards.core/hist-recorder* ~body)))
 
-(defmacro edn [body]
-  (when (utils/devcards-active?)
-    `(devcards.core/edn* ~body)))
-
-(defmacro edn-hist [body]
-  (when (utils/devcards-active?)
-    `(devcards.core/edn-hist* ~body)))
-
-(defmacro doc [& body]
-  (when (utils/devcards-active?)
-    `(devcards.core/doc* ~@body)))
-
 (defmacro om-root
-  ([om-comp-fn initial-state om-options]
+  ([om-comp-fn initial-data om-options]
    (when (utils/devcards-active?)
      `(dom-node
        (fn [node# _#]
-         (om.core/root ~om-comp-fn ~initial-state (merge ~om-options {:target node#}))))))
-  ([om-comp-fn initial-state]
+         (om.core/root ~om-comp-fn ~initial-data (merge ~om-options {:target node#}))))))
+  ([om-comp-fn initial-data]
    (when (utils/devcards-active?)
-     `(om-root ~om-comp-fn ~initial-state {}))))
+     `(om-root ~om-comp-fn ~initial-data {}))))
 
 ;; formatting for markdown cards
 
@@ -121,12 +120,14 @@
   (when (utils/devcards-active?)
     `(devcards.util.utils/pprint-code ~obj)))
 
+(defn mkdn-code [body] `(str "```\n" ~body "```\n"))
+
 (defmacro mkdn-pprint-code [obj]
   (when (utils/devcards-active?)
-    `(devcards.core/mkdn-code
-      (devcards.util.utils/pprint-code ~obj))))
+    (mkdn-code
+     `(devcards.util.utils/pprint-code ~obj))))
 
 (defmacro mkdn-pprint-str [obj]
   (when (utils/devcards-active?)
-    `(devcards.core/mkdn-code
-      (devcards.util.utils/pprint-str ~obj))))
+    (mkdn-code
+     `(devcards.util.utils/pprint-str ~obj))))
