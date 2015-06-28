@@ -1,5 +1,10 @@
 # Devcards
 
+# Devcards is currently under heavy development
+
+> Expect a new release with many breaking changes soon
+> 6/28/15
+
 Devcards aims to provide ClojureScript developers with an interactive
 visual REPL. Devcards makes it simple to interactively surface code
 examples that have a visual aspect into a browser interface. 
