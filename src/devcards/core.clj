@@ -48,7 +48,7 @@
   ([vname docu main-obj]
    (card vname docu main-obj {} {}))
   ([vname docu]
-   (card vname docu nil {} {:heading (not= 'card vname)})))
+   (card vname docu nil {} {})))
 
 (defn optional-name [exprs default-name]
   (if (instance? clojure.lang.Named (first exprs)) [(first exprs) (rest exprs)]
