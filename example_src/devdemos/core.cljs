@@ -9,7 +9,7 @@
      [devdemos.testing]
      [cljs.test :as t :include-macros true])
     (:require-macros
-     [devcards.core :as dc :refer [defcard defcard-doc deftest]]))
+     [devcards.core :as dc :refer [defcard defcard-doc deftest dom-node]]))
 
 (enable-console-print!)
 
@@ -182,7 +182,9 @@
       (fn [owner data-atom]
         (sab/html [:button {:onClick (fn [] (swap! data-atom update-in [:count] dec))} "decrement"]))
       first-example-state))
-  "If you try these example cards below you will see that they are all wired together:")
+  "As you can see, we created three cards that all share the same state.
+
+   If you try these example cards below you will see that they are all wired together:")
 
 (defonce first-example-state (atom {:count 55}))
 
@@ -200,6 +202,31 @@
   (fn [owner data-atom]
     (sab/html [:button {:onClick (fn [] (swap! data-atom update-in [:count] dec)) } "decrement"]))
   first-example-state)
+
+
+(defcard-doc
+  "## Accessing the DOM 
+
+   While Devcards was written in and are very easy to use in
+   conjunction with React. You may want to write something that writes
+   directly to the DOM.
+
+   The helper function `dom-node` takes a function that accepts a DOM
+   node and ClojureScript Atom and returns a ReactElement."
+
+  (dc/mkdn-pprint-code
+   '(defcard example-dom-node
+      (dom-node (fn [node data-atom]
+                  (set! (.-innerHTML node) "<h2>Example Dom Node</h2>")))))
+  "This should enable you to do literally any type of client side
+  development.")
+
+(defcard example-dom-node
+  (dom-node
+   (fn [node data-atom]
+     (set! (.-innerHTML node) "<h2>Example Dom Node</h2>"))))
+
+
 
 (defcard "# Devcard examples")
 
