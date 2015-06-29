@@ -66,7 +66,7 @@
   (let [[vname docu main-obj initial-data options :as res]
         (parse-args xs default-name)]
     (if (= vname default-name)
-      [vname docu main-obj initial-data `(assoc ~options :heading false)]
+      [vname docu main-obj initial-data `(merge {:heading false} ~options)]
       res)))
 
 (defmacro defcard [& expr]
@@ -96,8 +96,7 @@
        `(fn [something# data-atom#]
           (devcards.util.edn-renderer/html-edn @data-atom#))
        edn-body
-       `(merge {:history true}
-               ~options)))))
+       `(merge {:history true} ~options)))))
 
 (defmacro deftest [vname & parts]
   (if (utils/devcards-active?)
