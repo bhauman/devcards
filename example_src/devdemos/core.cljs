@@ -78,7 +78,7 @@
 (defcard example-2 "## Example: This is optional markdown")
 
 (defcard-doc
-  "Since the name is optional you can write docs just by like this:"
+  "Since the name is optional you can write docs just like this:"
   (dc/mkdn-pprint-code '(defcard "## Example: This is quick documentation."))
   "Which creates the following card:")
 
