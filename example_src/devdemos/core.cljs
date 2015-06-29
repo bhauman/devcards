@@ -15,7 +15,7 @@
 
 (devcards.core/start-devcard-ui!)
 
-(defcard "#Just right some markdown")
+(defcard "#Just write some markdown")
 
 (defcard hithere (sab/html [:div [:h1 "Hey"]]))
 
@@ -34,15 +34,6 @@
    :watch-atom true
    :hidden false
    :frame true})
-
-(defcard marker
-  (dc/doc "# This is a tester"))
-
-(defcard my-card
- (sab/html [:h1 "Hey there"]))
-
-(defcard
- (sab/html [:h1 "Hey there 2"]))
 
 (defcard
  (fn [_ data]
@@ -93,6 +84,7 @@
  "Devcards are designed to be written inline with your code during
   development. They are like advanced stateful `println`s that can
   hold almost any arbitrary functionality that you want.")
+
 
 (defcard-doc
    "## Devcards are intended to be interactive

@@ -57,10 +57,17 @@
 (defn optional-doc [xs]
   (if (string? (first xs)) [(first xs) (rest xs)] [nil xs]))
 
-(defn parse-card-args [xs default-name]
+(defn parse-args [xs default-name]
   (let [[vname xs] (optional-name xs default-name)
         [docu xs]  (optional-doc xs)]
     (concat [vname docu] xs)))
+
+(defn parse-card-args [xs default-name]
+  (let [[vname docu main-obj initial-data options :as res]
+        (parse-args xs default-name)]
+    (if (= vname default-name)
+      [vname docu main-obj initial-data `(assoc ~options :heading false)]
+      res)))
 
 (defmacro defcard [& expr]
   (when (utils/devcards-active?)
@@ -82,7 +89,7 @@
 ;; name is required
 (defmacro defcard-edn [& exprs]
   (when (utils/devcards-active?)
-    (let [[vname docu edn-body options] (parse-card-args exprs 'edn-card)]
+    (let [[vname docu edn-body options] (parse-args exprs 'edn-card)]
       (devcards.core/card
        vname
        docu 
@@ -122,7 +129,7 @@
 
 (defmacro defcard-om [& exprs]
   (when (utils/devcards-active?)
-    (let [[vname docu om-comp-fn initial-data om-options options] (parse-card-args exprs 'om-root-card)]
+    (let [[vname docu om-comp-fn initial-data om-options options] (parse-args exprs 'om-root-card)]
       (card vname docu `(om-root ~om-comp-fn ~om-options) initial-data
             `(merge {:watch-atom false} ~options)))))
 
