@@ -115,9 +115,7 @@
                    (.setState this
                               (or (and (.. this -state -data_atom) (.. this -state))
                                   #js {:data_atom
-                                       (let [data (or
-                                                   (when-let [{:keys [data-atom initial-data]} (.. this -props -options)]
-                                                        (or data-atom initial-data)))]
+                                       (let [data (or (:initial-data (.. this -props -options)) {})]
                                          (if (satisfies? IAtom data)
                                            data
                                            (atom data)))}))))

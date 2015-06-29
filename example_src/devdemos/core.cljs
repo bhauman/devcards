@@ -122,14 +122,15 @@
   
    Let's make a quick example counter:"
     (dc/mkdn-pprint-code
-   '(defcard (fn [owner data-atom]
-               (sab/html [:div [:h3 "Example Counter: " (:count @data-atom)]
-                          [:a {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]])))))
+     '(defcard
+        (fn [owner data-atom]
+          (sab/html [:div [:h3 "Example Counter: " (:count @data-atom)]
+                     [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]])))))
 
 (defcard
   (fn [owner data-atom]
     (sab/html [:div [:h3 "Example Counter: " (:count @data-atom)]
-               [:a {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]])))
+               [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]])))
 
 (defcard-doc
   "## Initial state
@@ -137,7 +138,68 @@
   The counter example above was very interesting but what if you want
   to introduce some initial state?
 
-  Well the next option after ")
+  Well the next option after the main object is the **initial-data**
+  parameter. You can use it like so:"
+  (dc/mkdn-pprint-code
+   '(defcard
+      (fn [owner data-atom]
+        (sab/html [:div [:h3 "Example Counter w/Initial Data: " (:count @data-atom)]
+                   [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]]))
+      {:count 50})))
+
+(defcard
+  (fn [owner data-atom]
+    (sab/html [:div [:h3 "Example Counter w/Initial Data: " (:count @data-atom)]
+               [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]]))
+  {:count 50})
+
+(defcard-doc
+  "## Initial state can be an Atom
+
+  You can also pass an Atom as the initial state. This is a very
+  important feature of devcards as it allows you to share state
+  between cards.
+
+  The following examples share state:"
+
+  (dc/mkdn-pprint-code
+   '(defonce first-example-state (atom {:count 55})))
+
+  (dc/mkdn-pprint-code
+   '(defcard example-counter
+      (fn [owner data-atom]
+        (sab/html [:h3 "Example Counter w/Shared Initial Atom: " (:count @data-atom)]))
+      first-example-state))
+  
+  (dc/mkdn-pprint-code
+   '(defcard example-incrementer
+      (fn [owner data-atom]
+        (sab/html [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "increment"]))
+      first-example-state))
+
+  (dc/mkdn-pprint-code
+   '(defcard example-decrementer
+      (fn [owner data-atom]
+        (sab/html [:button {:onClick (fn [] (swap! data-atom update-in [:count] dec))} "decrement"]))
+      first-example-state))
+  "If you try these example cards below you will see that they are all wired together:")
+
+(defonce first-example-state (atom {:count 55}))
+
+(defcard example-counter
+  (fn [owner data-atom]
+    (sab/html [:h3 "Example Counter w/Shared Initial Atom: " (:count @data-atom)]))
+  first-example-state)
+
+(defcard example-incrementer
+  (fn [owner data-atom]
+    (sab/html [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc)) } "increment"]))
+  first-example-state)
+
+(defcard example-decrementer
+  (fn [owner data-atom]
+    (sab/html [:button {:onClick (fn [] (swap! data-atom update-in [:count] dec)) } "decrement"]))
+  first-example-state)
 
 (defcard "# Devcard examples")
 
