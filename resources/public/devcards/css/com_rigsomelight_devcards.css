@@ -29,6 +29,12 @@ body {
   border-radius: 4px;
 }
 
+.com-rigsomelight-devcards-padding-top-border {
+    border-top: 1px solid #f5f5f5;
+    margin-top: 14px;
+    padding-top: 14px;
+}
+
 .com-rigsomelight-devcards-markdown code {
   padding: 2px 4px;
   font-size: 90%;
@@ -46,6 +52,7 @@ body {
   background-color: transparent;
   border-radius: 0;
 }
+
 
 .com-rigsomelight-devcards-base,
 .com-rigsomelight-devcards-markdown {
@@ -68,6 +75,14 @@ body {
     font-weight: 500;
 }
 
+.com-rigsomelight-devcards-markdown h1:first-child,
+.com-rigsomelight-devcards-markdown h2:first-child,
+.com-rigsomelight-devcards-markdown h3:first-child,
+.com-rigsomelight-devcards-markdown h4:first-child,
+.com-rigsomelight-devcards-markdown h5:first-child {
+    margin-top: 14px;
+}
+                                           
 .com-rigsomelight-devcards-base a {
     color: #428bca;
     text-decoration: none;

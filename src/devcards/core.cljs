@@ -43,10 +43,19 @@
 ;;        The thunk has to be executed to get the functionality of
 ;;        the card.
 
+(defn card? [c]
+  (and (map? c)
+       (let [{:keys [path func]} c]
+         (vector? path)
+         (not-empty path)
+         (every? keyword? path)
+         (fn? func))))
+
 ;; could move into macros
-(defn register-card [path func options]
+(defn register-card [c]
+  {:pre [(card? c)]}
   "Register a new card."
-  (put! devcard-event-chan [:register-card {:path path :func func :options options}]))
+  (put! devcard-event-chan [:register-card c]))
 
 (defn- react-raw [raw-html-str]
   "A React component that renders raw html."
@@ -81,13 +90,16 @@
         (sab/html
          [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
           [:div.com-rigsomelight-devcards-panel-heading
-           [:span
-            { :onClick
-             (devcards.system/prevent->
-             #(devcards.system/set-current-path!
-               devcards.system/app-state
-               path))}
-            (when path (name (last path)) ) " "]]
+           (if path
+             (sab/html
+              [:span
+               { :onClick
+                (devcards.system/prevent->
+                 #(devcards.system/set-current-path!
+                   devcards.system/app-state
+                   path))}
+               (name (last path))  " "])
+             (sab/html [:span (:name options)]))]
           (naked-card children options)]))
       (sab/html [:span])))))
 
@@ -103,8 +115,8 @@
                    (.setState this
                               (or (and (.. this -state -data_atom) (.. this -state))
                                   #js {:data_atom
-                                       (let [data (or (.. this -props -data_atom) ;; TODO: legacy get rid of this 
-                                                      (when-let [{:keys [data-atom initial-data]} (.. this -props -options)]
+                                       (let [data (or
+                                                   (when-let [{:keys [data-atom initial-data]} (.. this -props -options)]
                                                         (or data-atom initial-data)))]
                                          (if (satisfies? IAtom data)
                                            data
@@ -122,31 +134,34 @@
           (this-as
            this
            (let [options (.. this -props -options)]
-             (when-not (false? (:watch-atom options))
-               (let [data_atom (.. this -state -data_atom)
-                     id        (.. this -state -unique_id)]
-                 (when (and data_atom id)
-                   (add-watch data_atom id (fn [_ _ _ _] (.forceUpdate this)))))))))
+             (let [data_atom (.. this -state -data_atom)
+                   id        (.. this -state -unique_id)]
+               (when (and data_atom id)
+                 (add-watch
+                  data_atom id
+                  (fn [_ _ _ _]
+                    (when-not (false? (:watch-atom (.. this -props -options)))
+                      (.forceUpdate this)))))))))
         :render
         (fn []
-          (this-as this
-                   (let [options (.. this -props -options)
-                         children ((.-react_fn (.-props this))
-                                   this
-                                   (.-data_atom (.-state this)))
-                         children (if-let [docu (:documentation options)]
-                                    (sab/html [:div
-                                               (markdown->react docu)
-                                               children])
-                                    children)
-                         children (if (:history options)
-                                    (sab/html [:div
-                                               (hist-recorder* (.-data_atom (.-state this)))
-                                               children])
-                                    children)]
-                     (if (:frame options)
-                       (frame children options) ;; make component and forward options
-                       children))))}))
+          (this-as
+           this
+           (let [options   (.. this -props -options)
+                 main      ((.-react_fn (.-props this))
+                            this
+                            (.-data_atom (.-state this)))
+                 document  (when-let [docu (:documentation options)]
+                             (markdown->react docu))
+                 hist-ctl  (when (:history options)
+                             (hist-recorder* (.-data_atom (.-state this))))
+                 edn       (when (:inspect-data options)
+                             (sab/html
+                              [:div.com-rigsomelight-devcards-padding-top-border
+                               (edn-rend/html-edn @(.-data_atom (.-state this)))]))
+                 children  (sab/html [:div (list document hist-ctl main edn)])]
+             (if (:frame options)
+               (frame children options) ;; make component and forward options
+               (sab/html [:div.com-rigsomelight-devcards-frameless children])))))}))
 
 (def DomComponent
   (js/React.createClass
@@ -178,13 +193,15 @@
 (defn convert-to-react-fn [obj]
   (if (fn? obj) obj (fn [_ _] obj)))
 
+;; TODO: should validate options coming in here
 (defn card-base
-  ([opts react-or-fn]
+  ([opts]
    (js/React.createElement RunnerComponent
-                           #js {:react_fn (convert-to-react-fn react-or-fn)
-                                :options  opts}))
-  ([react-or-fn]
-   (card-base devcards.system/*devcard-data* react-or-fn)))
+                           #js {:react_fn (convert-to-react-fn (:react-or-fn opts))
+                                :options  (merge
+                                           devcards.system/*devcard-data*
+                                           (:base-card-options @devcards.system/app-state)
+                                           opts)})))
 
 ;; keep
 (defn- dom-node* [node-fn]
@@ -439,57 +456,57 @@
 
 ;; RE-VISIT
 
-(defn- test-frame [test-summary]
-  (let [options devcards.system/*devcard-data*
-        path (:path options)
+(defn render-test-frame [test-summary]
+  (let [path (:path devcards.system/*devcard-data*)
         tests (:_devcards_collect_tests test-summary)
         some-tests (filter (fn [{:keys [type]}] (not= type :test-doc))
                       (:_devcards_collect_tests test-summary))
         total-tests (count some-tests)
         {:keys [fail pass error]} (:report-counters test-summary)]
-    (card-base
-     (assoc options :frame false)
-     (fn [owner data-atom]
-       (sab/html
-        [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
-         [:div.com-rigsomelight-devcards-panel-heading
-          [:span
-           { :onClick
-            (dev/prevent->
-             #(devcards.system/set-current-path!
-               devcards.system/app-state
-               path))}
-           (when path (str (name (last path))) )]
-          [:span.com-rigsomelight-devcards-badge
-           {:style {:float "right"
-                    :margin "3px 3px"}
-            :onClick (dev/prevent->
-                      #(swap! data-atom assoc :filter identity))}
-           total-tests]
-          (when-not (zero? (+ fail error))
-            (sab/html
-             [:span.com-rigsomelight-devcards-badge
-              {:style {:float "right"
-                       :backgroundColor "#d9534f"
-                       :color "#fff"
-                       :margin "3px 3px"}
-               :onClick (dev/prevent->
-                         #(swap! data-atom assoc :filter (fn [{:keys [type]}]
-                                                           (#{:fail :error} type))))}
-              (+ fail error)]))          
-          (when-not (zero? pass)
-            (sab/html
-             [:span.com-rigsomelight-devcards-badge
-              {:style {:float "right"
-                       :backgroundColor "#5cb85c"
-                       :color "#fff"
-                       :margin "3px 3px"}
-               :onClick (dev/prevent->
-                         #(swap! data-atom assoc :filter (fn [{:keys [type]}] (= type :pass)))) }
-              pass]))]
-         [:div {:className devcards.system/devcards-rendered-card-class}
-          (layout-tests (filter (:filter @data-atom) tests))]])))))
+    (fn [owner data-atom]
+      (sab/html
+       [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
+        [:div.com-rigsomelight-devcards-panel-heading
+         [:span
+          { :onClick
+           (dev/prevent->
+            #(devcards.system/set-current-path!
+              devcards.system/app-state
+              path))}
+          (when path (str (name (last path))) )]
+         [:span.com-rigsomelight-devcards-badge
+          {:style {:float "right"
+                   :margin "3px 3px"}
+           :onClick (dev/prevent->
+                     #(swap! data-atom assoc :filter identity))}
+          total-tests]
+         (when-not (zero? (+ fail error))
+           (sab/html
+            [:span.com-rigsomelight-devcards-badge
+             {:style {:float "right"
+                      :backgroundColor "#d9534f"
+                      :color "#fff"
+                      :margin "3px 3px"}
+              :onClick (dev/prevent->
+                        #(swap! data-atom assoc :filter (fn [{:keys [type]}]
+                                                          (#{:fail :error} type))))}
+             (+ fail error)]))          
+         (when-not (zero? pass)
+           (sab/html
+            [:span.com-rigsomelight-devcards-badge
+             {:style {:float "right"
+                      :backgroundColor "#5cb85c"
+                      :color "#fff"
+                      :margin "3px 3px"}
+              :onClick (dev/prevent->
+                        #(swap! data-atom assoc :filter (fn [{:keys [type]}] (= type :pass)))) }
+             pass]))]
+        [:div {:className devcards.system/devcards-rendered-card-class}
+         (layout-tests (filter (:filter @data-atom) tests))]]))))
 
 (defn- test-card* [& parts]
   (let [tests (run-test-block (fn [] (doseq [f parts] (f))))]
-    (test-frame tests)))
+    (card-base
+     {:frame false
+      :initial-data {:filter identity}
+      :react-or-fn (render-test-frame tests)})))

@@ -1,5 +1,6 @@
 (ns devdemos.two-zero
   (:require
+   [devcards.core]
    [clojure.string :as string]
    [clojure.set :refer [difference union]]
    [sablono.core :as sab :include-macros true]
@@ -11,7 +12,7 @@
    [cljs.test :as t :include-macros true])
   (:require-macros
    [cljs.core.async.macros :refer [go]]
-   [devcards.core :as dc :refer [defcard deftest]]))
+   [devcards.core :as dc :refer [defcard defcard-doc deftest]]))
 
 (defn lh [x] (prn-str x) x)
 
@@ -23,18 +24,9 @@
                         (aget (.getElementsByTagName js/document "body") 0))
                        490)))
 
-(dc/doc-card
+(defcard
  "# 2048
   Let's build 2048 interactively with devcards")
-
-(dc/doc-card
- "## Board Style
-
-   Let's start by creating the style for the board.
-
-   The board is a 4x4 board. It will have one container with 16
-   absolutely positioned cells in it. These cells will mark where the
-   potential locations for the game tiles.")
 
 (def to-pixel-pos
   (if is-mobile?
@@ -80,14 +72,19 @@
     [:div.cells (map board-cell data)]]))
 
 (defcard board-style
+   "## Board Style
+
+  Let's start by creating the style for the board.
+
+  The board is a 4x4 board. It will have one container with 16
+  absolutely positioned cells in it. These cells will mark where the
+  potential locations for the game tiles."
   (game-board []))
 
-(dc/doc-card
-   "### Cell Style
-   Then we'll work on the style for the cells. The hard part is
-   getting the colors and the font sizes correct.")
-
 (defcard board-with-cells
+  "### Cell Style
+   Then we'll work on the style for the cells. The hard part is
+   getting the colors and the font sizes correct."
   (game-board [{ :top 0 :left 0 :v 2 :id :t1}
                { :top 0 :left 1 :v 4 :id :t2}
                { :top 0 :left 2 :v 8 :id :t3}
@@ -100,7 +97,7 @@
                { :top 2 :left 1 :v 1024 :id :t10}
                { :top 2 :left 2 :v 2048 :id :t11}]))
 
-(dc/doc-card
+(defcard-doc
  "## Checking basic tile movement animation")
 
 #_(defcard animation-work
@@ -112,7 +109,7 @@
      (one-row-board-static [{:left left :top 0 :v 2 :id :t1}]))))
 
 
-(dc/doc-card
+(defcard-doc
    "## Main data structures
     #### Tile Map
 
@@ -177,14 +174,13 @@
      :t3 { :top 0 :left 3 :v 4 :id :t3 :double true }
      :t4 { :top 0 :left 3 :v 4 :id :t4 :remove true }}))
 
-(defcard basic-data-transformations
-  (dc/doc
-   "### Transforming one row
+(defcard-doc
+  "### Transforming one row
 
    We need to get a transformation for one row. From there we can get
    all the other transformations.
 
-   We will be transforming one row for a move `:left`."))
+   We will be transforming one row for a move `:left`.")
 
 (def remove-blanks (partial filterv #(not= % :_)))
 
@@ -433,7 +429,6 @@
 
 (def start-data {:tile1 { :v 2 :top 0 :left 0 :id :tile1}
                  :tile2 { :v 2 :top 0 :left 3 :id :tile2}})
-
 
 (defcard try-game-card
   (fn [_ data]

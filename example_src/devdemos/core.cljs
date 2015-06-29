@@ -9,15 +9,17 @@
      [devdemos.testing]
      [cljs.test :as t :include-macros true])
     (:require-macros
-     [devcards.core :as dc :refer [defcard deftest]]))
+     [devcards.core :as dc :refer [defcard defcard-doc deftest]]))
 
 (enable-console-print!)
 
 (devcards.core/start-devcard-ui!)
 
-(dc/defcard hithere (sab/html [:div [:h1 "Hey"]]))
+(defcard "#Just right some markdown")
 
-(dc/defcard react-runner-runner
+(defcard hithere (sab/html [:div [:h1 "Hey"]]))
+
+(defcard react-runner-runner
   "#This is cool"
   (fn [owner state-atom]
     (sab/html [:div
@@ -26,7 +28,12 @@
                     (fn [] (swap! state-atom update-in [:count] inc))}
                 "inc"]])) 
   {:count 6}
-  {:history true})
+  {:history false
+   :heading true
+   :inspect-data true
+   :watch-atom true
+   :hidden false
+   :frame true})
 
 (defcard marker
   (dc/doc "# This is a tester"))
@@ -67,7 +74,7 @@
       (set! (.. node -innerHTML) (str "<h1>Hi I'm a crazy nodee " (:wow @data-atom) "</h1>"))))
   {:wow "man"})
 
-(dc/doc-card
+(defcard-doc
  "## Devcards
 
   ClojureScript Devcards are a tool to help you **quickly** surface what
@@ -87,7 +94,7 @@
   development. They are like advanced stateful `println`s that can
   hold almost any arbitrary functionality that you want.")
 
-(dc/doc-card
+(defcard-doc
    "## Devcards are intended to be interactive
 
    The cards on this page can be found in the file
@@ -103,17 +110,12 @@
 
    Go ahead and change this text to see the changes reflected here.")
 
-(dc/doc-card
+(defcard-doc
    "## Devcard examples")
 
-(defcard edn-card-example
-  (dc/edn
-   {:edn-card "This is an edn card"
-    :helpful? "It lets you quickly view EDN"}))
-
-(dc/edn-card
- {:edn-card "This is an edn card"
-  :helpful? "It lets you quickly view EDN"})
+(dc/defcard-edn edn-card-example
+  {:edn-card "This is an edn card"
+   :helpful? "It lets you quickly view EDN"})
 
 (defcard sablono-card-example
   (sab/html
@@ -157,7 +159,7 @@
       (counter-app-rct data-atom)]))
   {:count 30 })
 
-(dc/doc-card
+(defcard-doc
  "### Sharing an Atom
 
  If you pass an Atom as the `:initial-state` option to the
@@ -184,7 +186,7 @@
     (sab/html [:h1 "Count: " (:count @data-atom)]))
   react-shared-atom)
 
-(dc/doc-card
+(defcard-doc
    "## Om 
 
     The `om-root-card` will render Om components, much the way `om/root` does.")
@@ -195,8 +197,8 @@
 
 (defonce test-om-data test-om-data)
 
-(defcard omcard-ex
-  (dc/om-root widget (atom {:text "yep it is now "})))
+(dc/defcard-om omcard-ex
+   widget {:text "yep it is here"})
 
 (defcard om-share-atoms
   (dc/doc
@@ -216,21 +218,21 @@
 
 (defn om-counter-inc [data owner] (counter owner data inc "inc"))
 
-(defcard omcard-shared-ex-1
-  (dc/om-root om-counter-inc om-test-atom {:shared {:title "First counter "}}))
+(dc/defcard-om omcard-shared-ex-1
+  om-counter-inc 
+  om-test-atom
+  {:shared {:title "First counter "}})
 
 (defn om-counter-dec [data owner] (counter owner data dec "dec"))
 
-(defcard omcard-shared-ex-2
-  (dc/om-root om-counter-dec om-test-atom {:shared {:title "Second counter "}}))
+(dc/defcard-om omcard-shared-ex-2
+  om-counter-dec
+  om-test-atom
+  {:shared {:title "Second counter "}})
 
-(defcard 
-  (dc/doc
-   "#### You can share an Atom with an `edn-card` too"))
-
-(dc/edn-card "Some data"
- om-test-atom
- {:history true})
+(dc/defcard-edn om-test-atom-data
+  "### You can share an Atom with an `edn-card` too:"
+  om-test-atom)
 
 (deftest test-card-ex
   "## Test card
