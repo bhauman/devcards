@@ -142,14 +142,14 @@
   (when (utils/devcards-active?)
     `(devcards.util.utils/pprint-code ~obj)))
 
-(defn mkdn-code [body] `(str "```\n" ~body "```\n"))
+(defmacro mkdn-code [body] `(str "```\n" ~body "```\n"))
 
 (defmacro mkdn-pprint-code [obj]
   (when (utils/devcards-active?)
-    (mkdn-code
-     `(devcards.util.utils/pprint-code ~obj))))
+    `(mkdn-code
+      (devcards.util.utils/pprint-code ~obj))))
 
 (defmacro mkdn-pprint-str [obj]
   (when (utils/devcards-active?)
-    (mkdn-code
-     `(devcards.util.utils/pprint-str ~obj))))
+    `(mkdn-code
+       (devcards.util.utils/pprint-str ~obj))))

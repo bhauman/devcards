@@ -15,79 +15,25 @@
 
 (devcards.core/start-devcard-ui!)
 
-(defcard "#Just write some markdown")
-
-(defcard hithere (sab/html [:div [:h1 "Hey"]]))
-
-(defcard react-runner-runner
-  "#This is cool"
-  (fn [owner state-atom]
-    (sab/html [:div
-               [:div "counter newer : " (prn-str state-atom)]
-               [:a {:onClick
-                    (fn [] (swap! state-atom update-in [:count] inc))}
-                "inc"]])) 
-  {:count 6}
-  {:history false
-   :heading true
-   :inspect-data true
-   :watch-atom true
-   :hidden false
-   :frame true})
-
-(defcard
- (fn [_ data]
-   (sab/html [:h1 "Hey there 3" (prn-str data)]))
- {:counter 5})
-
-(defcard react-runner-runner
-  (fn [owner state-atom]
-    (sab/html [:div
-               [:div "counter newer : " (prn-str state-atom)]
-               [:a {:onClick
-                    (fn [] (swap! state-atom update-in [:count] inc))}
-                "inc"]])) 
-  {:count 6})
-
-(defcard react-history-runner-runner
-  (fn [owner state-atom]
-    (sab/html [:div
-               [:div "counter newer : " (prn-str state-atom)]
-               [:a {:onClick
-                    (fn [] (swap! state-atom update-in [:count] inc))}
-                "inc"]]))
-  {:count 6}
-  {:history true})
-
-(defcard node-runner-runner
-  (dc/dom-node
-    (fn [node data-atom]
-      (set! (.. node -innerHTML) (str "<h1>Hi I'm a crazy nodee " (:wow @data-atom) "</h1>"))))
-  {:wow "man"})
-
 (defcard-doc
- "## Devcards
+ "# Devcards
 
   ClojureScript Devcards are a tool to help you **quickly** surface what
   you are working on. This page holds an quick introduction to
   devcards.
 
-  #### This is a devcard
-
-  This is a **markdown-card**. You can create a markdown-card like
-  this like so:"
+  #### This is a Devcard"
    
  (dc/mkdn-pprint-code
-  '(defcard first-markdown-card
-     (markdown-card "# This is a heading")))
-   
+  '(defcard "# This is a heading"))
+
+ "The Devcard above simply outputs a 'card' with the markdown in it."
+ 
  "Devcards are designed to be written inline with your code during
   development. They are like advanced stateful `println`s that can
-  hold almost any arbitrary functionality that you want.")
+  hold almost any arbitrary functionality that you want."
 
-
-(defcard-doc
-   "## Devcards are intended to be interactive
+ "## Devcards are intended to be interactive
 
    The cards on this page can be found in the file
    **example_src/devdemos/core.cljs**.  Please follow along in this file
@@ -100,12 +46,69 @@
    I highly encourage you to poke and prod at the code you find on
    this page so you can experience how Devcards works.
 
-   Go ahead and change this text to see the changes reflected here.")
+   Go ahead and change this text to see the changes reflected here."
+
+  "## Devcards do not impact your production code.
+   The defcard API consists of macros that will dissapear from builds
+   that don't have the `:devcards true` build option set.")
+
 
 (defcard-doc
-   "## Devcard examples")
+  "#It all starts with `defcard`
+   `defcard` is a multipurpose macro.
+   
+   The first optional argument is a symbol to *name* the card. This
+   symbol will show up as the heading of a card."
+  (dc/mkdn-pprint-code '(defcard first-example))
+  "This creates the following card:")
+
+(defcard first-example)
+
+(defcard-doc
+  "### Optional markdown doc
+
+  You can also add an optional markdown documentation to your card."
+  (dc/mkdn-pprint-code '(defcard example-2 "## Example: This is optional markdown"))
+  "Which creates the following card:")
+
+(defcard example-2 "## Example: This is optional markdown")
+
+(defcard-doc
+  "Since the name is optional you can write docs just by like this:"
+  (dc/mkdn-pprint-code '(defcard "## Example: This is quick documentation."))
+  "Which creates the following card:")
+
+(defcard "## Example: This is quick documentation.")
+
+(defcard-doc
+  "## The object of our attention 
+   
+   The main object that we are displaying comes after the optional
+   **name** and **documentation**.
+
+   This main object can be either a ReactElement of a function that
+   returns a ReactElement.
+
+   For example this is valid:"
+  (dc/mkdn-pprint-code '(defcard react-example (sab/html [:h3 "Example: Rendering a ReactElement"])))
+  "Above we simply passed a React Element created by `sablono` to `defcard` 
+  and it gets rendered as the following card:")
+
+(defcard react-example (sab/html [:h3 "Example: Rendering a ReactElement"]))
+
+(defcard-doc
+  "### The function parameter:
+   
+  You can also 
+"
+  (dc/mkdn-pprint-code '(defcard (sab/html [:h3 "This is a valid card."])))
+  "Above we simply passed a React Element created by `sablono` to `defcard` 
+  and it gets rendered as the following card:")
+
+(defcard "# Devcard examples")
 
 (dc/defcard-edn edn-card-example
+  
   {:edn-card "This is an edn card"
    :helpful? "It lets you quickly view EDN"})
 
