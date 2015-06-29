@@ -50,7 +50,11 @@
 
   "## Devcards do not impact your production code.
    The defcard API consists of macros that will dissapear from builds
-   that don't have the `:devcards true` build option set.")
+   that don't have the `:devcards true` build option set."
+
+  "## Only interested in Om?  
+
+   Devcards fully supports Om. You can skip down to the `defcard-om` section below.")
 
 
 (defcard-doc
@@ -99,11 +103,41 @@
 (defcard-doc
   "### The function parameter:
    
-  You can also 
-"
-  (dc/mkdn-pprint-code '(defcard (sab/html [:h3 "This is a valid card."])))
-  "Above we simply passed a React Element created by `sablono` to `defcard` 
-  and it gets rendered as the following card:")
+  Instead of a ReactElement you can provide a function the takes two
+  parameters and returns a ReactElement like so:"
+  (dc/mkdn-pprint-code
+   '(defcard (fn [owner data-atom]
+               (sab/html [:div [:h2 "Example: fn that returns React"]
+                          (prn-str data-atom)]))))
+  "In this example the `owner` is the enclosing cards ReactElement and
+  the `data-atom` is a ClojureScript Atom.")
+
+(defcard
+  (fn [owner data-atom]
+    (sab/html [:div [:h3 "Example: fn that returns React"]
+               (prn-str data-atom)])))
+
+(defcard-doc
+  "If `data-atom` in the above example changes then the card will be re-rendered.
+  
+   Let's make a quick example counter:"
+    (dc/mkdn-pprint-code
+   '(defcard (fn [owner data-atom]
+               (sab/html [:div [:h3 "Example Counter: " (:count @data-atom)]
+                          [:a {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]])))))
+
+(defcard
+  (fn [owner data-atom]
+    (sab/html [:div [:h3 "Example Counter: " (:count @data-atom)]
+               [:a {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]])))
+
+(defcard-doc
+  "## Initial state
+
+  The counter example above was very interesting but what if you want
+  to introduce some initial state?
+
+  Well the next option after ")
 
 (defcard "# Devcard examples")
 
