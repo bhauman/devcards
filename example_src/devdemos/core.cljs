@@ -56,7 +56,6 @@
 
    Devcards fully supports Om. You can skip down to the `defcard-om` section below.")
 
-
 (defcard-doc
   "#It all starts with `defcard`
    `defcard` is a multipurpose macro.
@@ -205,21 +204,19 @@
 
 
 (defcard-doc
-  "## Accessing the DOM 
+  "## Accessing the DOM with `dom-node`
 
    While Devcards was written in and are very easy to use in
    conjunction with React. You may want to write something that writes
    directly to the DOM.
 
-   The helper function `dom-node` takes a function that accepts a DOM
+   The helper macro `dom-node` takes a function that accepts a DOM
    node and ClojureScript Atom and returns a ReactElement."
 
   (dc/mkdn-pprint-code
    '(defcard example-dom-node
       (dom-node (fn [node data-atom]
-                  (set! (.-innerHTML node) "<h2>Example Dom Node</h2>")))))
-  "This should enable you to do literally any type of client side
-  development.")
+                  (set! (.-innerHTML node) "<h2>Example Dom Node</h2>"))))))
 
 (defcard example-dom-node
   (dom-node

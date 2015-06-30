@@ -188,18 +188,98 @@
                      #js { :ref (.. this -state -unique_id) }
                      "Card has not mounted DOM node.")))}))
 
+(defn booler? [key opts]
+  (let [x (get opts key)]
+    (or (true? x) (false? x) (nil? x)
+     {:label key 
+      :message "should be boolean or nil"
+      :value x})))
+
+(defn stringer? [key opts]
+  (let [x (get opts key)]
+    (or (string? x) (nil? x)
+        {:label   key
+         :message "should be string or nil"
+         :value x})))
+
+(defn validate-card-options [opts]
+  (if (map? opts)
+    (filter #(not (true? %))
+            (let [{:keys [name
+                          react-or-fn
+                          initial-data]} opts]
+              (concat
+               [(stringer? :name opts)                
+                (stringer? :documentation opts)
+                (or (nil? react-or-fn) (fn? react-or-fn) (some? (and (.-_context react-or-fn) (.-_store react-or-fn)))
+                    {:label   :react-or-fn
+                     :message "should be a function or a ReactElement or nil."
+                     :value react-or-fn})
+                (or (nil? initial-data) (map? initial-data) (satisfies? IAtom initial-data)
+                    {:label :initial-data
+                     :message "should be an Atom or a Map or nil."
+                     :value initial-data})]
+               (mapv #(booler? % opts) [:frame :heading :padding :inspect-data :watch-atom :history]))))
+    [{:message "Card options should be a Map."
+      :value   opts}]))
+
+
+(comment
+  (prn (validate-card-options {:name "hi"
+                             :documentation "hey"
+                             :react-or-fn (fn [] 1)
+                             :initial-data {}
+                             :frame true
+                             :heading false
+                             :padding false
+                             :inspect-data true
+                             :watch-atom nil
+                             :history nil})))
+
+(defn error-line [e]
+  (sab/html [:div {:style {:color "#a94442" :display "flex" :margin "0.5em 0px"}}
+             (when (:label e)
+               (sab/html
+                [:code {:style { :flex "1 100px"}}
+                 (pr-str (:label e))]))
+             [:span
+              {:style { :flex "2 0px" :margin "0px 10px"}}
+              (:message e)]
+             [:span
+              {:style { :flex "1 100px" }}
+              " Recieved: " [:code (pr-str (:value e))]]]))
+
 (defn convert-to-react-fn [obj]
   (if (fn? obj) obj (fn [_ _] obj)))
 
-;; TODO: should validate options coming in here
+(defn render-errors [opts errors]
+  (sab/html
+   [:div.com-rigsomelight-devcards-card-base-no-pad.com
+    [:div.com-rigsomelight-devcards-panel-heading.com-rigsomelight-devcards-fail
+     (str (when (and (map? opts) (string? (:name opts)))
+            (str (:name opts) ": ")) "Devcard received bad options")]
+    (naked-card
+     (sab/html
+      [:div 
+       [:div
+        (map error-line errors)]
+       (when (map? opts)
+         (sab/html
+          [:div.com-rigsomelight-devcards-padding-top-border
+           (edn-rend/html-edn opts)]))])
+     {:padding true})]))
+
 (defn card-base
   ([opts]
-   (js/React.createElement RunnerComponent
-                           #js {:react_fn (convert-to-react-fn (:react-or-fn opts))
-                                :options  (merge
-                                           devcards.system/*devcard-data*
-                                           (:base-card-options @devcards.system/app-state)
-                                           opts)})))
+   (let [errors (validate-card-options opts)]
+     (if (not-empty errors)
+       (render-errors opts errors)
+       (js/React.createElement RunnerComponent
+                               #js {:react_fn (convert-to-react-fn (:react-or-fn opts))
+                                    :options  (merge
+                                               devcards.system/*devcard-data*
+                                               (:base-card-options @devcards.system/app-state)
+                                               opts)})))))
 
 ;; keep
 (defn- dom-node* [node-fn]

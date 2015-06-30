@@ -52,5 +52,10 @@
     (.makeHtml converter markdown-txt)))
 
 (defn less-sensitive-markdown [m]
-  (str "<div class=\"com-rigsomelight-devcards-markdown\">" ((comp markdown-to-html preformat-markdown) m) "</div>"))
-
+  (if (every? string? m)
+    (str "<div class=\"com-rigsomelight-devcards-markdown\">" ((comp markdown-to-html preformat-markdown) m) "</div>")
+    (do
+      (let [message "Devcards Error: Didn't pass a seq of strings to less-sensitive-markdown. 
+ You are probably trying to pass react to markdown instead of strings. (defcard-doc (doc ...)) won't work."]
+        (try (.error js/console message))
+        (str "<div style=\"color: #a94442\">" message "</div>")))))
