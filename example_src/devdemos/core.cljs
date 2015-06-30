@@ -7,6 +7,7 @@
      [sablono.core :as sab :include-macros true]
      [devdemos.two-zero]
      [devdemos.testing]
+     [devdemos.errors]     
      [cljs.test :as t :include-macros true])
     (:require-macros
      [devcards.core :as dc :refer [defcard defcard-doc deftest dom-node]]))

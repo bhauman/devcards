@@ -38,11 +38,11 @@
   ([vname docu main-obj initial-data options]
    `(devcards.core/defcard* ~(symbol (name vname))
       (devcards.core/card-base
-       (assoc ~options
-              :name          ~(name vname)
-              :documentation ~docu
-              :react-or-fn   ~main-obj
-              :initial-data  ~initial-data))))
+       { :name          ~(name vname)
+         :documentation ~docu
+         :react-or-fn   ~main-obj
+         :initial-data  ~initial-data
+         :options       ~options})))
   ([vname docu main-obj initial-data]
    (card vname docu main-obj initial-data {}))
   ([vname docu main-obj]
@@ -62,11 +62,14 @@
         [docu xs]  (optional-doc xs)]
     (concat [vname docu] xs)))
 
+(defn merge-options [lit-opt-map options]
+  `(merge ~lit-opt-map (devcards.core/assert-options-map ~options)))
+
 (defn parse-card-args [xs default-name]
   (let [[vname docu main-obj initial-data options :as res]
         (parse-args xs default-name)]
     (if (= vname default-name)
-      [vname docu main-obj initial-data `(merge {:heading false} ~options)]
+      [vname docu main-obj initial-data (merge-options {:heading false} options)]
       res)))
 
 (defmacro defcard [& expr]
@@ -96,7 +99,7 @@
        `(fn [something# data-atom#]
           (devcards.util.edn-renderer/html-edn @data-atom#))
        edn-body
-       `(merge {:history true} ~options)))))
+       (merge-options {:history true} options)))))
 
 (defmacro deftest [vname & parts]
   (if (utils/devcards-active?)
@@ -130,7 +133,7 @@
   (when (utils/devcards-active?)
     (let [[vname docu om-comp-fn initial-data om-options options] (parse-args exprs 'om-root-card)]
       (card vname docu `(om-root ~om-comp-fn ~om-options) initial-data
-            `(merge {:watch-atom false} ~options)))))
+            (merge-options {:watch-atom false} options)))))
 
 ;; formatting for markdown cards
 

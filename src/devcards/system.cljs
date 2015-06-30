@@ -275,6 +275,8 @@
 
 (comment
 
+  list namespaces in dependency order
+  
   the composition structure of the main api
     needs to copy normal react composition
     particularly the relationship of
@@ -353,11 +355,13 @@
         (let [new-state (<! (off-the-books channel @app-state []))]
           (reset! app-state new-state))
         
-        (hash-routing-init app-state)        
+        (hash-routing-init app-state)
+        
+        ;; escape core async context for better errors
         (js/setTimeout #(renderer app-state) 0)
-        (add-watch app-state :devcards-render
-                   (fn [_ _ _ _] (renderer app-state)))
-
+        (js/setTimeout #(add-watch app-state :devcards-render
+                                   (fn [_ _ _ _] (renderer app-state))) 0)
+        
         (loop  []
           (when-let [v (<! channel)]
             #_(prn "hey" (first v))

@@ -69,24 +69,24 @@
 
 ;; returns a react component of rendered edn
 
-(defn- naked-card [children options]
+(defn- naked-card [children card]
   (sab/html
    [:div
     {:class
      (str devcards.system/devcards-rendered-card-class
-          (if (:padding options) " com-rigsomelight-devcards-devcard-padding" "")) }
+          (if (get-in card [:options :padding]) " com-rigsomelight-devcards-devcard-padding" "")) }
     children]))
 
 (defn- frame
   ([children]
    (frame children {}))
-  ([children options]
-  (let [path (:path options)]
+  ([children card]
+   (let [{:keys [path options]} card]
     (if-not (:hidden options)
       (if (false? (:heading options))
         (sab/html
          [:div.com-rigsomelight-devcards-card-base-no-pad
-          (naked-card children options)])
+          (naked-card children card)])
         (sab/html
          [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
           [:div.com-rigsomelight-devcards-panel-heading
@@ -99,8 +99,8 @@
                    devcards.system/app-state
                    path))}
                (name (last path))  " "])
-             (sab/html [:span (:name options)]))]
-          (naked-card children options)]))
+             (sab/html [:span (:name card)]))]
+          (naked-card children card)]))
       (sab/html [:span])))))
 
 (declare hist-recorder*)
@@ -115,7 +115,7 @@
                    (.setState this
                               (or (and (.. this -state -data_atom) (.. this -state))
                                   #js {:data_atom
-                                       (let [data (or (:initial-data (.. this -props -options)) {})]
+                                       (let [data (or (:initial-data (.. this -props -card)) {})]
                                          (if (satisfies? IAtom data)
                                            data
                                            (atom data)))}))))
@@ -131,24 +131,25 @@
         (fn []
           (this-as
            this
-           (let [options (.. this -props -options)]
+           (let [options (:options (.. this -props -card))]
              (let [data_atom (.. this -state -data_atom)
                    id        (.. this -state -unique_id)]
                (when (and data_atom id)
                  (add-watch
                   data_atom id
                   (fn [_ _ _ _]
-                    (when-not (false? (:watch-atom (.. this -props -options)))
+                    (when-not (false? (:watch-atom (:options (.. this -props -card))))
                       (.forceUpdate this)))))))))
         :render
         (fn []
           (this-as
            this
-           (let [options   (.. this -props -options)
+           (let [card      (.. this -props -card)
+                 options   (:options card)
                  main      ((.-react_fn (.-props this))
                             this
                             (.-data_atom (.-state this)))
-                 document  (when-let [docu (:documentation options)]
+                 document  (when-let [docu (:documentation card)]
                              (markdown->react docu))
                  hist-ctl  (when (:history options)
                              (hist-recorder* (.-data_atom (.-state this))))
@@ -158,7 +159,7 @@
                                (edn-rend/html-edn @(.-data_atom (.-state this)))]))
                  children  (sab/html [:div (list document hist-ctl main edn)])]
              (if (:frame options)
-               (frame children options) ;; make component and forward options
+               (frame children card) ;; make component and forward options
                (sab/html [:div.com-rigsomelight-devcards-frameless children])))))}))
 
 (def DomComponent
@@ -204,25 +205,31 @@
 
 (defn validate-card-options [opts]
   (if (map? opts)
-    (filter #(not (true? %))
-            (let [{:keys [name
-                          react-or-fn
-                          initial-data]} opts]
-              (concat
-               [(stringer? :name opts)                
-                (stringer? :documentation opts)
-                (or (nil? react-or-fn) (fn? react-or-fn) (some? (and (.-_context react-or-fn) (.-_store react-or-fn)))
-                    {:label   :react-or-fn
-                     :message "should be a function or a ReactElement or nil."
-                     :value react-or-fn})
-                (or (nil? initial-data) (map? initial-data) (satisfies? IAtom initial-data)
-                    {:label :initial-data
-                     :message "should be an Atom or a Map or nil."
-                     :value initial-data})]
-               (mapv #(booler? % opts) [:frame :heading :padding :inspect-data :watch-atom :history]))))
-    [{:message "Card options should be a Map."
+    (let [propagated-errors (get-in opts [:options :propagated-errors])]
+      (filter #(not (true? %))
+              (let [{:keys [name
+                            react-or-fn
+                            initial-data
+                            options]} opts]
+                (concat
+                 propagated-errors
+                 [(or (map? options) (nil? options)
+                      {:label   :options 
+                       :message "should be a Map or nil"
+                       :value options})
+                  (stringer? :name opts)                
+                  (stringer? :documentation opts)
+                  (or (nil? react-or-fn) (fn? react-or-fn) (some? (and (.-_context react-or-fn) (.-_store react-or-fn)))
+                      {:label   :react-or-fn
+                       :message "should be a function or a ReactElement or nil."
+                       :value react-or-fn})
+                  (or (nil? initial-data) (map? initial-data) (satisfies? IAtom initial-data)
+                      {:label :initial-data
+                       :message "should be an Atom or a Map or nil."
+                       :value initial-data})]
+                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history])))))
+    [{:message "Card should be a Map."
       :value   opts}]))
-
 
 (comment
   (prn (validate-card-options {:name "hi"
@@ -238,23 +245,29 @@
 
 (defn error-line [e]
   (sab/html [:div {:style {:color "#a94442" :display "flex" :margin "0.5em 0px"}}
-             (when (:label e)
-               (sab/html
-                [:code {:style { :flex "1 100px"}}
-                 (pr-str (:label e))]))
+             (sab/html
+              [:code {:style { :flex "1 100px" :margin-right "10px"}}
+               (when (:label e) (pr-str (:label e)))])
              [:span
-              {:style { :flex "2 0px" :margin "0px 10px"}}
+              {:style { :flex "3 100px" :margin-right "10px"}}
               (:message e)]
              [:span
               {:style { :flex "1 100px" }}
               " Recieved: " [:code (pr-str (:value e))]]]))
+
+(defn assert-options-map [m]
+  (if-not (or (nil? m) (map? m))
+    {:propagated-errors [{:label :options 
+                          :message "should be a Map or nil."
+                          :value m}]}
+    m))
 
 (defn convert-to-react-fn [obj]
   (if (fn? obj) obj (fn [_ _] obj)))
 
 (defn render-errors [opts errors]
   (sab/html
-   [:div.com-rigsomelight-devcards-card-base-no-pad.com
+   [:div.com-rigsomelight-devcards-card-base-no-pad
     [:div.com-rigsomelight-devcards-panel-heading.com-rigsomelight-devcards-fail
      (str (when (and (map? opts) (string? (:name opts)))
             (str (:name opts) ": ")) "Devcard received bad options")]
@@ -266,8 +279,8 @@
        (when (map? opts)
          (sab/html
           [:div.com-rigsomelight-devcards-padding-top-border
-           (edn-rend/html-edn opts)]))])
-     {:padding true})]))
+           (edn-rend/html-edn (update-in opts [:options] dissoc :propagated-errors))]))])
+     {:options {:padding true}})]))
 
 (defn card-base
   ([opts]
@@ -276,10 +289,10 @@
        (render-errors opts errors)
        (js/React.createElement RunnerComponent
                                #js {:react_fn (convert-to-react-fn (:react-or-fn opts))
-                                    :options  (merge
-                                               devcards.system/*devcard-data*
-                                               (:base-card-options @devcards.system/app-state)
-                                               opts)})))))
+                                    :card  (merge
+                                            devcards.system/*devcard-data*
+                                            (update-in opts [:options]
+                                                       #(merge (:base-card-options @devcards.system/app-state) %)))})))))
 
 ;; keep
 (defn- dom-node* [node-fn]
@@ -580,11 +593,12 @@
                         #(swap! data-atom assoc :filter (fn [{:keys [type]}] (= type :pass)))) }
              pass]))]
         [:div {:className devcards.system/devcards-rendered-card-class}
-         (layout-tests (filter (:filter @data-atom) tests))]]))))
+         (layout-tests (filter (or (:filter @data-atom)
+                                   identity)
+                               tests))]]))))
 
 (defn- test-card* [& parts]
   (let [tests (run-test-block (fn [] (doseq [f parts] (f))))]
     (card-base
-     {:frame false
-      :initial-data {:filter identity}
-      :react-or-fn (render-test-frame tests)})))
+     { :options { :frame false }
+       :react-or-fn (render-test-frame tests)})))
