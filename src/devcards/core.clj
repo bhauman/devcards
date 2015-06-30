@@ -40,7 +40,7 @@
       (devcards.core/card-base
        { :name          ~(name vname)
          :documentation ~docu
-         :react-or-fn   ~main-obj
+         :main-obj   ~main-obj
          :initial-data  ~initial-data
          :options       ~options})))
   ([vname docu main-obj initial-data]

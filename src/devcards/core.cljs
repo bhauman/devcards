@@ -146,7 +146,7 @@
            this
            (let [card      (.. this -props -card)
                  options   (:options card)
-                 main      ((.-react_fn (.-props this))
+                 main      ((:main-obj card)
                             this
                             (.-data_atom (.-state this)))
                  document  (when-let [docu (:documentation card)]
@@ -262,9 +262,6 @@
                           :value m}]}
     m))
 
-(defn convert-to-react-fn [obj]
-  (if (fn? obj) obj (fn [_ _] obj)))
-
 (defn render-errors [opts errors]
   (sab/html
    [:div.com-rigsomelight-devcards-card-base-no-pad
@@ -282,17 +279,22 @@
            (edn-rend/html-edn (update-in opts [:options] dissoc :propagated-errors))]))])
      {:options {:padding true}})]))
 
+(defn convert-to-react-fn [obj]
+  (if (fn? obj) obj (fn [_ _] obj)))
+
 (defn card-base
   ([opts]
    (let [errors (validate-card-options opts)]
      (if (not-empty errors)
        (render-errors opts errors)
-       (js/React.createElement RunnerComponent
-                               #js {:react_fn (convert-to-react-fn (:react-or-fn opts))
-                                    :card  (merge
-                                            devcards.system/*devcard-data*
-                                            (update-in opts [:options]
-                                                       #(merge (:base-card-options @devcards.system/app-state) %)))})))))
+       (js/React.createElement
+        RunnerComponent
+        #js { :card  (merge
+                      devcards.system/*devcard-data*
+                      (-> opts
+                        (update-in [:options]
+                                   (fn [x] (merge (:base-card-options @devcards.system/app-state) x)))
+                        (update-in [:main-obj] convert-to-react-fn)))})))))
 
 ;; keep
 (defn- dom-node* [node-fn]
@@ -601,4 +603,4 @@
   (let [tests (run-test-block (fn [] (doseq [f parts] (f))))]
     (card-base
      { :options { :frame false }
-       :react-or-fn (render-test-frame tests)})))
+       :main-obj (render-test-frame tests)})))
