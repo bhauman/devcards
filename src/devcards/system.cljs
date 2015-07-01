@@ -367,6 +367,6 @@
             #_(prn "hey" (first v))
             (let [new-state (<! (off-the-books channel @app-state v))]
               #_(prn "in the books")
-              (reset! app-state new-state))
+              (js/setTimeout #(reset! app-state new-state) 0))
             (recur))))
       true)))
