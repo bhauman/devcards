@@ -108,7 +108,7 @@
 
 (declare hist-recorder*)
 
-(def RunnerComponent
+(defonce DevcardBase
   (js/React.createClass
    #js {:getInitialState
         (fn [] #js {:unique_id (gensym 'react-runner)})
@@ -166,7 +166,7 @@
                (frame children card) ;; make component and forward options
                (sab/html [:div.com-rigsomelight-devcards-frameless children])))))}))
 
-(def DomComponent
+(defonce DomComponent
   (js/React.createClass
    #js {:getInitialState
         (fn [] #js {:unique_id (str (gensym 'devcards-card-runner-))})
@@ -292,7 +292,7 @@
      (if (not-empty errors)
        (render-errors opts errors)
        (js/React.createElement
-        RunnerComponent
+        DevcardBase
         #js { :card (merge
                      devcards.system/*devcard-data*
                      (-> card-opts
@@ -353,7 +353,7 @@
   would be nice to have a drop down of history diffs)
 
 ;; keep
-(def HistoryComponent
+(defonce HistoryComponent
   (js/React.createClass
    #js {:getInitialState
         (fn [] #js {:unique_id    (str (gensym 'devcards-history-runner-))
