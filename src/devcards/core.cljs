@@ -103,6 +103,9 @@
           (naked-card children card)]))
       (sab/html [:span])))))
 
+(defprotocol IDevcard
+  (-devcard [this devcard-opts]))
+
 (declare hist-recorder*)
 
 (def RunnerComponent
@@ -146,9 +149,10 @@
            this
            (let [card      (.. this -props -card)
                  options   (:options card)
-                 main      ((:main-obj card)
-                            this
-                            (.-data_atom (.-state this)))
+                 main      (let [m (:main-obj card)]
+                             (if (fn? m)
+                               (m this (.-data_atom (.-state this)))
+                               m))
                  document  (when-let [docu (:documentation card)]
                              (markdown->react docu))
                  hist-ctl  (when (:history options)
@@ -208,7 +212,7 @@
     (let [propagated-errors (get-in opts [:options :propagated-errors])]
       (filter #(not (true? %))
               (let [{:keys [name
-                            react-or-fn
+                            main-obj
                             initial-data
                             options]} opts]
                 (concat
@@ -219,10 +223,10 @@
                        :value options})
                   (stringer? :name opts)                
                   (stringer? :documentation opts)
-                  (or (nil? react-or-fn) (fn? react-or-fn) (some? (and (.-_context react-or-fn) (.-_store react-or-fn)))
-                      {:label   :react-or-fn
+                  (or (nil? main-obj) (fn? main-obj) (some? (and (.-_context main-obj) (.-_store main-obj)))
+                      {:label   :main-obj
                        :message "should be a function or a ReactElement or nil."
-                       :value react-or-fn})
+                       :value main-obj})
                   (or (nil? initial-data) (map? initial-data) (satisfies? IAtom initial-data)
                       {:label :initial-data
                        :message "should be an Atom or a Map or nil."
@@ -279,22 +283,21 @@
            (edn-rend/html-edn (update-in opts [:options] dissoc :propagated-errors))]))])
      {:options {:padding true}})]))
 
-(defn convert-to-react-fn [obj]
-  (if (fn? obj) obj (fn [_ _] obj)))
-
 (defn card-base
   ([opts]
-   (let [errors (validate-card-options opts)]
+   (let [card-opts (if (satisfies? IDevcard (:main-obj opts))
+                     (-devcard (:main-obj opts) opts)
+                     opts)
+         errors (validate-card-options card-opts)]
      (if (not-empty errors)
        (render-errors opts errors)
        (js/React.createElement
         RunnerComponent
-        #js { :card  (merge
-                      devcards.system/*devcard-data*
-                      (-> opts
-                        (update-in [:options]
-                                   (fn [x] (merge (:base-card-options @devcards.system/app-state) x)))
-                        (update-in [:main-obj] convert-to-react-fn)))})))))
+        #js { :card (merge
+                     devcards.system/*devcard-data*
+                     (-> card-opts
+                       (update-in [:options]
+                                  (fn [x] (merge (:base-card-options @devcards.system/app-state) x)))))})))))
 
 ;; keep
 (defn- dom-node* [node-fn]
@@ -302,6 +305,47 @@
      (js/React.createElement DomComponent
                              #js {:node_fn   node-fn
                                   :data_atom data-atom})))
+
+;; devcard protocol that takes a devcard and returns a devcard
+
+(extend-type string
+  IDevcard
+  (-devcard [this devcard-opts]
+    (update-in devcard-opts [:main-obj] markdown->react)))
+
+(extend-type PersistentArrayMap
+  IDevcard
+  (-devcard [this devcard-opts]
+    (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
+
+(extend-type PersistentVector
+  IDevcard
+  (-devcard [this devcard-opts]
+    (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
+
+(extend-type PersistentHashSet
+  IDevcard
+  (-devcard [this devcard-opts]
+    (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
+
+(extend-type List
+  IDevcard
+  (-devcard [this devcard-opts]
+    (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
+
+(extend-type EmptyList
+  IDevcard
+  (-devcard [this devcard-opts]
+    (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
+
+(extend-type Atom
+  IDevcard
+  (-devcard [this {:keys [options main-obj] :as devcard-opts}]
+    (assoc devcard-opts
+           :main-obj (fn [_ data-atom] (edn-rend/html-edn @data-atom))
+           :initial-data main-obj
+           :options (merge { :history true }
+                           (assert-options-map options)))))
 
 ;; history recorder
 
@@ -482,8 +526,6 @@
     (f)
     (cljs.test/get-current-env)))
 
-
-
 (defmulti test-render :type)
 
 (defmethod test-render :default [m]
@@ -599,8 +641,7 @@
                                    identity)
                                tests))]]))))
 
-(defn- test-card* [& parts]
-  (let [tests (run-test-block (fn [] (doseq [f parts] (f))))]
-    (card-base
-     { :options { :frame false }
-       :main-obj (render-test-frame tests)})))
+(defn- test-card-help [& test-thunks]
+  ;; its helpful to be in this namespace to pick up the extended report function.
+  (let [tests (run-test-block (fn [] (doseq [f test-thunks] (f))))]
+    (render-test-frame tests)))
