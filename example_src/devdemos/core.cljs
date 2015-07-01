@@ -7,34 +7,35 @@
      [sablono.core :as sab :include-macros true]
      [devdemos.two-zero]
      [devdemos.testing]
-     [devdemos.errors]     
+     [devdemos.errors]
+     [devdemos.extentions]
      [cljs.test :as t :include-macros true])
     (:require-macros
-     [devcards.core :as dc :refer [defcard defcard-doc deftest dom-node]]))
+     [devcards.core :as dc :refer [defcard defcard-doc noframe-doc deftest dom-node]]))
 
 (enable-console-print!)
 
 (devcards.core/start-devcard-ui!)
 
 (defcard-doc
- "# Devcards
+  "# Devcards
 
-  ClojureScript Devcards are a tool to help you **quickly** surface what
-  you are working on. This page holds an quick introduction to
-  devcards.
+   ClojureScript Devcards are a tool to help you **quickly** surface what
+   you are working on. This page holds an quick introduction to
+   devcards.
 
-  #### This is a Devcard"
+   #### This is a Devcard"
    
- (dc/mkdn-pprint-code
-  '(defcard "# This is a heading"))
+  (dc/mkdn-pprint-code
+   '(defcard "# This is a heading"))
 
- "The Devcard above simply outputs a 'card' with the markdown in it."
+  "The Devcard above simply outputs a 'card' with the markdown in it."
  
- "Devcards are designed to be written inline with your code during
-  development. They are like advanced stateful `println`s that can
-  hold almost any arbitrary functionality that you want."
+  "Devcards are designed to be written inline with your code during
+   development. They are like advanced stateful `println`s that can
+   hold almost any arbitrary functionality that you want."
 
- "## Devcards are intended to be interactive
+  "## Devcards are intended to be interactive
 
    The cards on this page can be found in the file
    **example_src/devdemos/core.cljs**.  Please follow along in this file
@@ -228,8 +229,7 @@
 
 (defcard "# Devcard examples")
 
-(dc/defcard-edn edn-card-example
-  
+(dc/defcard edn-card-example
   {:edn-card "This is an edn card"
    :helpful? "It lets you quickly view EDN"})
 
@@ -346,7 +346,7 @@
   om-test-atom
   {:shared {:title "Second counter "}})
 
-(dc/defcard-edn om-test-atom-data
+(dc/defcard om-test-atom-data
   "### You can share an Atom with an `edn-card` too:"
   om-test-atom)
 

@@ -22,7 +22,8 @@
   
   :profiles {
    :dev {
-      :dependencies [[org.omcljs/om "0.8.8"]]                   
+      :dependencies [[org.omcljs/om "0.8.8"]
+                     [reagent "0.5.0"]]                   
       :plugins [[lein-cljsbuild "1.0.5"]
                 [lein-figwheel "0.3.5"]]
       :cljsbuild {

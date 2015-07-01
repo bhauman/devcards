@@ -26,13 +26,12 @@
 (defn name->path [env vname]
   [(keyword (get-ns env)) (keyword vname)])
 
+;; it's nice to have this low level card i think
 (defmacro defcard*
-  ([vname expr options]
+  ([vname expr]
    (when (utils/devcards-active?)
      `(devcards.core/register-card  ~{:path (name->path &env vname)
-                                      :func  `(fn [] ~expr)})))
-  ([vname expr]
-   `(defcard* ~vname ~expr {})))
+                                      :func  `(fn [] ~expr)}))))
 
 (defn card
   ([vname docu main-obj initial-data options]
@@ -40,7 +39,7 @@
       (devcards.core/card-base
        { :name          ~(name vname)
          :documentation ~docu
-         :main-obj   ~main-obj
+         :main-obj      ~main-obj
          :initial-data  ~initial-data
          :options       ~options})))
   ([vname docu main-obj initial-data]
@@ -76,41 +75,6 @@
   (when (utils/devcards-active?)
     (apply devcards.core/card (parse-card-args expr 'card))))
 
-(defmacro doc [& body]
-  (when (utils/devcards-active?)
-    `(devcards.core/markdown->react ~@body)))
-
-(defmacro edn [body]
-  (when (utils/devcards-active?)
-    `(devcards.util.edn-renderer/html-edn ~body)))
-
-(defmacro defcard-doc [& exprs]
-  (when (utils/devcards-active?)
-    `(devcards.core/defcard 
-       (devcards.core/doc ~@exprs))))
-
-;; name is required
-(defmacro defcard-edn [& exprs]
-  (when (utils/devcards-active?)
-    (let [[vname docu edn-body options] (parse-args exprs 'edn-card)]
-      (devcards.core/card
-       vname
-       docu 
-       `(fn [something# data-atom#]
-          (devcards.util.edn-renderer/html-edn @data-atom#))
-       edn-body
-       (merge-options {:history true} options)))))
-
-(defmacro deftest [vname & parts]
-  (if (utils/devcards-active?)
-    `(do
-       (devcards.core/defcard* ~vname
-         (devcards.core/test-card* ~@(map (fn [p] (if (string? p)
-                                                   `(fn [] (devcards.core/test-doc ~p))
-                                                   `(fn [] ~p))) parts)))
-       (cljs.test/deftest ~vname
-         ~@parts))))
-
 (defmacro dom-node [body]
   (when (utils/devcards-active?)
     `(devcards.core/dom-node* ~body)))
@@ -119,21 +83,87 @@
   (when (utils/devcards-active?)
     `(devcards.core/hist-recorder* ~body)))
 
+;; should probably get rid of this
+;; there is a prize for a leaner api
+(defmacro doc [& body]
+  (when (utils/devcards-active?)
+    `(devcards.core/markdown->react ~@body)))
+
+;; should probably get rid of this as well
+(defmacro edn [body]
+  (when (utils/devcards-active?)
+    `(devcards.util.edn-renderer/html-edn ~body)))
+
+;; is this really needed now?
+(defmacro defcard-doc [& exprs]
+  (when (utils/devcards-active?)
+    `(devcards.core/defcard (doc ~@exprs))))
+
+(defmacro noframe-doc [& exprs]
+  (when (utils/devcards-active?)
+    `(devcards.core/defcard (doc ~@exprs) {} {:frame false})))
+
+;; currently reflects the most common pattern for creating idevcards
+;; currently to meant to only be consumed internally
+(defmacro create-idevcard [main-obj-body default-options-literal]
+  (when (utils/devcards-active?)
+    `(reify devcards.core/IDevcard
+       (~'-devcard [this# devcard-opts#]
+         (assoc devcard-opts#
+                :main-obj ~main-obj-body
+                :options (merge ~default-options-literal
+                                (devcards.core/assert-options-map (:options devcard-opts#))))))))
+
+;; testing
+
+(defmacro tests [& parts]
+  (when (utils/devcards-active?)
+    `(create-idevcard
+      (devcards.core/test-card-help
+                 ~@(map (fn [p] (if (string? p)
+                                `(fn [] (devcards.core/test-doc ~p))
+                                `(fn [] ~p))) parts))
+      {:frame false})))
+
+(defmacro deftest [vname & parts]
+  `(do
+     ~(when (utils/devcards-active?)
+        `(devcards.core/defcard ~vname
+           (devcards.core/tests ~@parts)))
+     (cljs.test/deftest ~vname
+        ~@parts)))
+
+;; reagent helpers
+
+(defmacro reagent->react [body]
+  `(js/React.createElement (reagent.core/reactify-component (fn [_#] ~body))))
+
+(defmacro reagent [body]
+  `(create-idevcard (reagent->react ~body) {:watch-atom false}))
+
+(defmacro reagent-> [body]
+  `(create-idevcard (fn [d# da#] (reagent->react (~body d# da#))) {:watch-atom false}))
+
+;; om helpers
+
 (defmacro om-root
   ([om-comp-fn om-options]
    (when (utils/devcards-active?)
-     `(dom-node
-       (fn [node# data-atom#]
-         (om.core/root ~om-comp-fn data-atom# (merge ~om-options {:target node#}))))))
+     `(create-idevcard
+       (devcards.core/dom-node*
+        (fn [node# data-atom#]
+          (om.core/root ~om-comp-fn data-atom#
+                        (merge ~om-options
+                               {:target node#}))))
+       {:watch-atom false})))
   ([om-comp-fn]
    (when (utils/devcards-active?)
      `(om-root ~om-comp-fn {}))))
 
 (defmacro defcard-om [& exprs]
   (when (utils/devcards-active?)
-    (let [[vname docu om-comp-fn initial-data om-options options] (parse-args exprs 'om-root-card)]
-      (card vname docu `(om-root ~om-comp-fn ~om-options) initial-data
-            (merge-options {:watch-atom false} options)))))
+    (let [[vname docu om-comp-fn initial-data om-options options] (parse-card-args exprs 'om-root-card)]
+      (card vname docu `(om-root ~om-comp-fn ~om-options) initial-data options))))
 
 ;; formatting for markdown cards
 
@@ -145,7 +175,7 @@
   (when (utils/devcards-active?)
     `(devcards.util.utils/pprint-code ~obj)))
 
-(defmacro mkdn-code [body] `(str "```\n" ~body "```\n"))
+(defmacro mkdn-code [body] `(str "\n```\n" ~body "```\n"))
 
 (defmacro mkdn-pprint-code [obj]
   (when (utils/devcards-active?)

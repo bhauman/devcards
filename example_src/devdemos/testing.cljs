@@ -8,7 +8,13 @@
 
 (enable-console-print!)
 
-(dc/deftest first-tests
+(defcard some-tests
+  (dc/tests
+   "## this should show up"
+   (is (= 1 1))
+   (is (= 1 2))))
+
+(dc/deftest first-testers
   "## This is documentation
    It should work well"
   (testing "good stuff"
@@ -26,13 +32,3 @@
       (is (= (+ 1 0 0 0) 1))        
       (t/is (= (+ 3 4 55555) 4))
       (t/is false))))
-
-#_(defcard namename
-  (dc/edn-card
-   (dc/run-test-block
-    (fn []
-      (t/testing "good stuff"
-        (is (= (+ 1 0 0 0) 1))        
-        (t/is (= (+ 3 4 55555) 4))
-        (t/is false))))))
-
