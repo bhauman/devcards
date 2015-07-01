@@ -244,7 +244,7 @@
                 {:style {:float "right"}}
                 (count child-tree)]
                [:span " " (name key)]]))
-           (reverse dirs))])))
+           (sort-by (fn [[_ child-tree]] (-> child-tree first second :position -))  dirs))])))
 
 (defn main-template [state-atom]
   (let [data @state-atom]
