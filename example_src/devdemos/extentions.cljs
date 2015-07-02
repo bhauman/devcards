@@ -110,7 +110,6 @@
    :other "hi"
    :stuff "yep"})
 
-
 (defn counting-component-passing-ratom [ratom]
   [:div
    "The atom " [:code "click-count"] " has valuer: "
