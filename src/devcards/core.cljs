@@ -144,8 +144,9 @@
                  (add-watch
                   data_atom id
                   (fn [_ _ _ _]
-                    (when-not (false? (:watch-atom (:options (.. this -props -card))))
-                      (.forceUpdate this)))))))))
+                    (let [{:keys [watch-atom inspect-data history]} (:options (.. this -props -card))]
+                      (when (if (false? watch-atom) (or inspect-data history) true) 
+                        (.forceUpdate this))))))))))
         :render
         (fn []
           (this-as
