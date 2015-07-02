@@ -103,6 +103,9 @@
           (naked-card children card)]))
       (sab/html [:span])))))
 
+(defprotocol IDevcardOptions
+  (-devcard-options [this devcard-opts]))
+
 (defprotocol IDevcard
   (-devcard [this devcard-opts]))
 
@@ -283,21 +286,25 @@
            (edn-rend/html-edn (update-in opts [:options] dissoc :propagated-errors))]))])
      {:options {:padding true}})]))
 
-(defn card-base
-  ([opts]
-   (let [card-opts (if (satisfies? IDevcard (:main-obj opts))
-                     (-devcard (:main-obj opts) opts)
-                     opts)
-         errors (validate-card-options card-opts)]
-     (if (not-empty errors)
-       (render-errors opts errors)
-       (js/React.createElement
-        DevcardBase
-        #js { :card (merge
-                     devcards.system/*devcard-data*
-                     (-> card-opts
-                       (update-in [:options]
-                                  (fn [x] (merge (:base-card-options @devcards.system/app-state) x)))))})))))
+(defn add-environment-defaults [card-options]
+  (update-in card-options [:options]
+             #(merge (:base-card-options @devcards.system/app-state) %)))
+
+(defn card-with-errors [card-options]
+  (let [errors (validate-card-options card-options)]
+    (if (not-empty errors)
+      (render-errors card-options errors)
+      (js/React.createElement DevcardBase #js { :card (add-environment-defaults card-options) }))))
+
+(defn card-base [opts]
+  (let [opts (assoc opts :path (:path devcards.system/*devcard-data*))]
+    (if (satisfies? IDevcard (:main-obj opts))
+      (-devcard (:main-obj opts) opts)
+      (card-with-errors
+       (if (satisfies? IDevcardOptions (:main-obj opts))
+         (-devcard-options (:main-obj opts) opts)
+         opts)))))
+
 
 ;; keep
 (defn- dom-node* [node-fn]
@@ -309,38 +316,38 @@
 ;; devcard protocol that takes a devcard and returns a devcard
 
 (extend-type string
-  IDevcard
-  (-devcard [this devcard-opts]
+  IDevcardOptions
+  (-devcard-options [this devcard-opts]
     (update-in devcard-opts [:main-obj] markdown->react)))
 
 (extend-type PersistentArrayMap
-  IDevcard
-  (-devcard [this devcard-opts]
+  IDevcardOptions
+  (-devcard-options [this devcard-opts]
     (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
 
 (extend-type PersistentVector
-  IDevcard
-  (-devcard [this devcard-opts]
+  IDevcardOptions
+  (-devcard-options [this devcard-opts]
     (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
 
 (extend-type PersistentHashSet
-  IDevcard
-  (-devcard [this devcard-opts]
+  IDevcardOptions
+  (-devcard-options [this devcard-opts]
     (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
 
 (extend-type List
-  IDevcard
-  (-devcard [this devcard-opts]
+  IDevcardOptions
+  (-devcard-options [this devcard-opts]
     (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
 
 (extend-type EmptyList
-  IDevcard
-  (-devcard [this devcard-opts]
+  IDevcardOptions
+  (-devcard-options [this devcard-opts]
     (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
 
 (extend-type Atom
-  IDevcard
-  (-devcard [this {:keys [options main-obj] :as devcard-opts}]
+  IDevcardOptions
+  (-devcard-options [this {:keys [options main-obj] :as devcard-opts}]
     (assoc devcard-opts
            :main-obj (fn [_ data-atom] (edn-rend/html-edn @data-atom))
            :initial-data main-obj

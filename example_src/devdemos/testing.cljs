@@ -1,4 +1,4 @@
-(ns ^:figwheel-load devdemos.testing
+(ns devdemos.testing
   (:require
    [cljs.test :as t :refer [report] :include-macros true]
    [sablono.core :as sab])

@@ -36,7 +36,7 @@
 (defn card
   ([vname docu main-obj initial-data options]
    `(devcards.core/defcard* ~(symbol (name vname))
-      (devcards.core/card-base
+      (devcards.core/card-base 
        { :name          ~(name vname)
          :documentation ~docu
          :main-obj      ~main-obj
@@ -107,8 +107,8 @@
 ;; currently to meant to only be consumed internally
 (defmacro create-idevcard [main-obj-body default-options-literal]
   (when (utils/devcards-active?)
-    `(reify devcards.core/IDevcard
-       (~'-devcard [this# devcard-opts#]
+    `(reify devcards.core/IDevcardOptions
+       (~'-devcard-options [this# devcard-opts#]
          (assoc devcard-opts#
                 :main-obj ~main-obj-body
                 :options (merge ~default-options-literal
