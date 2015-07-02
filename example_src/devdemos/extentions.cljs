@@ -139,10 +139,6 @@
 
 ;; hmmm need to be smarter about watching things for cursors sake
 
-(defonce c (rg/cursor temp-atom []))
+#_(defonce c (rg/cursor temp-atom []))
 
-(prn (devcards.core/atom-like? c))
-
-(prn (satisfies? devcards.core/IDevcardOptions c))
-
-(defcard reagent-cursor c {} {:heading 5})
+#_(defcard reagent-cursor c {} {:heading 5})
