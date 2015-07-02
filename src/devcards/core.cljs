@@ -210,6 +210,9 @@
          :message "should be string or nil"
          :value x})))
 
+(defn react-element? [main-obj]
+  (some? (and (.-_context main-obj) (.-_store main-obj))))
+
 (defn validate-card-options [opts]
   (if (map? opts)
     (let [propagated-errors (get-in opts [:options :propagated-errors])]
@@ -226,7 +229,7 @@
                        :value options})
                   (stringer? :name opts)                
                   (stringer? :documentation opts)
-                  (or (nil? main-obj) (fn? main-obj) (some? (and (.-_context main-obj) (.-_store main-obj)))
+                  (or (nil? main-obj) (fn? main-obj) (react-element? main-obj)
                       {:label   :main-obj
                        :message "should be a function or a ReactElement or nil."
                        :value main-obj})
@@ -296,15 +299,51 @@
       (render-errors card-options errors)
       (js/React.createElement DevcardBase #js { :card (add-environment-defaults card-options) }))))
 
+(defrecord IdentiyOptions [obj]
+  IDevcardOptions
+  (-devcard-options [this opts] opts))
+
+(defn atom-like-options [main-obj {:keys [options] :as devcard-opts}]
+  (assoc devcard-opts
+         :main-obj (fn [_ data-atom] (edn-rend/html-edn @data-atom))
+         :initial-data main-obj
+         :options (merge { :history true }
+                         (assert-options-map options))))
+
+(defrecord AtomLikeOptions [obj]
+  IDevcardOptions
+  (-devcard-options [this opts] (atom-like-options obj opts)))
+
+(defn edn-like-options [main-obj devcard-opts]
+  (assoc devcard-opts :main-obj
+         (edn-rend/html-edn (if (satisfies? IDeref main-obj)
+                              (deref main-obj)
+                              main-obj))))
+
+(defrecord EdnLikeOptions [obj]
+  IDevcardOptions
+  (-devcard-options [this devcard-opts]
+    (edn-like-options obj devcard-opts)))
+
+(defn atom-like? [x] (and (satisfies? IWatchable x) (satisfies? IDeref x)))
+
+(defn edn-like? [x] (satisfies? IDeref x))
+
+(defn coerce-to-devcards-options [main-obj]
+  (if (satisfies? IDevcardOptions main-obj)
+    main-obj
+    (cond
+      (atom-like? main-obj) (AtomLikeOptions. main-obj)
+      (edn-like?  main-obj) (EdnLikeOptions.  main-obj)
+      :else (IdentiyOptions. main-obj))))
+
 (defn card-base [opts]
   (let [opts (assoc opts :path (:path devcards.system/*devcard-data*))]
     (if (satisfies? IDevcard (:main-obj opts))
       (-devcard (:main-obj opts) opts)
       (card-with-errors
-       (if (satisfies? IDevcardOptions (:main-obj opts))
-         (-devcard-options (:main-obj opts) opts)
-         opts)))))
-
+       (-devcard-options (coerce-to-devcards-options (:main-obj opts))
+                           opts)))))
 
 ;; keep
 (defn- dom-node* [node-fn]
@@ -323,27 +362,27 @@
 (extend-type PersistentArrayMap
   IDevcardOptions
   (-devcard-options [this devcard-opts]
-    (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
+    (edn-like-options this devcard-opts)))
 
 (extend-type PersistentVector
   IDevcardOptions
   (-devcard-options [this devcard-opts]
-    (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
+    (edn-like-options this devcard-opts)))
 
 (extend-type PersistentHashSet
   IDevcardOptions
   (-devcard-options [this devcard-opts]
-    (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
+    (edn-like-options this devcard-opts)))
 
 (extend-type List
   IDevcardOptions
   (-devcard-options [this devcard-opts]
-    (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
+    (edn-like-options this devcard-opts)))
 
 (extend-type EmptyList
   IDevcardOptions
   (-devcard-options [this devcard-opts]
-    (update-in devcard-opts [:main-obj] edn-rend/html-edn)))
+    (edn-like-options this devcard-opts)))
 
 (extend-type Atom
   IDevcardOptions

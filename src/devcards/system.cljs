@@ -275,7 +275,7 @@
 
 (comment
 
-  list namespaces in dependency order
+  smarter about responding to different types (cursors) for change
   
   the composition structure of the main api
     needs to copy normal react composition

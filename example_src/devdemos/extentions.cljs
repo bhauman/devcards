@@ -132,4 +132,17 @@
    :watch-atom true
    :history true})
 
+(defcard direct-ratom-support
+  temp-atom)
 
+;; tried to support reagent cursor but updates are firing during render
+
+;; hmmm need to be smarter about watching things for cursors sake
+
+(defonce c (rg/cursor temp-atom []))
+
+(prn (devcards.core/atom-like? c))
+
+(prn (satisfies? devcards.core/IDevcardOptions c))
+
+(defcard reagent-cursor c {} {:heading 5})
