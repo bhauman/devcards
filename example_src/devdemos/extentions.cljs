@@ -103,10 +103,13 @@
   (rg/create-element timer-apper))
 
 (defcard reagent-locals-try
-  (fn [data-atom _]
-    (let [{:keys [name age]} @data-atom]
-      (dc/reagent->react [:div [:h1 "Hi there " @name]
-                          [:p "You are " @age " years old!"]])))
+  "A quick way to create some stable local atoms"
+  (dc/reagent->
+   (fn [data-atom _]
+     (let [{:keys [name age]} @data-atom]
+       [:div [:h3 "Hi there " @name]
+        [:p "You are " @age " years old!"]])))
+  ;; store the needed locals in the data atom
   {:age  (rg/atom 55)
    :name (rg/atom "George")})
 
