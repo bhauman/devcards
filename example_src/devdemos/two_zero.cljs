@@ -1,4 +1,6 @@
-(ns devdemos.two-zero
+(ns
+    ^{:description "An implementation of 2048"}
+  devdemos.two-zero
   (:require
    [devcards.core]
    [clojure.string :as string]
@@ -97,10 +99,8 @@
                { :top 2 :left 1 :v 1024 :id :t10}
                { :top 2 :left 2 :v 2048 :id :t11}]))
 
-(defcard-doc
- "## Checking basic tile movement animation")
-
 #_(defcard animation-work
+     "## Checking basic tile movement animation"
   (dc/slider-card
    identity
    { :left (range 4) }
@@ -431,7 +431,7 @@
                  :tile2 { :v 2 :top 0 :left 3 :id :tile2}})
 
 (defcard try-game-card
-  (fn [_ data]
+  (fn [data _]
     (sab/html
      [:div
       (game-board (vals @data))

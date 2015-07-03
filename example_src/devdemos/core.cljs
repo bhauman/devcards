@@ -1,4 +1,7 @@
-(ns ^:figwheel-always devdemos.core
+(ns 
+  ^{:description "Devcards: A high level introduction."
+    :figwheel-always true }
+  devdemos.core
     (:require
      [om.core :as om :include-macros true]
      [om.dom :as dom :include-macros true]
@@ -39,7 +42,7 @@
    exectuable comments. You can also keep them seperate like a test
    suite.
 
-   Devcards configuration couldn't be simpler. Just add `:figwheel
+   Devcards configuration couldn't be simpler. Just add `[devcards \"0.2.0-SNAPSHOT\"]` as a dependency and `:figwheel
    {:devcards true}` to your build config.
 
    Let's look at an advanced Devcard:"
@@ -47,7 +50,7 @@
   (dc/mkdn-pprint-code
    '(defcard bmi-calculator
       "*Code taken from the Reagent readme.*"
-      (fn [_ data-atom] (bmi-component data-atom))
+      (fn [data-atom _] (bmi-component data-atom))
       {:height 180 :weight 80}
       {:inspect-data true :history true}))
 
@@ -93,7 +96,7 @@
 
 (defcard bmi-calculator
   "*Code taken from the Reagent readme.*"
-  (fn [_ data-atom] (bmi-component data-atom))
+  (fn [data-atom _] (bmi-component data-atom))
   {:height 180 :weight 80}
   {:inspect-data true :history true})
 
@@ -217,7 +220,6 @@
   {:inspect-data true
    :history true })
 
-
 (defonce re-bmi-data (reagent/atom {:height 180 :weight 80}))
 
 (defn re-slider [param value min max]
@@ -287,6 +289,8 @@
    requires a seperate build, similar to how you would create a test
    build.
 
+   Add `[devcards \"0.2.0-SNAPSHOT\"]` as a dependency.
+
    Require the devcards macros: 
    ```
    (ns example.core
@@ -315,11 +319,26 @@
    ```
  
   It's important to make sure that your application isn't launching
-  itself on load. Otherwise the devcards application will try to start
-  at the same time your applicatoin is starting.
+  itself on load. We don't want your application to run. We want
+  devards to run. So having a seperate HTML file for the devcards is
+  the best solution.
+
+  A quick way to prevent your main application from running is to make
+  it conditional on the presense of the node it's supposed to mount.
+
+  ```
+  (defn main []
+    ;; conditionally start the app based on the presence of #main-app-area
+    ;; node is on the page
+    (if-let [node (.getElementById js/document \"main-app-area\")]
+      (js/React.render (sab/html [:div \"This is main app is ruunning.\"]) node)))
+
+  (main)  
+  ```
   
-  For now refer to the devcards-template for a simple pattern to
-  have your application start conditionally.
+  For now refer to the
+  [devcards-template](https://github.com/bhauman/devcards-template)
+  for a more complete picture of setting up decards.
   
   
   ")

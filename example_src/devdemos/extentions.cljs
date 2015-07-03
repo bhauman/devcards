@@ -48,7 +48,7 @@
 
 (defcard om-root
   (dc/om-root
-   (fn [owner data]
+   (fn [data owner]
      (reify om/IRender
        (render [_]
          (sab/html [:h1 "This is om now!!!"]))))))
@@ -103,12 +103,12 @@
   (rg/create-element timer-apper))
 
 (defcard reagent-locals-try
-  (fn [_ data-atom]
-    (let [{:keys [counter other stuff]} @data-atom]
-      (dc/reagent->react [:div [:h1 "Hi there" @counter]])))
-  {:counter (rg/atom 55)
-   :other "hi"
-   :stuff "yep"})
+  (fn [data-atom _]
+    (let [{:keys [name age]} @data-atom]
+      (dc/reagent->react [:div [:h1 "Hi there " @name]
+                          [:p "You are " @age " years old!"]])))
+  {:age  (rg/atom 55)
+   :name (rg/atom "George")})
 
 (defn counting-component-passing-ratom [ratom]
   [:div
@@ -119,16 +119,16 @@
 
 (defonce temp-atom (rg/atom {:count 12}))
 
-(defcard reagent-atom-supportt
+(defcard reagent-atom-support
   "## We should support anything with the IAtom interface
 
    This will allow folks to use Reagent's rAtom."
   (dc/reagent->
-   (fn [_ counter-atom]
-     [:div "counting away " [:button {:on-click #(swap! counter-atom update-in [:count] inc)} "inc"] " " (:count @counter-atom)]))
+   (fn [counter-atom _]
+     [:div "counting away "
+      [:button {:on-click #(swap! counter-atom update-in [:count] inc)} "inc"] " " (:count @counter-atom)]))
   temp-atom
   {:inspect-data true
-   :watch-atom true
    :history true})
 
 (defcard direct-ratom-support

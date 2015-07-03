@@ -61,14 +61,14 @@
   Instead of a ReactElement you can provide a function the takes two
   parameters and returns a ReactElement like so:"
   (dc/mkdn-pprint-code
-   '(defcard (fn [owner data-atom]
+   '(defcard (fn [data-atom owner]
                (sab/html [:div [:h2 "Example: fn that returns React"]
                           (prn-str data-atom)]))))
   "In this example the `owner` is the enclosing cards ReactElement and
   the `data-atom` is a ClojureScript Atom.")
 
 (defcard
-  (fn [owner data-atom]
+  (fn [data-atom owner]
     (sab/html [:div [:h3 "Example: fn that returns React"]
                (prn-str data-atom)])))
 
@@ -78,12 +78,12 @@
    Let's make a quick example counter:"
     (dc/mkdn-pprint-code
      '(defcard
-        (fn [owner data-atom]
+        (fn [data-atom owner]
           (sab/html [:div [:h3 "Example Counter: " (:count @data-atom)]
                      [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]])))))
 
 (defcard
-  (fn [owner data-atom]
+  (fn [data-atom owner]
     (sab/html [:div [:h3 "Example Counter: " (:count @data-atom)]
                [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]])))
 
@@ -97,13 +97,13 @@
   parameter. You can use it like so:"
   (dc/mkdn-pprint-code
    '(defcard
-      (fn [owner data-atom]
+      (fn [data-atom owner]
         (sab/html [:div [:h3 "Example Counter w/Initial Data: " (:count @data-atom)]
                    [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]]))
       {:count 50})))
 
 (defcard
-  (fn [owner data-atom]
+  (fn [data-atom owner]
     (sab/html [:div [:h3 "Example Counter w/Initial Data: " (:count @data-atom)]
                [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]]))
   {:count 50})
@@ -122,19 +122,19 @@
 
   (dc/mkdn-pprint-code
    '(defcard example-counter
-      (fn [owner data-atom]
+      (fn [data-atom owner]
         (sab/html [:h3 "Example Counter w/Shared Initial Atom: " (:count @data-atom)]))
       first-example-state))
   
   (dc/mkdn-pprint-code
    '(defcard example-incrementer
-      (fn [owner data-atom]
+      (fn [data-atom owner]
         (sab/html [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "increment"]))
       first-example-state))
 
   (dc/mkdn-pprint-code
    '(defcard example-decrementer
-      (fn [owner data-atom]
+      (fn [data-atom owner]
         (sab/html [:button {:onClick (fn [] (swap! data-atom update-in [:count] dec))} "decrement"]))
       first-example-state))
   "As you can see, we created three cards that all share the same state.
@@ -144,17 +144,17 @@
 (defonce first-example-state (atom {:count 55}))
 
 (defcard example-counter
-  (fn [owner data-atom]
+  (fn [data-atom owner]
     (sab/html [:h3 "Example Counter w/Shared Initial Atom: " (:count @data-atom)]))
   first-example-state)
 
 (defcard example-incrementer
-  (fn [owner data-atom]
+  (fn [data-atom owner]
     (sab/html [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc)) } "increment"]))
   first-example-state)
 
 (defcard example-decrementer
-  (fn [owner data-atom]
+  (fn [data-atom owner]
     (sab/html [:button {:onClick (fn [] (swap! data-atom update-in [:count] dec)) } "decrement"]))
   first-example-state)
 
@@ -171,12 +171,12 @@
 
   (dc/mkdn-pprint-code
    '(defcard example-dom-node
-      (dom-node (fn [node data-atom]
+      (dom-node (fn [data-atom node]
                   (set! (.-innerHTML node) "<h2>Example Dom Node</h2>"))))))
 
 (defcard example-dom-node
   (dom-node
-   (fn [node data-atom]
+   (fn [data-atom node]
      (set! (.-innerHTML node) "<h2>Example Dom Node</h2>"))))
 
 
@@ -221,7 +221,7 @@
      [:li [:a {:onClick (fn [] (swap! data-atom update-in [:count] dec))} "dec"]]]]))
 
 (defcard react-runner-card-example
-  (fn [_ data-atom]
+  (fn [data-atom _]
     (sab/html
      [:div
        [:h3 "This is a " "react-runner-card"]
@@ -243,7 +243,7 @@
 (defonce react-shared-atom (atom {:count 3}))
 
 (defcard react-runner-card-shared-1
-  (fn [_ data-atom]
+  (fn [data-atom _]
     (sab/html
      [:div
       [:h3 "This counter is sharing state"]
@@ -252,7 +252,7 @@
   react-shared-atom)
 
 (defcard react-runner-card-shared-2
-  (fn [_ data-atom]
+  (fn [data-atom _]
     (sab/html [:h1 "Count: " (:count @data-atom)]))
   react-shared-atom)
 

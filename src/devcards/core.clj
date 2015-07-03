@@ -142,7 +142,8 @@
   `(create-idevcard (reagent->react ~body) {:watch-atom false}))
 
 (defmacro reagent-> [body]
-  `(create-idevcard (fn [d# da#] (reagent->react (~body d# da#))) {:watch-atom false}))
+  `(create-idevcard (fn [data-atom# owner#]
+                      (reagent->react (~body data-atom# owner#))) {:watch-atom false}))
 
 ;; om helpers
 
@@ -151,7 +152,7 @@
    (when (utils/devcards-active?)
      `(create-idevcard
        (devcards.core/dom-node*
-        (fn [node# data-atom#]
+        (fn [data-atom# node#]
           (om.core/root ~om-comp-fn data-atom#
                         (merge ~om-options
                                {:target node#}))))

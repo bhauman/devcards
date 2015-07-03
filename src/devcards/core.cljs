@@ -18,6 +18,10 @@
 ;; this channel is only used for card registration notifications
 (defonce devcard-event-chan (chan))
 
+;; its possible to record the meta-data for the loaded ns's being
+;; shipped by figwheel, by ataching a before load listener and storing
+;; the meta data, might be better to have figwheel do that.
+
 (defn register-figwheel-listeners!
   "This event doesn't need to be fired for the system to run. It will just render
    a little faster on reload if it is fired. Figwheel isn't required to run devcards."
@@ -114,7 +118,7 @@
 (defonce DevcardBase
   (js/React.createClass
    #js {:getInitialState
-        (fn [] #js {:unique_id (gensym 'react-runner)})
+        (fn [] #js {:unique_id (gensym 'devcards-base-)})
         :componentWillMount
         (fn []
           (this-as this
@@ -155,7 +159,7 @@
                  options   (:options card)
                  main      (let [m (:main-obj card)]
                              (if (fn? m)
-                               (m this (.-data_atom (.-state this)))
+                               (m (.-data_atom (.-state this)) this)
                                m))
                  document  (when-let [docu (:documentation card)]
                              (markdown->react docu))
@@ -173,14 +177,14 @@
 (defonce DomComponent
   (js/React.createClass
    #js {:getInitialState
-        (fn [] #js {:unique_id (str (gensym 'devcards-card-runner-))})
+        (fn [] #js {:unique_id (str (gensym 'devcards-dom-component-))})
         :renderIntoDOM
         (fn []
           (this-as this
                    (when-let [node-fn (.. this -props -node_fn)]
                      (when-let [comp (aget (.. this -refs) (.. this -state -unique_id))]
                        (when-let [node (js/React.findDOMNode comp)]
-                         (node-fn node (.. this -props -data_atom)))))))
+                         (node-fn (.. this -props -data_atom) node))))))
         :componentDidUpdate
         (fn [prevP, prevS]
           (this-as this
@@ -306,7 +310,7 @@
 
 (defn atom-like-options [main-obj {:keys [options] :as devcard-opts}]
   (assoc devcard-opts
-         :main-obj (fn [_ data-atom] (edn-rend/html-edn @data-atom))
+         :main-obj (fn [data-atom _] (edn-rend/html-edn @data-atom))
          :initial-data main-obj
          :options (merge { :history true }
                          (assert-options-map options))))
@@ -348,7 +352,7 @@
 
 ;; keep
 (defn- dom-node* [node-fn]
-  (fn [owner data-atom]
+  (fn [data-atom owner]
      (js/React.createElement DomComponent
                              #js {:node_fn   node-fn
                                   :data_atom data-atom})))
@@ -387,12 +391,13 @@
 
 (extend-type Atom
   IDevcardOptions
-  (-devcard-options [this {:keys [options main-obj] :as devcard-opts}]
-    (assoc devcard-opts
-           :main-obj (fn [_ data-atom] (edn-rend/html-edn @data-atom))
-           :initial-data main-obj
-           :options (merge { :history true }
-                           (assert-options-map options)))))
+  (-devcard-options [this devcard-opts]
+    (atom-like-options this devcard-opts)
+    #_(assoc devcard-opts
+             :main-obj (fn [data-atom _] (edn-rend/html-edn @data-atom))
+             :initial-data main-obj
+             :options (merge { :history true }
+                             (assert-options-map options)))))
 
 ;; history recorder
 
@@ -645,7 +650,7 @@
                       (:_devcards_collect_tests test-summary))
         total-tests (count some-tests)
         {:keys [fail pass error]} (:report-counters test-summary)]
-    (fn [owner data-atom]
+    (fn [data-atom owner]
       (sab/html
        [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
         [:div.com-rigsomelight-devcards-panel-heading
