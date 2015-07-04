@@ -384,6 +384,11 @@
   (-devcard-options [this devcard-opts]
     (edn-like-options this devcard-opts)))
 
+(extend-type LazySeq
+  IDevcardOptions
+  (-devcard-options [this devcard-opts]
+    (edn-like-options this devcard-opts)))
+
 (extend-type EmptyList
   IDevcardOptions
   (-devcard-options [this devcard-opts]
