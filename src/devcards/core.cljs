@@ -64,7 +64,8 @@
 (defn- react-raw [raw-html-str]
   "A React component that renders raw html."
   (.div (.-DOM js/React)
-        (clj->js { :dangerouslySetInnerHTML
+        (clj->js { :key (str (hash raw-html-str))
+                   :dangerouslySetInnerHTML
                    { :__html
                      raw-html-str }})))
 
