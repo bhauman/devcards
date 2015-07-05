@@ -13,6 +13,7 @@
      [devdemos.testing]
      [devdemos.errors]
      [devdemos.extentions]
+     [devdemos.edn-render]
      [cljs.test :as t :include-macros true :refer-macros [testing is]])
     (:require-macros
      ;; Notice that I am not including the 'devcards.core namespace
@@ -30,8 +31,8 @@
    Devcards is intended to make ClojureScript development a pure joy.
  
    Devcards are intended to facilitate **interactive live
-   development**. Devcards can be used in conjuntion with figwheel but
-   will also work with any form of live file reloading.
+   development**. Devcards can be used in conjunction with figwheel but
+   will also work with any form of live file reloading (repl, boot-reload, ...)
  
    Devcards revolves around a multi-purpose macro called `defcard`.
    You can think of `defcard` a powerful form of pprint that helps you display
@@ -42,13 +43,14 @@
    exectuable comments. You can also keep them seperate like a test
    suite.
 
-   Devcards configuration couldn't be simpler. Just add `[devcards \"0.2.0-SNAPSHOT\"]` as a dependency and `:figwheel
+   With figwheel, Devcards configuration couldn't be simpler. Just add
+   `[devcards \"0.2.0-SNAPSHOT\"]` as a dependency and `:figwheel
    {:devcards true}` to your build config.
 
    Let's look at an advanced Devcard:"
 
   (dc/mkdn-pprint-code
-   '(defcard bmi-calculator
+   '(defcard bmi-calculator 
       "*Code taken from the Reagent readme.*"
       (fn [data-atom _] (bmi-component data-atom))
       {:height 180 :weight 80}

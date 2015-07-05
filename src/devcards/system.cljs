@@ -57,7 +57,7 @@
       (when-not (get-element-by-id "com-rigsomelight-edn-css")
         (.appendChild head
                       (create-style-element "com-rigsomelight-edn-css"
-                                            (inline-resouce-file "public/devcards/css/com_rigsomelight_edn.css")))))))
+                                            (inline-resouce-file "public/devcards/css/com_rigsomelight_edn_flex.css")))))))
 
 (defn render-base-if-necessary! []
   (add-css-if-necessary!)
@@ -65,6 +65,7 @@
     (let [el (js/document.createElement "div")]
       (set! (.-id el) devcards-app-element-id)
       (prepend-child (.-body js/document) el))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Hashbang routing

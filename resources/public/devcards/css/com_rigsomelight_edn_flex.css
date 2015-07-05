@@ -1,83 +1,46 @@
-.com-rigsomelight-rendered-edn {
+.com-rigsomelight-rendered-edn .collection {
+    display: flex;
+}
+
+.com-rigsomelight-rendered-edn .keyval {
     display: flex;
     flex-wrap: wrap;
-    width: 100%;
 }
 
 .com-rigsomelight-rendered-edn .keyval > .keyword {
-   color: rgb(196,33,0);
- 
+    color: #a94442;
 }
 
 
 .com-rigsomelight-rendered-edn .keyval > *:first-child {
-  margin: 0px 7px;
+    margin: 0px 3px;
+    flex-shrink: 0;
 }
 
 .com-rigsomelight-rendered-edn .keyval > *:last-child {
-  margin: 0px 7px;
+    margin: 0px 3px;
 }
-
-
-.com-rigsomelight-rendered-edn .collection,
-.com-rigsomelight-rendered-edn .keyval {
-    /* position: relative; */
-    display: -webkit-flex;
-    -webkit-flex-direction: row;
-    -webkit-justify-content: flex-start;
-}
-
-
-.com-rigsomelight-rendered-edn .vector,
-.com-rigsomelight-rendered-edn .set,
-.com-rigsomelight-rendered-edn .seq  {
- /*   padding-left: 0.9em;
-    padding-right: 0.9em; */
-}
-
-.com-rigsomelight-rendered-edn .set { 
-   /*  padding-left: 1.2em; */
-}
-
-.com-rigsomelight-rendered-edn .collection.map {
-    /* padding: 1.8em; */
-   /* vertical-align: top; */
-}
-
-/* .com-rigsomelight-rendered-edn .vector,
-.com-rigsomelight-rendered-edn .set,
-.com-rigsomelight-rendered-edn .seq {
-    display: inline-block;
-    vertical-align: top;
-} */
 
 .com-rigsomelight-rendered-edn .opener {
     color: #999;
-    margin: 0px 7px;
-
-
-    display: flex;
-    flex-direction: column;
-   /*  -webkit-align-items: flex-start; */
-    -webkit-justify-content: flex-start;
+    margin: 0px 4px;
+    flex-shrink: 0;
 }
 
 .com-rigsomelight-rendered-edn .closer {
-    margin-bottom: 0px;
-
     display: flex;
-    flex-direction: column-reverse;     
-    /* flex-direction: column; */
+    flex-direction: column-reverse;
+    margin: 0px 3px;    
     color: #999;
 }
 
-.com-rigsomelight-rendered-edn .contents {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
+.com-rigsomelight-rendered-edn .string {
+    color: #428bca;
 }
 
-.com-rigsomelight-rendered-edn .collection.map > .contents {
-    margin-top: 1.3em;
-    margin-bottom: 1.3em; 
+.com-rigsomelight-rendered-edn .string .opener,
+.com-rigsomelight-rendered-edn .string .closer {
+    display: inline;
+    margin: 0px;
+    color: #428bca;    
 }
