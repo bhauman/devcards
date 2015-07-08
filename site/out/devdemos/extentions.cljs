@@ -103,8 +103,8 @@
   (rg/create-element timer-apper))
 
 (defcard reagent-locals-try
-  "A quick way to create some stable local atoms"
-  (dc/reagent->
+  "A quick way to create some stable local RAtoms"
+  (dc/reagent
    (fn [data-atom _]
      (let [{:keys [name age]} @data-atom]
        [:div [:h3 "Hi there " @name]
