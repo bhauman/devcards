@@ -164,7 +164,9 @@ Take a look at [the `defcard` api](http://rigsomelight.com/devcards/#!/devdemos.
 
 #### Does Devcards only work with React or Om?
 
-No it doesn't.
+Nope, it can work with arbitrary CLJS code examples as well. Devcards
+provides a `dom-node` helper that will give you a node in the DOM to
+display stuff in.
 
 #### Does Devcards require Figwheel?
 
@@ -175,7 +177,7 @@ You can also just reload the browser after making a change.
 #### What do I do for deployment?
 
 Devcards has been rewritten so that you can write Devcards alongside
-your code will no impact on your production code.
+your code with no impact on your production code.
 
 That being said it is often helpful to move the bulk of your cards to
 a different buildpath that is only built when working on the **devcards**
