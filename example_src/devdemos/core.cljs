@@ -26,7 +26,7 @@
 (devcards.core/start-devcard-ui!)
 
 (defcard-doc
-  "# Devcards: the hard sell
+  "# [Devcards](https://github.com/bhauman/devcards): the hard sell
     
    Devcards is intended to make ClojureScript development a pure joy.
  
@@ -48,16 +48,21 @@
    `[devcards \"0.2.0-SNAPSHOT\"]` as a dependency and `:figwheel
    {:devcards true}` to your build config.
 
-   Let's look at an advanced Devcard:"
+   Let's look at an advanced Devcard:
+   
+   ```
+   (defcard bmi-calculator                        ;; optional symbol name
+     \"*Code taken from Reagent readme.*\"          ;; optional markdown doc
+     (fn [data-atom _] (bmi-component data-atom)) ;; object of focus
+     {:height 180 :weight 80}                     ;; optional initial data
+     {:inspect-data true :history true})          ;; optional devcard config options
+      
+   ```
 
-  (dc/mkdn-pprint-code
-   '(defcard bmi-calculator 
-      "*Code taken from the Reagent readme.*"
-      (fn [data-atom _] (bmi-component data-atom))
-      {:height 180 :weight 80}
-      {:inspect-data true :history true}))
+   The [defcard api](http://localhost:3449/devcards/index.html#!/devdemos.defcard_api)
+   is intended to be small and intuitive.
 
-  "And you can see this devcard rendered below:")
+   And you can see this devcard rendered below:")
 
 ;; code from the reagent page adapted to plain reagent
 (defn calc-bmi [bmi-data]
@@ -143,11 +148,14 @@
    ## Auto-detection
    
    The `defcard` macro does its best to display the data given to it.
-   You can pass `defcard` a **string**, a **ReactElement**, a **Map**, a **Vector**, a
-   **List**, an **Atom**, an **RAtom**, an **IDeref** and expect
-   various cursor implementations to work soon as well. 
+   You can pass `defcard` a **string** (will be interpreted as
+   markdown), a **function** that takes a data-atom and an owner, a
+   **ReactElement**, a **Map**, a **Vector**, a **List**, an **Atom**,
+   an **RAtom**, an **IDeref**, anything that implements
+   **IDevcardOptions** or **IDevcard**, and I'm hoping to get various
+   cursor implementations working as well.
 
-   Implementing your own cards is easy as defcard will take any
+   Implementing your own cards is easy as `defcard` will take any
    ReactElement. If you want to create a completely custom card there are the
    **IDevcardOptions** and **IDevcard** protocols.
    " )

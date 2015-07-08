@@ -14,9 +14,12 @@ represents some code to be displayed. Devcards provides an interface
 which allows the developer navigate to different namespaces and view
 the *cards* that have been defined in that namespace. 
 
-When used in conjunction with [lein figwheel][leinfigwheel] the cards can be
-created and edited **"live"** in one's ClojureScript source
-files.
+When used in conjunction with [lein figwheel][leinfigwheel] the cards
+can be created and edited **"live"** in one's ClojureScript source
+files. Essentially lifting the code example out of the file into the
+browser for you to try out immediately.
+
+Read: [The Hard Sell](http://rigsomelight.com/devcards/#!/devdemos.core) 
 
 [See the introduction video.](https://vimeo.com/97078905)
 
@@ -44,9 +47,11 @@ rendered into the Devcards interface.
 Regardless of which path you take to get started with Devcards please
 see the following examples:
 
-[Examples of all the cards](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/core.cljs)
+[Introduction examples](http://rigsomelight.com/devcards/#!/devdemos.core) ([src](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/core.cljs))
 
-[An example implementation of 2048](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/two_zero.cljs)
+[An example implementation of 2048](http://rigsomelight.com/devcards/#!/devdemos.two_zero) ([src](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/two_zero.cljs))
+
+[An introduction to the `defcard` api](http://rigsomelight.com/devcards/#!/devdemos.defcard_api) ([src](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/defcard_api.cljs))
 
 ## Super Quick Start
 
@@ -102,7 +107,7 @@ First make sure you include the following `:dependencies` in your `project.clj` 
 ```
 
 lein figwheel is not required to use Devcards but ... if you want to
-experience interactive coding with Devcards you will need to have
+experience interactive coding with Devcards you will want to try it initially with 
 [lein-figwheel](https://github.com/bhauman/lein-figwheel) configured.
 See the [lein-figwheel repo](https://github.com/bhauman/lein-figwheel)
 for instructions on how to do that.
@@ -122,10 +127,6 @@ Configure your devcards build:
                 :source-map-timestamp true }}]
 }                
 ```
-
-Devcards is extremely new so the patterns for using it are completely
-up in the air. I am going to show you the very least you need to setup to
-get devcards running.
 
 You will need an HTML file to host the devcards interface. It makes
 sense to have a separate file to host devcards. I would create the
@@ -159,11 +160,16 @@ Next you will need to include the Devcards macros into your file:
 
 This will create a card in the devcards interface.
 
+
+Take a look at [the `defcard` api](http://rigsomelight.com/devcards/#!/devdemos.defcard_api) ([src](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/defcard_api.cljs))
+
 ## FAQ
 
 #### Does Devcards only work with React or Om?
 
-No it doesn't.
+Nope, it can work with arbitrary CLJS code examples as well. Devcards
+provides a `dom-node` helper that will give you a node in the DOM to
+display stuff in.
 
 #### Does Devcards require Figwheel?
 
@@ -174,7 +180,7 @@ You can also just reload the browser after making a change.
 #### What do I do for deployment?
 
 Devcards has been rewritten so that you can write Devcards alongside
-your code will no impact on your production code.
+your code with no impact on your production code.
 
 That being said it is often helpful to move the bulk of your cards to
 a different buildpath that is only built when working on the **devcards**
