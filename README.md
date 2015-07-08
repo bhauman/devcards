@@ -44,7 +44,7 @@ rendered into the Devcards interface.
 Regardless of which path you take to get started with Devcards please
 see the following examples:
 
-[Examples of all the cards](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/core.cljs)
+[Introduction examples](http://rigsomelight.com/devcards/#!/devdemos.core)([src](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/core.cljs))
 
 [An example implementation of 2048](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/two_zero.cljs)
 
