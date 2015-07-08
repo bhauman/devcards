@@ -33,10 +33,11 @@
    Devcards are intended to facilitate **interactive live
    development**. Devcards can be used in conjunction with figwheel but
    will also work with any form of live file reloading (repl, boot-reload, ...)
- 
+
    Devcards revolves around a multi-purpose macro called `defcard`.
-   You can think of `defcard` a powerful form of pprint that helps you display
-   code examples as an organized set of cards. 
+   You can think of `defcard` a powerful form of pprint that helps you
+   display code examples as an organized set of cards in the Devcards
+   interface (you are currently looking at the Devcards interface).
 
    The Devcards you create are intended to have no impact on the size
    of your production code. You can use devcards just as you would use
@@ -114,7 +115,13 @@
    can be enabled by adding `{:history true}` to the devcard options.
    
    Go ahead and move the sliders and play with the history control
-   widget. *add instructions for other controls here*
+   widget. You can move forward with the <span class='com-rigsomelight-devcards-history-control-right'></span> control. You can continue from where you left off with the fast forward control 
+   <span class='com-rigsomelight-devcards-history-control-fast-forward'>
+<span  style='margin-right: -14px' class='com-rigsomelight-devcards-history-control-small-arrow'></span>
+<span style='margin-right: -14px' class='com-rigsomelight-devcards-history-control-small-arrow'></span>
+<span class='com-rigsomelight-devcards-history-control-block'></span>
+   </span>  And you can reify the current point in history and start working with your app from there with the 
+   <span class='com-rigsomelight-devcards-history-stop'></span> control or by simply interacting with the app.
 
    ## Data display
 
@@ -122,10 +129,10 @@
    being displayed. This is enabled by adding `{:inspect-data true}`
    to the devcard options.
  
-   There if you interact with the calculator above you will see that
-   the integers are being stored as strings in the data atom. This is
-   a smell that you will see immediately when the data is displayed front
-   and center like this.
+   If you interact with the calculator above you will see that the
+   integers are being stored as strings in the data atom. This is a
+   smell that you will see immediately when the data is displayed
+   front and center like this.
 
    ## Markdown docs
    
@@ -138,7 +145,11 @@
    The `defcard` macro does its best to display the data given to it.
    You can pass `defcard` a **string**, a **ReactElement**, a **Map**, a **Vector**, a
    **List**, an **Atom**, an **RAtom**, an **IDeref** and expect
-   various cursor implementations to work soon as well.
+   various cursor implementations to work soon as well. 
+
+   Implementing your own cards is easy as defcard will take any
+   ReactElement. If you want to create a completely custom card there are the
+   **IDevcardOptions** and **IDevcard** protocols.
    " )
 
 (deftest cljs-test-integration
@@ -156,10 +167,37 @@
    Go ahead and click on the numbers in the header of this card.
   
    The test card will display the testing context as well as the
-   messages for the various tests that run."
+   messages for the various tests that run.
+
+   For example the following tests are defined like this:
+
+   ```
+   (deftest cljs-test-integration
+     \"## Here are some example tests\"
+     (testing \"testing context 1\"
+       (is (= (+ 3 4 55555) 4) \"This is the message arg to an 'is' test\")
+       (is (= (+ 1 0 0 0) 1) \"This should work\")
+       (is (= 1 3))
+       (is false)
+       (is (throw \"errors get an extra red line on the side\")))
+      \"Top level strings are interpreted as markdown for inline documentation.\"
+     (testing \"testing context 2\"
+       (is (= (+ 1 0 0 0) 1))        
+       (is (= (+ 3 4 55555) 4))
+       (is false)
+     (testing \"nested context\"
+       (is (= (+ 1 0 0 0) 1))        
+       (is (= (+ 3 4 55555) 4))
+       (is false))))
+   ```
+
+   The `testing` and is macros are the ones from `cljs.test`
+
+   These tests are rendered below:"
   (testing "testing context 1"
     (is (= (+ 3 4 55555) 4) "This is the message arg to an 'is' test")
-    (is (= (+ 1 0 0 0) 1) "This should work")
+    (is (= (+ 1 0 0 0) 1)
+        "This should work")
     (is (= 1 3))              
     (is false)
     (is (throw "errors get an extra red line on the side")))
@@ -285,8 +323,6 @@
 
    ## Existing project
 
-
-
    Integrating devcards into an existing is fairly straightforward and
    requires a seperate build, similar to how you would create a test
    build.
@@ -303,9 +339,9 @@
      [devcards.core :as dc :refer [defcard deftest]]))
    ```
 
-   If you are using figwheel you can just copy your figwheel dev build
-   and add `:devcards true` (figwheel >= 0.3.5) to your `:figwheel`
-   build config like so:
+   If you are using figwheel you can create a build from your current
+   figwheel dev build and add `:devcards true` (figwheel >= 0.3.7) to
+   your `:figwheel` build config like so:
 
    ```
    :cljsbuild {
@@ -324,6 +360,18 @@
   itself on load. We don't want your application to run. We want
   devards to run. So having a seperate HTML file for the devcards is
   the best solution.
+
+  ```
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no\">
+    </head>
+    <body>
+      <script src=\"js/example.js\" type=\"text/javascript\"></script>
+    </body>
+  </html>  
+  ```
 
   A quick way to prevent your main application from running is to make
   it conditional on the presense of the node it's supposed to mount.

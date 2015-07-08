@@ -139,11 +139,12 @@
   `(js/React.createElement (reagent.core/reactify-component (fn [_#] ~body))))
 
 (defmacro reagent [body]
-  `(create-idevcard (reagent->react ~body) {:watch-atom false}))
-
-(defmacro reagent-> [body]
-  `(create-idevcard (fn [data-atom# owner#]
-                      (reagent->react (~body data-atom# owner#))) {:watch-atom false}))
+  `(create-idevcard (let [v# ~body]
+                      (reagent->react
+                       (if (fn? v#)
+                         (fn [data-atom# owner#] (v# data-atom# owner#)
+                           v#))))
+                    {:watch-atom false}))
 
 ;; om helpers
 
