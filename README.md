@@ -16,8 +16,8 @@ the *cards* that have been defined in that namespace.
 
 When used in conjunction with [lein figwheel][leinfigwheel] the cards
 can be created and edited **"live"** in one's ClojureScript source
-files. Essentially lifting the code out of the file into the browser
-for you to try out immediately.
+files. Essentially lifting the code example out of the file into the
+browser for you to try out immediately.
 
 Read: [The Hard Sell](http://rigsomelight.com/devcards/#!/devdemos.core) 
 
