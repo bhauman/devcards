@@ -1,6 +1,6 @@
 (ns devdemos.extentions
     (:require
-     [devcards.core :as devcards]
+     [devcards.core]
      [sablono.core :as sab :include-macros true]
      [cljs.test :as t :include-macros true]
      [om.core :as om]
@@ -126,7 +126,7 @@
   "## We should support anything with the IAtom interface
 
    This will allow folks to use Reagent's rAtom."
-  (dc/reagent->
+  (dc/reagent
    (fn [counter-atom _]
      [:div "counting away "
       [:button {:on-click #(swap! counter-atom update-in [:count] inc)} "inc"] " " (:count @counter-atom)]))
