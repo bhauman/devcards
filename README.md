@@ -18,6 +18,8 @@ When used in conjunction with [lein figwheel][leinfigwheel] the cards can be
 created and edited **"live"** in one's ClojureScript source
 files.
 
+[Read: The Hard Sell](http://rigsomelight.com/devcards/#!/devdemos.core) 
+
 [See the introduction video.](https://vimeo.com/97078905)
 
 <img src="https://s3.amazonaws.com/bhauman-blog-images/devcards-action-shot.png"/>
