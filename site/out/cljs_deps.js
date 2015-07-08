@@ -32,11 +32,11 @@ goog.addDependency("../cljs/reader.js", ['cljs.reader'], ['goog.string', 'cljs.c
 goog.addDependency("../figwheel/client/socket.js", ['figwheel.client.socket'], ['cljs.core', 'figwheel.client.utils', 'cljs.reader']);
 goog.addDependency("../cljs/pprint.js", ['cljs.pprint'], ['cljs.core', 'goog.string.StringBuffer', 'clojure.string']);
 goog.addDependency("../devcards/util/utils.js", ['devcards.util.utils'], ['cljs.core', 'goog.string.StringBuffer', 'cljs.pprint']);
+goog.addDependency("../devcards/util/edn_renderer.js", ['devcards.util.edn_renderer'], ['devcards.util.utils', 'cljs.core', 'sablono.core']);
 goog.addDependency("../cljs/core/async/impl/timers.js", ['cljs.core.async.impl.timers'], ['cljs.core.async.impl.channels', 'cljs.core.async.impl.dispatch', 'cljs.core', 'cljs.core.async.impl.protocols']);
 goog.addDependency("../cljs/core/async.js", ['cljs.core.async'], ['cljs.core.async.impl.channels', 'cljs.core.async.impl.dispatch', 'cljs.core', 'cljs.core.async.impl.buffers', 'cljs.core.async.impl.protocols', 'cljs.core.async.impl.ioc_helpers', 'cljs.core.async.impl.timers']);
-goog.addDependency("../devcards/util/edn_renderer.js", ['devcards.util.edn_renderer'], ['devcards.util.utils', 'cljs.core', 'sablono.core']);
 goog.addDependency("../devcards/system.js", ['devcards.system'], ['cljs.core', 'goog.history.EventType', 'goog.History', 'cljs.core.async', 'sablono.core', 'devcards.util.edn_renderer', 'clojure.string', 'goog.events']);
-goog.addDependency("../devcards/core.js", ['devcards.core'], ['devcards.util.utils', 'devcards.system', 'cljs.core', 'cljs.test', 'cljs.core.async', 'sablono.core', 'devcards.util.edn_renderer', 'devcards.util.markdown', 'clojure.string']);
+goog.addDependency("../CB41546.js", ['devcards.core'], ['cljs.core', 'devcards.util.edn_renderer', 'devcards.util.utils', 'devcards.system', 'cljs.core.async', 'cljs.test', 'devcards.util.markdown', 'sablono.core', 'clojure.string']);
 goog.addDependency("../devdemos/errors.js", ['devdemos.errors'], ['devcards.core', 'cljs.core', 'cljs.test', 'sablono.core']);
 goog.addDependency("../figwheel/client/file_reloading.js", ['figwheel.client.file_reloading'], ['goog.string', 'goog.net.jsloader', 'goog.Uri', 'cljs.core', 'cljs.core.async', 'clojure.set', 'figwheel.client.utils', 'clojure.string']);
 goog.addDependency("../devdemos/extentions.js", ['devdemos.extentions'], ['devcards.core', 'reagent.core', 'cljs.core', 'cljs.test', 'sablono.core', 'om.core']);
@@ -47,4 +47,3 @@ goog.addDependency("../figwheel/client/heads_up.js", ['figwheel.client.heads_up'
 goog.addDependency("../cljs/repl.js", ['cljs.repl'], ['cljs.core']);
 goog.addDependency("../figwheel/client.js", ['figwheel.client'], ['goog.Uri', 'cljs.core', 'cljs.core.async', 'figwheel.client.file_reloading', 'figwheel.client.utils', 'cljs.repl', 'figwheel.client.heads_up', 'figwheel.client.socket', 'clojure.string']);
 goog.addDependency("../figwheel/connect.js", ['figwheel.connect'], ['devcards.core', 'cljs.core', 'devdemos.core', 'figwheel.client', 'figwheel.client.utils']);
-goog.addDependency("../AF3B3BC.js", ['devcards.core'], ['cljs.core', 'devcards.util.edn_renderer', 'devcards.util.utils', 'devcards.system', 'cljs.core.async', 'cljs.test', 'devcards.util.markdown', 'sablono.core', 'clojure.string']);
