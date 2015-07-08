@@ -14,11 +14,12 @@ represents some code to be displayed. Devcards provides an interface
 which allows the developer navigate to different namespaces and view
 the *cards* that have been defined in that namespace. 
 
-When used in conjunction with [lein figwheel][leinfigwheel] the cards can be
-created and edited **"live"** in one's ClojureScript source
-files.
+When used in conjunction with [lein figwheel][leinfigwheel] the cards
+can be created and edited **"live"** in one's ClojureScript source
+files. Essentially lifting the code out of the file into the browser
+for you to try out immediately.
 
-[Read: The Hard Sell](http://rigsomelight.com/devcards/#!/devdemos.core) 
+Read: [The Hard Sell](http://rigsomelight.com/devcards/#!/devdemos.core) 
 
 [See the introduction video.](https://vimeo.com/97078905)
 
