@@ -37,6 +37,17 @@
                              :output-dir "resources/public/devcards/js/compiled/out"
                              ;:recompile-dependents true                             
                              :optimizations :none
+                             :source-map-timestamp true}}
+                 {:id "website"
+                  :source-paths ["example_src" "src"]
+                  :figwheel { :devcards true }
+                  :compiler {
+                             :main "devdemos.core"
+                             :asset-path "site/out"
+                             :output-to "site/devdemos.js"
+                             :output-dir "site/out"
+                             ;:recompile-dependents true                             
+                             :optimizations :none
                              :source-map-timestamp true}}]}
                    
          :figwheel { :css-dirs ["resources/public/devcards/css"]
