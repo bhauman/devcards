@@ -1,10 +1,5 @@
 # Devcards
 
-# Devcards is currently under heavy development
-
-> Expect a new release with many breaking changes within the week :)
-> 6/28/15
-
 Devcards aims to provide ClojureScript developers with an interactive
 visual REPL. Devcards makes it simple to interactively surface code
 examples that have a visual aspect into a browser interface. 
@@ -153,45 +148,42 @@ Next you will need to include the Devcards macros into your file:
 
 ```clojure
 (ns example.core
+  (:require
+   [sablono.core :as sab]) ; just for example
   (:require-macros
-   [devcards.core :refer [defcard]])))
+   [devcards.core :refer [defcard]]))
 
-;; required ;)
 (defcard my-first-card
-  (dc/sab-card [:h1 "Devcards is freaking awesome!"]))
+  (sab/html [:h1 "Devcards is freaking awesome!"]))
 ```
+
+This will create a card in the devcards interface.
 
 ## FAQ
 
 #### Does Devcards only work with React or Om?
 
-No it doesn't. At its core Devcards manages a raw HTML node and a
-data atom for each card. Devcards works with anything you can put in a
-node.
+No it doesn't.
 
 #### Does Devcards require Figwheel?
 
-No, you can manually reload the browser after changing your code.
-Devcards requires the figwheel client as a dependancy because if you do
-decide to use figwheel it hooks into various events fired by the
-figwheel client.
+Devcards will work automatically with REPL workflow or boot-reload.
 
-You could also integrate Devcards into a Browser REPL workflow
-instead of using figwheel.
+You can also just reload the browser after making a change.
 
 #### What do I do for deployment?
 
-What pattern to use when working with Devcards is still an open question.
+Devcards has been rewritten so that you can write Devcards alongside
+your code will no impact on your production code.
 
-You can move all the cards into a different build similar to the
-pattern used for testing in Clojure right now. Or you could start your
-coding in this seperate build and then move completed code into your
-main build as it matures.
+That being said it is often helpful to move the bulk of your cards to
+a different buildpath that is only built when working on the **devcards**
+build.
 
-I have been considering a **no-op** release of devcards so that you
-can leave Devcards in your source code. I don't know if this is a good
-idea but it might be worth a try. Does having the devcards make your
-code easier to understand or is it more noisy with them in there?
+When working with devcards I oftern have three builds "devcards",
+"dev", "prod".
+
+
 
 
 [leinfigwheel]: https://github.com/bhauman/lein-figwheel
