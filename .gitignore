@@ -3,6 +3,8 @@ pom.xml
 /lib/
 /classes/
 /out/
+/resources/
+figwheel_server.log
 /target/
 .lein-deps-sum
 .lein-repl-history
