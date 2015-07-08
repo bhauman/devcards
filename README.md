@@ -48,6 +48,8 @@ see the following examples:
 
 [An example implementation of 2048](http://rigsomelight.com/devcards/#!/devdemos.two_zero) ([src](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/two_zero.cljs))
 
+[An introduction to the `defcard` api](http://rigsomelight.com/devcards/#!/devdemos.defcard_api) ([src](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/defcard_api.cljs))
+
 ## Super Quick Start
 
 There is a Devcards Leiningen template to get you up an running quickly.
@@ -102,7 +104,7 @@ First make sure you include the following `:dependencies` in your `project.clj` 
 ```
 
 lein figwheel is not required to use Devcards but ... if you want to
-experience interactive coding with Devcards you will need to have
+experience interactive coding with Devcards you will want to try it initially with 
 [lein-figwheel](https://github.com/bhauman/lein-figwheel) configured.
 See the [lein-figwheel repo](https://github.com/bhauman/lein-figwheel)
 for instructions on how to do that.
@@ -122,10 +124,6 @@ Configure your devcards build:
                 :source-map-timestamp true }}]
 }                
 ```
-
-Devcards is extremely new so the patterns for using it are completely
-up in the air. I am going to show you the very least you need to setup to
-get devcards running.
 
 You will need an HTML file to host the devcards interface. It makes
 sense to have a separate file to host devcards. I would create the
@@ -158,6 +156,9 @@ Next you will need to include the Devcards macros into your file:
 ```
 
 This will create a card in the devcards interface.
+
+
+
 
 ## FAQ
 
