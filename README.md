@@ -161,8 +161,6 @@ Next you will need to include the Devcards macros into your file:
   (dc/sab-card [:h1 "Devcards is freaking awesome!"]))
 ```
 
-
-
 ## FAQ
 
 #### Does Devcards only work with React or Om?
