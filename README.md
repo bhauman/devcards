@@ -158,7 +158,7 @@ Next you will need to include the Devcards macros into your file:
 This will create a card in the devcards interface.
 
 
-
+Take a look at [the `defcard` api](http://rigsomelight.com/devcards/#!/devdemos.defcard_api) ([src](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/defcard_api.cljs))
 
 ## FAQ
 
