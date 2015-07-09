@@ -223,7 +223,8 @@
              [:span {:style {:display "inline-block" }}
               [:a.com-rigsomelight-devcards_set-current-path
                {:href "#"
-                :onClick (prevent-> #(set-current-path! state-atom path))}
+                :onClick (prevent-> #(set-current-path! state-atom path))
+                :onTouchStart (prevent-> #(set-current-path! state-atom path))}
                n]]))
           crumbs))]))
 
@@ -235,6 +236,13 @@
              (sab/html
               [:a.com-rigsomelight-devcards-list-group-item
                {:onClick
+                (prevent->
+                 (fn [e] (swap! state-atom
+                               (fn [s]
+                                 (let [new-s (add-to-current-path s key)]
+                                   (hash-navigate (:current-path new-s))
+                                   new-s)))))
+                :onTouchStart
                 (prevent->
                  (fn [e] (swap! state-atom
                                (fn [s]
@@ -346,6 +354,7 @@
 (defn start-ui [channel]
   (defonce devcards-ui-setup
     (do
+      (js/React.initializeTouchEvents true)
       (render-base-if-necessary!)
       (go
         ;; initial load
@@ -371,3 +380,4 @@
               (js/setTimeout #(reset! app-state new-state) 0))
             (recur))))
       true)))
+
