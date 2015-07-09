@@ -224,7 +224,7 @@
               [:a.com-rigsomelight-devcards_set-current-path
                {:href "#"
                 :onClick      (prevent-> #(set-current-path! state-atom path))
-                :onTouchStart (prevent-> #(set-current-path! state-atom path))}
+                #_:onTouchStart #_(prevent-> #(set-current-path! state-atom path))}
                n]]))
           crumbs))]))
 
@@ -242,11 +242,12 @@
       (map (fn [[key child-tree]]
              (sab/html
               [:a.com-rigsomelight-devcards-list-group-item
-               {:onClick
+               {:href "#"
+                :onClick
                 (prevent->
                  (fn [e] (navigate-to-path key state-atom)))
-                :onTouchStart
-                (prevent->
+                #_:onTouchStart
+                #_(prevent->
                  (fn [e] (navigate-to-path key state-atom)))}
                [:span.com-rigsomelight-devcards-badge
                 {:style {:float "right"}}

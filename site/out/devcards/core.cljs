@@ -11,7 +11,9 @@
    [clojure.string :as string]
 
    [cljs.test]   
-   [cljs.core.async :refer [put! chan] :as async]))
+   [cljs.core.async :refer [put! chan] :as async])
+  (:require-macros
+   [cljs-react-reload.core :refer [defonce-react-class def-react-class]]))
 
 (enable-console-print!)
 
@@ -97,8 +99,9 @@
           [:div.com-rigsomelight-devcards-panel-heading
            (if path
              (sab/html
-              [:span
-               { :onClick
+              [:a
+               {:href "#"
+                :onClick
                 (devcards.system/prevent->
                  #(devcards.system/set-current-path!
                    devcards.system/app-state
@@ -116,9 +119,8 @@
 
 (declare hist-recorder*)
 
-(defonce DevcardBase
-  (js/React.createClass
-   #js {:getInitialState
+(defonce-react-class DevcardBase
+  #js {:getInitialState
         (fn [] #js {:unique_id (gensym 'devcards-base-)})
         :componentWillMount
         (fn []
@@ -162,22 +164,21 @@
                              (if (fn? m)
                                (m (.-data_atom (.-state this)) this)
                                m))
-                 document  (when-let [docu (:documentation card)]
-                             (markdown->react docu))
                  hist-ctl  (when (:history options)
                              (hist-recorder* (.-data_atom (.-state this))))
+                 document  (when-let [docu (:documentation card)]
+                             (markdown->react docu))
                  edn       (when (:inspect-data options)
                              (sab/html
                               [:div.com-rigsomelight-devcards-padding-top-border
                                (edn-rend/html-edn @(.-data_atom (.-state this)))]))
-                 children  (sab/html [:div (list document hist-ctl main edn)])]
+                 children  (sab/html [:div (list document main hist-ctl edn)])]
              (if (:frame options)
                (frame children card) ;; make component and forward options
-               (sab/html [:div.com-rigsomelight-devcards-frameless children])))))}))
+               (sab/html [:div.com-rigsomelight-devcards-frameless children])))))})
 
-(defonce DomComponent
-  (js/React.createClass
-   #js {:getInitialState
+(defonce-react-class DomComponent
+  #js {:getInitialState
         (fn [] #js {:unique_id (str (gensym 'devcards-dom-component-))})
         :renderIntoDOM
         (fn []
@@ -200,7 +201,7 @@
            (this-as this
                     (js/React.DOM.div
                      #js { :ref (.. this -state -unique_id) }
-                     "Card has not mounted DOM node.")))}))
+                     "Card has not mounted DOM node.")))})
 
 (defn booler? [key opts]
   (let [x (get opts key)]
@@ -416,9 +417,8 @@
   would be nice to have a drop down of history diffs)
 
 ;; keep
-(defonce HistoryComponent
-  (js/React.createClass
-   #js {:getInitialState
+(defonce-react-class HistoryComponent
+     #js {:getInitialState
         (fn [] #js {:unique_id    (str (gensym 'devcards-history-runner-))
                    :history_atom (atom {:history (list) :pointer 0})})
         :componentDidUpdate
@@ -462,7 +462,6 @@
                                                 (cons n hist)
                                                 hist))
                                      :ignore-click false))))))))
-
         :canGoBack
         (fn []
           (this-as this
@@ -513,41 +512,61 @@
                (swap! history-atom assoc :pointer 0 :ignore-click true)
                (reset! (.. this -props -data_atom) (first history))
                (.forceUpdate this)))))
-        :render
+          :render
          (fn []
-           (this-as this
-                    (sab/html
-                     [:div.com-rigsomelight-devcards-history-control-bar
-                      {:style { :visibility (if (or (.canGoBack this)
-                                                    (.canGoForward this))
-                                              "visible" "hidden")}}
-                      [:a.com-rigsomelight-devcards-history-control-left
-                       {:style { :visibility (if (.canGoBack this) "visible" "hidden")}
-                        :onClick (fn [e]
-                                   (.preventDefault e)
-                                   (.. this backInHistory))} ""]
-                      [:a.com-rigsomelight-devcards-history-stop
-                       {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
-                        :onClick (fn [e]
-                                   (.preventDefault e)
-                                   ;; touch the data atom
-                                   (reset! (.. this -props -data_atom)
-                                           @(.. this -props -data_atom)))} ""]
-                      [:a.com-rigsomelight-devcards-history-control-right
-                       {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
-                        :onClick (fn [e]
-                                   (.preventDefault e)
-                                   (.. this forwardInHistory))} ""]
-                      [:span.com-rigsomelight-devcards-history-control-fast-forward
-                       {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
-                        :onClick (fn [e]
-                                   (.preventDefault e)
-                                   (.. this continueOn))}
-                       [:span.com-rigsomelight-devcards-history-control-small-arrow]
-                       [:span.com-rigsomelight-devcards-history-control-small-arrow]
-                       [:span.com-rigsomelight-devcards-history-control-block]
-                       ]
-                      #_(edn->html @(.. this -state -history_atom))])))}))
+           (this-as
+            this
+            (when (or (.canGoBack this)
+                      (.canGoForward this))
+              (sab/html
+               [:div.com-rigsomelight-devcards-history-control-bar
+                {:style { :display (if (or (.canGoBack this)
+                                           (.canGoForward this))
+                                     "block" "none")}}
+                (let [action (fn [e]
+                                (.preventDefault e)
+                                (.. this backInHistory))]
+                  (sab/html
+                   [:button
+                    {:style { :visibility (if (.canGoBack this) "visible" "hidden")}
+                     :href "#"
+                     :onClick action
+                     :onTouchEnd action}
+                 [:span.com-rigsomelight-devcards-history-control-left ""]]))
+                (let [action (fn [e]
+                               (.preventDefault e)
+                               ;; touch the data atom
+                               (reset! (.. this -props -data_atom)
+                                       @(.. this -props -data_atom)))]
+                  (sab/html
+                   [:button
+                    {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
+                     :onClick action
+                     :onTouchEnd action}
+                 [:span.com-rigsomelight-devcards-history-stop ""]]))
+                (let [action (fn [e]
+                                (.preventDefault e)
+                                (.. this forwardInHistory))]
+                  (sab/html
+                   [:button
+                    {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
+                     :onClick action
+                     :onTouchEnd action}
+                    [:span.com-rigsomelight-devcards-history-control-right ""]]))
+                (let [listener (fn [e]
+                                (.preventDefault e)
+                                (.. this continueOn))]
+                  (sab/html
+                   [:button
+                    {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
+                     :onClick listener
+                     :onTouchEnd listener}
+                    [:span.com-rigsomelight-devcards-history-control-small-arrow]
+                    [:span.com-rigsomelight-devcards-history-control-small-arrow]
+                    [:span.com-rigsomelight-devcards-history-control-block]
+                    ]))
+                #_(edn->html @(.. this -state -history_atom))]
+               ))))})
 
 ;; keep
 (defn- hist-recorder* [data-atom]
@@ -665,14 +684,15 @@
       (sab/html
        [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
         [:div.com-rigsomelight-devcards-panel-heading
-         [:span
-          { :onClick
-           (dev/prevent->
-            #(devcards.system/set-current-path!
-              devcards.system/app-state
-              path))}
+         [:a
+          { :href "#"
+            :onClick
+            (dev/prevent->
+             #(devcards.system/set-current-path!
+               devcards.system/app-state
+                path))}
           (when path (str (name (last path))) )]
-         [:span.com-rigsomelight-devcards-badge
+         [:button.com-rigsomelight-devcards-badge
           {:style {:float "right"
                    :margin "3px 3px"}
            :onClick (dev/prevent->
@@ -680,7 +700,7 @@
           total-tests]
          (when-not (zero? (+ fail error))
            (sab/html
-            [:span.com-rigsomelight-devcards-badge
+            [:button.com-rigsomelight-devcards-badge
              {:style {:float "right"
                       :backgroundColor "#d9534f"
                       :color "#fff"
@@ -691,7 +711,7 @@
              (+ fail error)]))          
          (when-not (zero? pass)
            (sab/html
-            [:span.com-rigsomelight-devcards-badge
+            [:button.com-rigsomelight-devcards-badge
              {:style {:float "right"
                       :backgroundColor "#5cb85c"
                       :color "#fff"
