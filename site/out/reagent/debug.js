@@ -2,4 +2,4 @@
 goog.provide('reagent.debug');
 goog.require('cljs.core');
 
-//# sourceMappingURL=debug.js.map?rel=1436385350549
+//# sourceMappingURL=debug.js.map

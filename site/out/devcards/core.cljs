@@ -217,7 +217,7 @@
          :value x})))
 
 (defn react-element? [main-obj]
-  (some? (and (.-_context main-obj) (.-_store main-obj))))
+  (aget main-obj "_isReactElement"))
 
 (defn validate-card-options [opts]
   (if (map? opts)
