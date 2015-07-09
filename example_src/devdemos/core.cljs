@@ -37,20 +37,21 @@
    will also work with any form of live code reloading (repl, boot-reload, ...)
 
    Devcards revolves around a multi-purpose macro called `defcard`.
-   You can think of `defcard` a powerful form of pprint that helps you
+   You can think of `defcard` as a powerful form of **pprint** that helps you
    interactively lift code examples out of your source files into the
    Devcards interface (you are currently looking at the Devcards
    interface).
 
-   The Devcards you create are intended to have no impact on the size
-   of your production code. You can use devcards just as you would use
-   exectuable comments. You can also keep them seperate like a test
-   suite.
+   The Devcards that you create are intended to have no impact on the
+   size of your production code. You can use Devcards just as you
+   would use exectuable comments inline with your source code. You
+   can also keep them separate like a test suite.
 
    With [figwheel](https://github.com/bhauman/lein-figwheel), Devcards
    configuration couldn't be simpler. Just add `[devcards
    \"0.2.0-SNAPSHOT\"]` and create a new build config with `:figwheel
-   {:devcards true}`
+   {:devcards true}`. See the Quick Start instructions at the end of
+   this document.
 
    Let's look at an advanced Devcard:
    
@@ -164,9 +165,10 @@
    **IDevcardOptions** or **IDevcard**, and I'm hoping to get various
    cursor implementations working as well.
 
-   Implementing your own cards is easy as `defcard` will take any
-   ReactElement. If you want to create a completely custom card there are the
-   **IDevcardOptions** and **IDevcard** protocols.
+   Implementing your own cards is easy. You can simply create an
+   arbitrary ReactElement and `defcard` will render it. If you want to
+   create a completely custom card there are the **IDevcardOptions**
+   and **IDevcard** protocols.
    " )
 
 (deftest cljs-test-integration
