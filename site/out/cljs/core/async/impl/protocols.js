@@ -3,8 +3,8 @@ goog.provide('cljs.core.async.impl.protocols');
 goog.require('cljs.core');
 cljs.core.async.impl.protocols.MAX_QUEUE_SIZE = (1024);
 
-cljs.core.async.impl.protocols.ReadPort = (function (){var obj73582 = {};
-return obj73582;
+cljs.core.async.impl.protocols.ReadPort = (function (){var obj48196 = {};
+return obj48196;
 })();
 
 /**
@@ -37,8 +37,8 @@ throw cljs.core.missing_protocol.call(null,"ReadPort.take!",port);
 });
 
 
-cljs.core.async.impl.protocols.WritePort = (function (){var obj73584 = {};
-return obj73584;
+cljs.core.async.impl.protocols.WritePort = (function (){var obj48198 = {};
+return obj48198;
 })();
 
 /**
@@ -72,8 +72,8 @@ throw cljs.core.missing_protocol.call(null,"WritePort.put!",port);
 });
 
 
-cljs.core.async.impl.protocols.Channel = (function (){var obj73586 = {};
-return obj73586;
+cljs.core.async.impl.protocols.Channel = (function (){var obj48200 = {};
+return obj48200;
 })();
 
 cljs.core.async.impl.protocols.close_BANG_ = (function cljs$core$async$impl$protocols$close_BANG_(chan){
@@ -129,8 +129,8 @@ throw cljs.core.missing_protocol.call(null,"Channel.closed?",chan);
 });
 
 
-cljs.core.async.impl.protocols.Handler = (function (){var obj73588 = {};
-return obj73588;
+cljs.core.async.impl.protocols.Handler = (function (){var obj48202 = {};
+return obj48202;
 })();
 
 /**
@@ -192,8 +192,8 @@ throw cljs.core.missing_protocol.call(null,"Handler.commit",h);
 });
 
 
-cljs.core.async.impl.protocols.Buffer = (function (){var obj73590 = {};
-return obj73590;
+cljs.core.async.impl.protocols.Buffer = (function (){var obj48204 = {};
+return obj48204;
 })();
 
 cljs.core.async.impl.protocols.full_QMARK_ = (function cljs$core$async$impl$protocols$full_QMARK_(b){
@@ -275,8 +275,8 @@ throw cljs.core.missing_protocol.call(null,"Buffer.add!*",b);
 });
 
 cljs.core.async.impl.protocols.add_BANG_ = (function cljs$core$async$impl$protocols$add_BANG_(){
-var G__73592 = arguments.length;
-switch (G__73592) {
+var G__48206 = arguments.length;
+switch (G__48206) {
 case 1:
 return cljs.core.async.impl.protocols.add_BANG_.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
@@ -306,9 +306,7 @@ return cljs.core.async.impl.protocols.add_BANG__STAR_.call(null,b,itm);
 
 cljs.core.async.impl.protocols.add_BANG_.cljs$lang$maxFixedArity = 2;
 
-cljs.core.async.impl.protocols.UnblockingBuffer = (function (){var obj73595 = {};
-return obj73595;
+cljs.core.async.impl.protocols.UnblockingBuffer = (function (){var obj48209 = {};
+return obj48209;
 })();
 
-
-//# sourceMappingURL=protocols.js.map

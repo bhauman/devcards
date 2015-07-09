@@ -2,7 +2,6 @@
 goog.provide('devcards.util.markdown');
 goog.require('cljs.core');
 goog.require('clojure.string');
-goog.require('cljsjs.showdown');
 devcards.util.markdown.leading_space_count = (function devcards$util$markdown$leading_space_count(s){
 var temp__4425__auto__ = cljs.core.second.call(null,cljs.core.re_matches.call(null,/^([\s]*).*/,s));
 if(cljs.core.truth_(temp__4425__auto__)){
@@ -26,8 +25,8 @@ var leading_spaces = devcards.util.markdown.leading_space_count.call(null,opener
 var code_block = cljs.core.take_while.call(null,cljs.core.complement.call(null,devcards.util.markdown.code_delim_QMARK_),cljs.core.rest.call(null,xs));
 var after_code_block = cljs.core.rest.call(null,cljs.core.drop_while.call(null,cljs.core.complement.call(null,devcards.util.markdown.code_delim_QMARK_),cljs.core.rest.call(null,xs)));
 return cljs.core.cons.call(null,clojure.string.join.call(null,"\n",cljs.core.concat.call(null,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [clojure.string.trim.call(null,opener)], null),cljs.core.map.call(null,((function (opener,leading_spaces,code_block,after_code_block){
-return (function (p1__69593_SHARP_){
-return cljs.core.subs.call(null,p1__69593_SHARP_,leading_spaces);
+return (function (p1__44144_SHARP_){
+return cljs.core.subs.call(null,p1__44144_SHARP_,leading_spaces);
 });})(opener,leading_spaces,code_block,after_code_block))
 ,code_block),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, ["```"], null))),after_code_block);
 });
@@ -57,15 +56,15 @@ return clojure.string.join.call(null,"\n",cljs.core.map.call(null,clojure.string
 devcards.util.markdown.preformat_markdown = (function devcards$util$markdown$preformat_markdown(mkdn_strs){
 return clojure.string.join.call(null,"\n",cljs.core.map.call(null,devcards.util.markdown.trim_markdown_string,mkdn_strs));
 });
-var conv_class_69594 = Showdown.converter;
-var converter_69595 = (new conv_class_69594());
+var conv_class_44145 = Showdown.converter;
+var converter_44146 = (new conv_class_44145());
 /**
  * render markdown
  */
-devcards.util.markdown.markdown_to_html = ((function (conv_class_69594,converter_69595){
+devcards.util.markdown.markdown_to_html = ((function (conv_class_44145,converter_44146){
 return (function devcards$util$markdown$markdown_to_html(markdown_txt){
-return converter_69595.makeHtml(markdown_txt);
-});})(conv_class_69594,converter_69595))
+return converter_44146.makeHtml(markdown_txt);
+});})(conv_class_44145,converter_44146))
 ;
 devcards.util.markdown.less_sensitive_markdown = (function devcards$util$markdown$less_sensitive_markdown(m){
 if(cljs.core.every_QMARK_.call(null,cljs.core.string_QMARK_,m)){
@@ -77,5 +76,3 @@ console.error(message);
 return [cljs.core.str("<div style=\"color: #a94442\">"),cljs.core.str(message),cljs.core.str("</div>")].join('');
 }
 });
-
-//# sourceMappingURL=markdown.js.map
