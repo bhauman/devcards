@@ -63,7 +63,7 @@
       
    ```
 
-   The [defcard api](/devcards/index.html#!/devdemos.defcard_api)
+   The [defcard api](#!/devdemos.defcard_api)
    is intended to be small and intuitive.
 
    And you can see this devcard rendered below:")
