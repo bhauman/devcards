@@ -317,11 +317,12 @@
   (defcard reagent-support
     (dc/reagent re-bmi-component)
     re-bmi-data ;; reagent atom
-    {:inspect-data true :history true })
+    #_{:inspect-data true :history true })
   ```"
   (dc/reagent re-bmi-component)
   re-bmi-data
-  {:inspect-data true :history true })
+  ;; right now watching data in reagent caused a strange rendering
+  #_{:inspect-data true :history true })
 
 (defcard
   "# Not cool enough?
@@ -332,10 +333,11 @@
 
    ## Quick Start
 
-   These are brief instructions for the curious these will not be
-   helpful if you do not have a lot of experience with ClojureScript.
+   These are brief instructions for the curious. These will not be
+   helpful if you are not an experienced ClojureScript developer.
    
    You can generate a new devcards project with:
+   
    ```
    lein new devcards hello-world
    ```
@@ -376,9 +378,9 @@
    ```
  
   It's important to make sure that your application isn't launching
-  itself on load. We don't want your application to run. We want
-  devards to run. So having a seperate HTML file for the devcards is
-  the best solution.
+  itself on load. We don't want your application to run. We want the
+  Devards application to run. So having a seperate HTML file for the
+  devcards build is the best solution.
 
   ```
   <!DOCTYPE html>
@@ -393,7 +395,9 @@
   ```
 
   A quick way to prevent your main application from running is to make
-  it conditional on the presense of the node it's supposed to mount.
+  it conditional on the presense of the DOM node it's expecting to
+  mount and then just include that DOM node on HTML pages where your
+  app is going to launch.
 
   ```
   (defn main []
