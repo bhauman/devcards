@@ -37,20 +37,21 @@
    will also work with any form of live code reloading (repl, boot-reload, ...)
 
    Devcards revolves around a multi-purpose macro called `defcard`.
-   You can think of `defcard` a powerful form of pprint that helps you
+   You can think of `defcard` as a powerful form of **pprint** that helps you
    interactively lift code examples out of your source files into the
    Devcards interface (you are currently looking at the Devcards
    interface).
 
-   The Devcards you create are intended to have no impact on the size
-   of your production code. You can use devcards just as you would use
-   exectuable comments. You can also keep them seperate like a test
-   suite.
+   The Devcards that you create are intended to have no impact on the
+   size of your production code. You can use Devcards just as you
+   would use exectuable comments inline with your source code. You
+   can also keep them separate like a test suite.
 
    With [figwheel](https://github.com/bhauman/lein-figwheel), Devcards
    configuration couldn't be simpler. Just add `[devcards
    \"0.2.0-SNAPSHOT\"]` and create a new build config with `:figwheel
-   {:devcards true}`
+   {:devcards true}`. See the Quick Start instructions at the end of
+   this document.
 
    Let's look at an advanced Devcard:
    
@@ -118,7 +119,7 @@
    Please interact with **the BMI calculator above**. As you change
    the sliders you will notice that a "
    (str "<span class='com-rigsomelight-devcards-history-control-left'></span>")
-   "shows up in the upper right hand corner.
+   "shows up.
 
    This is the integrated history control widget which be enabled by
    adding `{:history true}` to the devcard options.
@@ -164,9 +165,10 @@
    **IDevcardOptions** or **IDevcard**, and I'm hoping to get various
    cursor implementations working as well.
 
-   Implementing your own cards is easy as `defcard` will take any
-   ReactElement. If you want to create a completely custom card there are the
-   **IDevcardOptions** and **IDevcard** protocols.
+   Implementing your own cards is easy. You can simply create an
+   arbitrary ReactElement and `defcard` will render it. If you want to
+   create a completely custom card there are the **IDevcardOptions**
+   and **IDevcard** protocols.
    " )
 
 (deftest cljs-test-integration
@@ -315,11 +317,12 @@
   (defcard reagent-support
     (dc/reagent re-bmi-component)
     re-bmi-data ;; reagent atom
-    {:inspect-data true :history true })
+    #_{:inspect-data true :history true })
   ```"
   (dc/reagent re-bmi-component)
   re-bmi-data
-  {:inspect-data true :history true })
+  ;; right now watching data in reagent caused a strange rendering
+  #_{:inspect-data true :history true })
 
 (defcard
   "# Not cool enough?
@@ -330,10 +333,11 @@
 
    ## Quick Start
 
-   These are brief instructions for the curious these will not be
-   helpful if you do not have a lot of experience with ClojureScript.
+   These are brief instructions for the curious. These will not be
+   helpful if you are not an experienced ClojureScript developer.
    
    You can generate a new devcards project with:
+   
    ```
    lein new devcards hello-world
    ```
@@ -374,9 +378,9 @@
    ```
  
   It's important to make sure that your application isn't launching
-  itself on load. We don't want your application to run. We want
-  devards to run. So having a seperate HTML file for the devcards is
-  the best solution.
+  itself on load. We don't want your application to run. We want the
+  Devards application to run. So having a seperate HTML file for the
+  devcards build is the best solution.
 
   ```
   <!DOCTYPE html>
@@ -391,7 +395,9 @@
   ```
 
   A quick way to prevent your main application from running is to make
-  it conditional on the presense of the node it's supposed to mount.
+  it conditional on the presense of the DOM node it's expecting to
+  mount and then just include that DOM node on HTML pages where your
+  app is going to launch.
 
   ```
   (defn main []

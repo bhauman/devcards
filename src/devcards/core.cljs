@@ -708,7 +708,7 @@
               :onClick (dev/prevent->
                         #(swap! data-atom assoc :filter (fn [{:keys [type]}]
                                                           (#{:fail :error} type))))}
-             (+ fail error)]))          
+             (str (+ fail error))]))          
          (when-not (zero? pass)
            (sab/html
             [:button.com-rigsomelight-devcards-badge
