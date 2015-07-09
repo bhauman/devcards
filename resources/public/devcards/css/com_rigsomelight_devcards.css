@@ -1,0 +1,303 @@
+body {
+    margin: 0px;
+    background-color: rgb(233,234,237); 
+}
+
+#com-rigsomelight-devcards-main {
+    padding-bottom: 10em;
+}
+
+.com-rigsomelight-devcards_rendered-card {
+  position: relative;
+}
+
+.com-rigsomelight-devcards-body {
+    background-color: rgb(233,234,237);
+}
+
+.com-rigsomelight-devcards-markdown pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  word-break: break-all;
+  word-wrap: break-word;
+  color: #333;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.com-rigsomelight-devcards-padding-top-border {
+    border-top: 1px solid #f5f5f5;
+    margin-top: 14px;
+    padding-top: 14px;
+}
+
+.com-rigsomelight-devcards-markdown code {
+  padding: 2px 4px;
+  font-size: 90%;
+  color: #c7254e;
+  background-color: #f9f2f4;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.com-rigsomelight-devcards-markdown pre code {
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  white-space: pre-wrap;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+
+.com-rigsomelight-devcards-base,
+.com-rigsomelight-devcards-markdown {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+
+}
+
+.com-rigsomelight-devcards-markdown h1,
+.com-rigsomelight-devcards-markdown h2,
+.com-rigsomelight-devcards-markdown h3,
+.com-rigsomelight-devcards-markdown h4,
+.com-rigsomelight-devcards-markdown h5,
+.com-rigsomelight-devcards-base h1,
+.com-rigsomelight-devcards-base h2,
+.com-rigsomelight-devcards-base h3,
+.com-rigsomelight-devcards-base h4,
+.com-rigsomelight-devcards-base h5 {
+    font-weight: 500;
+}
+
+.com-rigsomelight-devcards-markdown h1:first-child,
+.com-rigsomelight-devcards-markdown h2:first-child,
+.com-rigsomelight-devcards-markdown h3:first-child,
+.com-rigsomelight-devcards-markdown h4:first-child,
+.com-rigsomelight-devcards-markdown h5:first-child {
+    margin-top: 14px;
+}
+                                           
+.com-rigsomelight-devcards-base a {
+    color: #428bca;
+    text-decoration: none;
+}
+
+.com-rigsomelight-devcards-markdown code,
+.com-rigsomelight-devcards-markdown kbd,
+.com-rigsomelight-devcards-markdown pre,
+.com-rigsomelight-devcards-markdown samp {
+  font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+}
+
+.com-rigsomelight-devcards-navbar {
+    background-color: rgb(60,90,153);
+    border-color: rgb(50,80,153);
+    color: #fff;
+    height: 50px;
+}
+
+.com-rigsomelight-devcards-brand {
+    color: #ccc;
+    font-size: 18px;
+    line-height: 50px; 
+}
+
+.com-rigsomelight-devcards-container {
+ /* margin: auto;
+    width: 80%;*/
+}
+
+.com-rigsomelight-devcards-card-base {
+    background: #fff;
+
+    padding: 8px 15px;     
+    margin-top: 20px;
+}
+
+.com-rigsomelight-devcards-card-base-no-pad {
+    background: #fff;
+    border-top:  1px solid;
+    border-color: #e5e6e9 #dfe0e4 #d0d1d5;
+    border-color: #e5e6e9 #dfe0e4 #d0d1d5;     
+    margin-top: 20px;
+}
+
+.com-rigsomelight-devcards-breadcrumbs {
+    font-size: 16px;
+    line-height: 1.5em;
+}
+
+.com-rigsomelight-devcards-breadcrumb-sep {
+    display: inline-block;
+    padding: 0px 5px;
+    color: #ccc;
+}
+
+.com-rigsomelight-devcards-list-group-item {
+    color: #555;
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: -1px;
+    border-bottom: 1px solid #ddd;
+}
+
+.com-rigsomelight-devcards-badge {
+  display: inline-block;
+  min-width: 10px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  vertical-align: baseline;
+  white-space: nowrap;
+  text-align: center;
+  background-color: #999;
+  border-radius: 10px;
+}
+
+.com-rigsomelight-devcards-panel-heading {
+    padding: 8px 15px;
+    font-size: 16px;
+    line-height: 1.5em;
+    color: #333;
+    background-color: #fcfcfc;
+    background-color: #f5f5f5;
+}
+
+.com-rigsomelight-devcards-devcard-padding {
+    margin-top: 14px;
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-bottom: 14px;
+}
+
+.com-rigsomelight-devcards-test-line {
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  border: none;
+  border-top: solid 1px #fafafa;  
+}
+
+.com-rigsomelight-devcards-test-line pre {
+  margin: 0px;
+}
+
+.com-rigsomelight-devcards-pass {
+  color: #3c763d;
+  background-color: #dff0d8;
+}
+
+.com-rigsomelight-devcards-fail {
+  color: #a94442;
+  background-color: #f2dede;
+}
+
+.com-rigsomelight-devcards-error {
+  color: #a94442;
+  border-left: 2px solid #a94442;    
+  background-color: #f2dede;
+}
+
+.com-rigsomelight-devcards-test-message {
+    display: block;
+    margin-top: -5px;    
+}
+
+.com-rigsomelight-devcards-pass .com-rigsomelight-devcards-test-message {
+    color: #386739;
+}
+
+.com-rigsomelight-devcards-fail .com-rigsomelight-devcards-test-message {
+    color: #994745;
+}
+
+.com-rigsomelight-devcards-history-control-small-arrow {
+    display: inline-block;
+    height: 0px;
+    width: 0px;
+    border: 8px solid transparent;
+    border-left-width: 9px;
+    border-left-color: #666;
+    margin-right: -10px;
+}
+
+.com-rigsomelight-devcards-history-control-block {
+    display: inline-block;
+    height: 16px;
+    width: 3px;
+    background-color: #666;
+    margin-right: 10px;
+}    
+
+.com-rigsomelight-devcards-history-control-right {
+    display: inline-block;
+    height: 0px;
+    width: 0px;
+    border: 8px solid transparent;
+    border-left-width: 16px;
+    border-left-color: #666;
+}
+
+.com-rigsomelight-devcards-history-control-left {
+    display: inline-block;
+    height: 0px;
+    width: 0px;
+    border: 8px solid transparent;
+    border-right-width: 16px;
+    border-right-color: #666;
+    margin-right: 10px;
+}
+
+.com-rigsomelight-devcards-history-stop {
+    display: inline-block;
+    height: 17px;
+    width: 17px;
+    background-color: #D88282;
+    border-radius: 3px;
+    margin-right: 10px;    
+}
+
+.com-rigsomelight-devcards-history-control-bar {
+    background-color: #f3f3f3;
+    padding-top: 5px;
+    height: 23px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+.com-rigsomelight-devcards-devcard-padding .com-rigsomelight-devcards-history-control-bar {
+    margin-top: -14px;    
+}
+
+@media (min-width: 768px) {
+
+ .com-rigsomelight-devcards-container {
+    margin: auto;
+    width: 750px;
+  }       
+
+ .com-rigsomelight-devcards-card-base,
+ .com-rigsomelight-devcards-card-base-no-pad {
+     border-radius: 3px;
+     border:  1px solid;
+     border-color: #e5e6e9 #dfe0e4 #d0d1d5;      
+ } 
+}
+
+
+@media (min-width: 1200px) {
+  .com-rigsomelight-devcards-container {    
+    margin: auto;
+    width: 970px;
+  }
+}

@@ -3,8 +3,6 @@ pom.xml
 /lib/
 /classes/
 /out/
-/resources/
-figwheel_server.log
 /target/
 .lein-deps-sum
 .lein-repl-history
@@ -14,6 +12,9 @@ checkouts/
 .lein-classpath
 .rbenv-version
 config.ru
-*init.clj
+resources/public/devcards/js/compiled
 .\#*
 \#*
+
+*-init.clj
+figwheel_server.log
