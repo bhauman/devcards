@@ -1,6 +1,6 @@
 (ns devdemos.extentions
     (:require
-     [devcards.core :as devcards]
+     [devcards.core]
      [sablono.core :as sab :include-macros true]
      [cljs.test :as t :include-macros true]
      [om.core :as om]
@@ -87,7 +87,6 @@
   (let [seconds-elapsed (rg/atom 0)]
     (js/setInterval #(swap! seconds-elapsed inc) 1000)
     (fn [props1]
-      (prn props1)
       (elapsed-template seconds-elapsed props))))
 
 ;; trick to capture local state through reloads
@@ -97,10 +96,11 @@
   [:div [:h1 "I'm a timer app"]
    (rg/create-element timer #js {:name "George" })])
 
+
 (defonce timer-apper (rg/reactify-component timer-app))
 
 (defcard reagent-counter-3
-  (rg/create-element timer-apper))
+   (rg/create-element timer-apper))
 
 (defcard reagent-locals-try
   "A quick way to create some stable local RAtoms"
@@ -126,7 +126,7 @@
   "## We should support anything with the IAtom interface
 
    This will allow folks to use Reagent's rAtom."
-  (dc/reagent->
+  (dc/reagent
    (fn [counter-atom _]
      [:div "counting away "
       [:button {:on-click #(swap! counter-atom update-in [:count] inc)} "inc"] " " (:count @counter-atom)]))

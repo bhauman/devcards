@@ -140,10 +140,9 @@
 
 (defmacro reagent [body]
   `(create-idevcard (let [v# ~body]
-                      (reagent->react
-                       (if (fn? v#)
-                         (fn [data-atom# owner#] (v# data-atom# owner#)
-                           v#))))
+                      (if (fn? v#)
+                        (fn [data-atom# owner#] (reagent->react (v# data-atom# owner#)))
+                        (reagent->react  v#)))
                     {:watch-atom false}))
 
 ;; om helpers
