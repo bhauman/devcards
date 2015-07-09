@@ -40,14 +40,14 @@
                              :source-map-timestamp true}}
                  {:id "website"
                   :source-paths ["example_src" "src"]
+                  :figwheel { :devcards true }
                   :compiler {
                              :main "devdemos.core"
                              :asset-path "site/out"
                              :output-to "site/devdemos.js"
                              :output-dir "site/out"
-                             :devcards true
                              ;:recompile-dependents true                             
-                             :optimizations :advanced }}]}
+                             :optimizations :none }}]}
                    
          :figwheel { :css-dirs ["resources/public/devcards/css"]
                      :open-file-command "emacsclient" }
