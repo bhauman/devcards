@@ -15,18 +15,25 @@ body {
     background-color: rgb(233,234,237);
 }
 
-.com-rigsomelight-devcards-markdown pre {
+.com-rigsomelight-devcards-markdown pre,
+.com-rigsomelight-devcards-test-line.com-rigsomelight-devcards-test-doc .com-rigsomelight-devcards-markdown pre
+{
   display: block;
   padding: 9.5px;
-  margin: 0 0 10px;
+  margin: 0px 0px 10px;
   font-size: 13px;
   line-height: 1.42857143;
-  word-break: break-all;
-  word-wrap: break-word;
+  word-break: normal;
+  word-wrap: normal;
+  overflow-x: scroll;
   color: #333;
   background-color: #f5f5f5;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #e1e1e1;  
+  margin-left: -14px;
+  margin-right: -14px;  
+  border-left: 0px;
+  border-right: 0px; 
+ /*  border-radius: 4px;  */
 }
 
 .com-rigsomelight-devcards-padding-top-border {
@@ -48,10 +55,11 @@ body {
   padding: 0;
   font-size: inherit;
   color: inherit;
-  white-space: pre-wrap;
+  white-space: pre; 
   background-color: transparent;
   border-radius: 0;
 }
+
 
 
 .com-rigsomelight-devcards-base,
@@ -189,6 +197,9 @@ body {
 
 .com-rigsomelight-devcards-test-line pre {
   margin: 0px;
+  word-break: normal;
+  word-wrap: normal;
+  overflow-x: scroll;    
 }
 
 .com-rigsomelight-devcards-pass {
@@ -276,7 +287,7 @@ body {
 }
 
 .com-rigsomelight-devcards-devcard-padding .com-rigsomelight-devcards-history-control-bar {
-    margin-top: -14px;    
+    margin-top: -14px;
 }
 
 @media (min-width: 768px) {
@@ -301,3 +312,6 @@ body {
     width: 970px;
   }
 }
+
+
+

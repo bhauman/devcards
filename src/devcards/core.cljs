@@ -100,7 +100,7 @@
            (if path
              (sab/html
               [:span
-               { :onClick
+               {:onClick
                 (devcards.system/prevent->
                  #(devcards.system/set-current-path!
                    devcards.system/app-state
@@ -461,7 +461,6 @@
                                                 (cons n hist)
                                                 hist))
                                      :ignore-click false))))))))
-
         :canGoBack
         (fn []
           (this-as this
