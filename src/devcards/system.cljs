@@ -223,10 +223,17 @@
              [:span {:style {:display "inline-block" }}
               [:a.com-rigsomelight-devcards_set-current-path
                {:href "#"
-                :onClick (prevent-> #(set-current-path! state-atom path))
+                :onClick      (prevent-> #(set-current-path! state-atom path))
                 :onTouchStart (prevent-> #(set-current-path! state-atom path))}
                n]]))
           crumbs))]))
+
+(defn navigate-to-path [key state-atom]
+  (swap! state-atom
+         (fn [s]
+           (let [new-s (add-to-current-path s key)]
+             (hash-navigate (:current-path new-s))
+             new-s))))
 
 (defn dir-links [dirs state-atom]
   (when-not (empty? dirs)
@@ -237,18 +244,10 @@
               [:a.com-rigsomelight-devcards-list-group-item
                {:onClick
                 (prevent->
-                 (fn [e] (swap! state-atom
-                               (fn [s]
-                                 (let [new-s (add-to-current-path s key)]
-                                   (hash-navigate (:current-path new-s))
-                                   new-s)))))
+                 (fn [e] (navigate-to-path key state-atom)))
                 :onTouchStart
                 (prevent->
-                 (fn [e] (swap! state-atom
-                               (fn [s]
-                                 (let [new-s (add-to-current-path s key)]
-                                   (hash-navigate (:current-path new-s))
-                                   new-s)))))}
+                 (fn [e] (navigate-to-path key state-atom)))}
                [:span.com-rigsomelight-devcards-badge
                 {:style {:float "right"}}
                 (count child-tree)]
@@ -380,4 +379,3 @@
               (js/setTimeout #(reset! app-state new-state) 0))
             (recur))))
       true)))
-
