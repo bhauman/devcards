@@ -340,7 +340,7 @@
     #_(prn "off the books")
     (go-loop [data (dev-trans first-message initial-data)]
       #_(prn "here")
-      (let [timer (timeout 500)]
+      (let [timer (timeout 500)] ;; needs to be longer for mobile think
         (when-let [[[msg-name payload] ch] (alts! [channel timer])]
           (cond
             (= ch timer)           (merge-in-new-data start-data data)
@@ -365,13 +365,15 @@
         (let [new-state (<! (off-the-books channel @app-state []))]
           (reset! app-state new-state))
         
-        (hash-routing-init app-state)
-        
         ;; escape core async context for better errors
         (js/setTimeout #(renderer app-state) 0)
+        
+
         (js/setTimeout #(add-watch app-state :devcards-render
                                    (fn [_ _ _ _] (renderer app-state))) 0)
-        
+
+                (js/setTimeout #(hash-routing-init app-state) 0) ;; needs a delay        
+
         (loop  []
           (when-let [v (<! channel)]
             #_(prn "hey" (first v))
