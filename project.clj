@@ -49,7 +49,7 @@
                              :output-to "site/devdemos.js"
                              :output-dir "site/out"
                              ;:recompile-dependents true                             
-                             :optimizations :none }}]}
+                             :optimizations :simple }}]}
                    
          :figwheel { :css-dirs ["resources/public/devcards/css"]
                      :open-file-command "emacsclient" }
