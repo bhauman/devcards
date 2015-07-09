@@ -49,14 +49,14 @@ var n__16947__auto__ = a.length;
 var i = (0);
 while(true){
 if((i < n__16947__auto__)){
-var c_32968 = (a[i]);
-if(cljs.core.truth_((c_32968["cljsIsDirty"]))){
-(c_32968["forceUpdate"])();
+var c_43447 = (a[i]);
+if(cljs.core.truth_((c_43447["cljsIsDirty"]))){
+(c_43447["forceUpdate"])();
 } else {
 }
 
-var G__32969 = (i + (1));
-i = G__32969;
+var G__43448 = (i + (1));
+i = G__43448;
 continue;
 } else {
 return null;
@@ -71,8 +71,8 @@ while(true){
 if((i < n__16947__auto__)){
 (a[i]).call(null);
 
-var G__32970 = (i + (1));
-i = G__32970;
+var G__43449 = (i + (1));
+i = G__43449;
 continue;
 } else {
 return null;
@@ -172,10 +172,10 @@ reagent.impl.batching.do_after_flush.call(null,f);
 return reagent.impl.batching.render_queue.schedule();
 });
 reagent.impl.batching.is_reagent_component = (function reagent$impl$batching$is_reagent_component(c){
-var G__32972 = c;
-var G__32972__$1 = (((G__32972 == null))?null:(G__32972["props"]));
-var G__32972__$2 = (((G__32972__$1 == null))?null:(G__32972__$1["argv"]));
-return G__32972__$2;
+var G__43451 = c;
+var G__43451__$1 = (((G__43451 == null))?null:(G__43451["props"]));
+var G__43451__$2 = (((G__43451__$1 == null))?null:(G__43451__$1["argv"]));
+return G__43451__$2;
 });
 reagent.impl.batching.run_reactively = (function reagent$impl$batching$run_reactively(c,run){
 if(cljs.core.truth_(reagent.impl.batching.is_reagent_component.call(null,c))){
@@ -204,10 +204,10 @@ return reagent.ratom.run.call(null,rat);
 }
 });
 reagent.impl.batching.dispose = (function reagent$impl$batching$dispose(c){
-var G__32974_32975 = (c["cljsRatom"]);
-var G__32974_32976__$1 = (((G__32974_32975 == null))?null:reagent.ratom.dispose_BANG_.call(null,G__32974_32975));
+var G__43453_43454 = (c["cljsRatom"]);
+var G__43453_43455__$1 = (((G__43453_43454 == null))?null:reagent.ratom.dispose_BANG_.call(null,G__43453_43454));
 
 return reagent.impl.batching.mark_rendered.call(null,c);
 });
 
-//# sourceMappingURL=batching.js.map?rel=1436385350871
+//# sourceMappingURL=batching.js.map

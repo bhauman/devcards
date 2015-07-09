@@ -8,6 +8,7 @@
      [reagent.core :as reagent]
      [clojure.string :as string]
      [sablono.core :as sab :include-macros true]
+     [devcards.core]
      [devdemos.defcard-api]
      [devdemos.two-zero]
      [devdemos.testing]
@@ -92,13 +93,13 @@
      [:div 
       [:h3 "BMI calculator"]
       [:div
-       "Height: " (int height) "cm"
+       [:span (str "Height: " (int height) "cm")]
        (slider bmi-data :height height 100 220)]
       [:div
-       "Weight: " (int weight) "kg"
+       [:span (str "Weight: " (int weight) "kg")]
        (slider bmi-data :weight weight 30 150)]
       [:div
-       "BMI: " (int bmi) " "
+       [:span (str "BMI: " (int bmi) " ")]
        [:span {:style {:color color}} diagnose]
        (slider bmi-data :bmi bmi 10 50)]])))
 
@@ -241,13 +242,13 @@
       [:div 
        [:h3 "BMI calculator"]
        [:div
-        "Height: " (int height) "cm"
+        [:span (str "Height: " (int height) "cm")]
         (om-slider bmi-data :height height 100 220)]
        [:div
-        "Weight: " (int weight) "kg"
+        [:span (str "Weight: " (int weight) "kg")]
         (om-slider bmi-data :weight weight 30 150)]
        [:div
-        "BMI: " (int bmi) " "
+        [:span (str "BMI: " (int bmi) " ")]
         [:span {:style {:color color}} diagnose]
         (om-slider bmi-data :bmi bmi 10 50)]]))))
 

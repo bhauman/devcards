@@ -1,5 +1,6 @@
 (ns devdemos.testing
   (:require
+   [devcards.core :as devcards]
    [cljs.test :as t :refer [report] :include-macros true]
    [sablono.core :as sab])
   (:require-macros

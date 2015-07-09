@@ -1,4 +1,5 @@
 (ns devdemos.edn-render
+  (:require [devcards.core])
   (:require-macros
    [devcards.core :as dc :refer [defcard edn]]))
 

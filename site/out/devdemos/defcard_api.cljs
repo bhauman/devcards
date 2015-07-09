@@ -1,5 +1,6 @@
 (ns ^:figwheel-always devdemos.defcard-api
     (:require
+     [devcards.core]
      [om.core :as om :include-macros true]
      [om.dom :as dom :include-macros true]
      [reagent.core :as reagent]
