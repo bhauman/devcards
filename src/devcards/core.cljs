@@ -92,10 +92,10 @@
     (if-not (:hidden options)
       (if (false? (:heading options))
         (sab/html
-         [:div.com-rigsomelight-devcards-card-base-no-pad
+         [:div.com-rigsomelight-devcards-card-base-no-pad {:key (prn-str path)}
           (naked-card children card)])
         (sab/html
-         [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
+         [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad {:key (prn-str path)}
           [:div.com-rigsomelight-devcards-panel-heading
            (if path
              (sab/html
@@ -119,16 +119,27 @@
 
 (declare hist-recorder*)
 
+;; react helpers
+;; these are needed for advanced compilation
+
+(defn get-props [this k]
+  (aget (.-props this) (name k)))
+
+(defn get-state [this k]
+  (aget (.-state this) (name k)))
+
 (defonce-react-class DevcardBase
-  #js {:getInitialState
-        (fn [] #js {:unique_id (gensym 'devcards-base-)})
+     #js {:getInitialState
+       (fn []
+         #js {:unique_id (gensym 'devcards-base-)})
         :componentWillMount
         (fn []
           (this-as this
                    (.setState this
-                              (or (and (.. this -state -data_atom) (.. this -state))
+                              (or (and (get-state this :data_atom)
+                                       (.. this -state))
                                   #js {:data_atom
-                                       (let [data (or (:initial-data (.. this -props -card)) {})]
+                                       (let [data (or (:initial-data (get-props this :card)) {})]
                                          (if (satisfies? IAtom data)
                                            data
                                            (atom data)))}))))
@@ -136,71 +147,70 @@
         (fn []
           (this-as
            this
-           (let [data_atom (.. this -state -data_atom)
-                 id        (.. this -state -unique_id)]
+           (let [data_atom (get-state this :data_atom)
+                 id        (get-state this :unique_id)]
              (when (and data_atom id)
                (remove-watch data_atom id)))))
         :componentDidMount
         (fn []
           (this-as
            this
-           (let [options (:options (.. this -props -card))]
-             (let [data_atom (.. this -state -data_atom)
-                   id        (.. this -state -unique_id)]
+           (let [options (:options (get-props this :card))]
+             (let [data_atom (get-state this :data_atom)
+                   id        (get-state this :unique_id)]
                (when (and data_atom id)
                  (add-watch
                   data_atom id
                   (fn [_ _ _ _]
-                    (let [{:keys [watch-atom inspect-data history]} (:options (.. this -props -card))]
+                    (let [{:keys [watch-atom inspect-data history]} (:options (get-props this :card))]
                       (when (if (false? watch-atom) (or inspect-data history) true) 
                         (.forceUpdate this))))))))))
         :render
         (fn []
           (this-as
            this
-           (let [card      (.. this -props -card)
+           (let [card      (get-props this :card)
                  options   (:options card)
                  main      (let [m (:main-obj card)]
                              (if (fn? m)
-                               (m (.-data_atom (.-state this)) this)
+                               (m (get-state this :data_atom) this)
                                m))
                  hist-ctl  (when (:history options)
-                             (hist-recorder* (.-data_atom (.-state this))))
+                             (hist-recorder* (get-state this :data_atom)))
                  document  (when-let [docu (:documentation card)]
                              (markdown->react docu))
                  edn       (when (:inspect-data options)
                              (sab/html
                               [:div.com-rigsomelight-devcards-padding-top-border
-                               (edn-rend/html-edn @(.-data_atom (.-state this)))]))
+                               (edn-rend/html-edn @(get-state this :data_atom))]))
                  children  (sab/html [:div (list document main hist-ctl edn)])]
              (if (:frame options)
                (frame children card) ;; make component and forward options
-               (sab/html [:div.com-rigsomelight-devcards-frameless children])))))})
+               (sab/html [:div.com-rigsomelight-devcards-frameless {} children])))))})
+
+(defn render-into-dom [this]
+   (when-let [node-fn (get-props this :node_fn)]
+     (when-let [comp (aget (.. this -refs) (get-state this :unique_id))]
+       (when-let [node (js/React.findDOMNode comp)]
+         (node-fn (get-props this :data_atom) node)))))
 
 (defonce-react-class DomComponent
   #js {:getInitialState
         (fn [] #js {:unique_id (str (gensym 'devcards-dom-component-))})
-        :renderIntoDOM
-        (fn []
-          (this-as this
-                   (when-let [node-fn (.. this -props -node_fn)]
-                     (when-let [comp (aget (.. this -refs) (.. this -state -unique_id))]
-                       (when-let [node (js/React.findDOMNode comp)]
-                         (node-fn (.. this -props -data_atom) node))))))
         :componentDidUpdate
         (fn [prevP, prevS]
           (this-as this
-                   (when (and (.. this -props -node_fn)
-                              (not= (.. this -props -node_fn)
-                                    (.. prevP -node_fn)))
-                     (.renderIntoDOM this))))
+                   (when (and (get-props this :node_fn) 
+                              (not= (get-props this :node_fn)
+                                    (aget prevP "node_fn")))
+                     (render-into-dom this))))
         :componentDidMount
-        (fn [] (this-as this (.renderIntoDOM this)))
+        (fn [] (this-as this (render-into-dom this)))
         :render
          (fn []
            (this-as this
                     (js/React.DOM.div
-                     #js { :ref (.. this -state -unique_id) }
+                     #js { :ref (get-state this :unique_id)}
                      "Card has not mounted DOM node.")))})
 
 (defn booler? [key opts]
@@ -416,119 +426,104 @@
 (comment
   would be nice to have a drop down of history diffs)
 
+(defn can-go-back [this]
+  (let [{:keys [history pointer]} @(get-state this :history_atom)]
+    (< (inc pointer) (count history))))
+
+(defn can-go-forward [this]
+  (> (:pointer @(get-state this :history_atom)) 0))
+
+(defn in-time-machine? [this]
+  (not (zero? (:pointer @(get-state this :history_atom)))))
+
+(defn back-in-history! [this]
+  (let [history-atom   (get-state this :history_atom)
+        {:keys [history pointer]} @history-atom]
+    (when (can-go-back this)
+      (swap! history-atom assoc
+             :pointer (inc pointer)
+             :ignore-click true)
+      (reset! (get-props this :data_atom)
+              (nth history (inc pointer)))
+      (.forceUpdate this))))
+
+(defn forward-in-history! [this]
+  (let [history-atom (get-state this :history_atom)
+        {:keys [history pointer]} @history-atom]
+    (when (can-go-forward this)
+      (swap! history-atom assoc
+             :pointer (dec pointer)
+             :ignore-click true)
+      (reset! (get-props this :data_atom)
+              (nth history (dec pointer)))
+      (.forceUpdate this))))
+
+(defn continue-on! [this]
+  (let [history-atom (get-state this :history_atom)
+        {:keys [history]} @history-atom]
+    (when (can-go-forward this)
+      (swap! history-atom assoc :pointer 0 :ignore-click true)
+      (reset! (get-props this :data_atom)
+              (first history))
+      (.forceUpdate this))))
+
 ;; keep
-(defonce-react-class HistoryComponent
-     #js {:getInitialState
-        (fn [] #js {:unique_id    (str (gensym 'devcards-history-runner-))
-                   :history_atom (atom {:history (list) :pointer 0})})
-        :componentDidUpdate
-        (fn [prevP, prevS]
-          (this-as this
-                   (when (and (.. this -props -node_fn)
-                              (not= (.. this -props -node_fn)
-                                    (.. prevP -node_fn)))
-                     (.renderIntoDOM this))))
-        :componentWillMount
-        (fn []
-          (this-as this
-                   (swap! (.. this -state -history_atom)
-                          assoc-in [:history] (list @(.. this -props -data_atom)))))        
-        :componentDidMount
-        (fn []
-          (this-as
-           this
-           (let [data_atom (.. this -props -data_atom)
-                 id        (.. this -state -unique_id)
-                 history-atom   (.. this -state -history_atom)]
-             (when (and data_atom id)
-               (add-watch data_atom id
-                          (fn [_ _ _ n]
-                            (if (.inTimeMachine this)
-                              (do
-                                (swap! history-atom
-                                       (fn [{:keys [pointer history ignore-click] :as ha}]
-                                         (if ignore-click
-                                           (assoc ha :ignore-click false)
-                                           (assoc ha
-                                                  :history
-                                                  (let [abridged-hist (drop pointer history)]
-                                                    (if (not= n (first abridged-hist))
-                                                      (cons n abridged-hist)
-                                                      abridged-hist))
-                                                  :pointer 0)))))
-                              (swap! history-atom assoc
-                                     :history (let [hist (:history @history-atom)]
-                                                (if (not= n (first hist))
-                                                (cons n hist)
-                                                hist))
-                                     :ignore-click false))))))))
-        :canGoBack
-        (fn []
-          (this-as this
-                   (let [{:keys [history pointer]} @(.. this -state -history_atom)]
-                     (< (inc pointer)
-                        (count history)))))
-
-        :canGoForward
-        (fn []
-          (this-as this
-                   (> (:pointer @(.. this -state -history_atom)) 0)))
-
-        :inTimeMachine
-        (fn []
-          (this-as this
-                   (not (zero? (:pointer @(.. this -state -history_atom))))))
+(def-react-class HistoryComponent
+  #js {:getInitialState
+       (fn [] #js {:unique_id    (str (gensym 'devcards-history-runner-))
+                  :history_atom (atom {:history (list) :pointer 0})})
+       :componentWillMount
+       (fn []
+         (this-as this
+                  (swap! (get-state this :history_atom)
+                         assoc-in [:history] (list @(get-props this :data_atom)))))        
+       :componentDidMount
+       (fn []
+         (this-as
+          this
+          (let [data_atom (get-props this :data_atom)
+                id        (get-state this :unique_id)
+                history-atom   (get-state this :history_atom)]
+            (when (and data_atom id)
+              (add-watch data_atom id
+                         (fn [_ _ _ n]
+                           (if (in-time-machine? this)
+                             (do
+                               (swap! history-atom
+                                      (fn [{:keys [pointer history ignore-click] :as ha}]
+                                        (if ignore-click
+                                          (assoc ha :ignore-click false)
+                                          (assoc ha
+                                                 :history
+                                                 (let [abridged-hist (drop pointer history)]
+                                                   (if (not= n (first abridged-hist))
+                                                     (cons n abridged-hist)
+                                                     abridged-hist))
+                                                 :pointer 0)))))
+                             (swap! history-atom assoc
+                                    :history (let [hist (:history @history-atom)]
+                                               (if (not= n (first hist))
+                                                 (cons n hist)
+                                                 hist))
+                                    :ignore-click false))))))))
        
-        :backInHistory
-        (fn []
-          (this-as this
-                   (let [history-atom   (.. this -state -history_atom)
-                         {:keys [history pointer]} @history-atom]
-                     (when (.. this canGoBack)
-                       (swap! history-atom assoc
-                              :pointer (inc pointer)
-                              :ignore-click true)
-                       (reset! (.. this -props -data_atom) (nth history (inc pointer)))
-                       (.forceUpdate this)))))
-
-        :forwardInHistory
-        (fn []
-          (this-as this
-                   (let [history-atom   (.. this -state -history_atom)
-                         {:keys [history pointer]} @history-atom]
-                     (when (.. this canGoForward)
-                       (swap! history-atom assoc
-                              :pointer (dec pointer)
-                              :ignore-click true)
-                       (reset! (.. this -props -data_atom) (nth history (dec pointer)))
-                       (.forceUpdate this)))))
-        :continueOn
-        (fn []
-          (this-as
-           this
-           (let [history-atom (.. this -state -history_atom)
-                 {:keys [history]} @history-atom]
-             (when (.. this canGoForward)
-               (swap! history-atom assoc :pointer 0 :ignore-click true)
-               (reset! (.. this -props -data_atom) (first history))
-               (.forceUpdate this)))))
-          :render
-         (fn []
-           (this-as
-            this
-            (when (or (.canGoBack this)
-                      (.canGoForward this))
-              (sab/html
+       :render
+       (fn []
+         (this-as
+          this
+          (when (or (can-go-back this)
+                    (can-go-forward this))
+            (sab/html
                [:div.com-rigsomelight-devcards-history-control-bar
-                {:style { :display (if (or (.canGoBack this)
-                                           (.canGoForward this))
+                {:style { :display (if (or (can-go-back this)
+                                           (can-go-forward this))
                                      "block" "none")}}
                 (let [action (fn [e]
-                                (.preventDefault e)
-                                (.. this backInHistory))]
+                               (.preventDefault e)
+                               (back-in-history! this))]
                   (sab/html
                    [:button
-                    {:style { :visibility (if (.canGoBack this) "visible" "hidden")}
+                    {:style { :visibility (if (can-go-back this) "visible" "hidden")}
                      :href "#"
                      :onClick action
                      :onTouchEnd action}
@@ -536,20 +531,21 @@
                 (let [action (fn [e]
                                (.preventDefault e)
                                ;; touch the data atom
-                               (reset! (.. this -props -data_atom)
-                                       @(.. this -props -data_atom)))]
+                               (let [data-atom (get-props this :data_atom)]
+                                 (reset! data-atom @data-atom))
+                               )]
                   (sab/html
                    [:button
-                    {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
+                    {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
                      :onClick action
                      :onTouchEnd action}
                  [:span.com-rigsomelight-devcards-history-stop ""]]))
                 (let [action (fn [e]
                                 (.preventDefault e)
-                                (.. this forwardInHistory))]
+                                (forward-in-history! this))]
                   (sab/html
                    [:button
-                    {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
+                    {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
                      :onClick action
                      :onTouchEnd action}
                     [:span.com-rigsomelight-devcards-history-control-right ""]]))
@@ -558,7 +554,7 @@
                                 (.. this continueOn))]
                   (sab/html
                    [:button
-                    {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
+                    {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
                      :onClick listener
                      :onTouchEnd listener}
                     [:span.com-rigsomelight-devcards-history-control-small-arrow]
