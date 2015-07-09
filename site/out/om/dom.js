@@ -14,10 +14,10 @@ return React.DOM.a.apply(null,cljs.core.into_array.call(null,cljs.core.cons.call
 
 om.dom.a.cljs$lang$maxFixedArity = (1);
 
-om.dom.a.cljs$lang$applyTo = (function (seq43089){
-var G__43090 = cljs.core.first.call(null,seq43089);
-var seq43089__$1 = cljs.core.next.call(null,seq43089);
-return om.dom.a.cljs$core$IFn$_invoke$arity$variadic(G__43090,seq43089__$1);
+om.dom.a.cljs$lang$applyTo = (function (seq69828){
+var G__69829 = cljs.core.first.call(null,seq69828);
+var seq69828__$1 = cljs.core.next.call(null,seq69828);
+return om.dom.a.cljs$core$IFn$_invoke$arity$variadic(G__69829,seq69828__$1);
 });
 
 om.dom.abbr = (function om$dom$abbr(){
@@ -31,10 +31,10 @@ return React.DOM.abbr.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.abbr.cljs$lang$maxFixedArity = (1);
 
-om.dom.abbr.cljs$lang$applyTo = (function (seq43091){
-var G__43092 = cljs.core.first.call(null,seq43091);
-var seq43091__$1 = cljs.core.next.call(null,seq43091);
-return om.dom.abbr.cljs$core$IFn$_invoke$arity$variadic(G__43092,seq43091__$1);
+om.dom.abbr.cljs$lang$applyTo = (function (seq69830){
+var G__69831 = cljs.core.first.call(null,seq69830);
+var seq69830__$1 = cljs.core.next.call(null,seq69830);
+return om.dom.abbr.cljs$core$IFn$_invoke$arity$variadic(G__69831,seq69830__$1);
 });
 
 om.dom.address = (function om$dom$address(){
@@ -48,10 +48,10 @@ return React.DOM.address.apply(null,cljs.core.into_array.call(null,cljs.core.con
 
 om.dom.address.cljs$lang$maxFixedArity = (1);
 
-om.dom.address.cljs$lang$applyTo = (function (seq43093){
-var G__43094 = cljs.core.first.call(null,seq43093);
-var seq43093__$1 = cljs.core.next.call(null,seq43093);
-return om.dom.address.cljs$core$IFn$_invoke$arity$variadic(G__43094,seq43093__$1);
+om.dom.address.cljs$lang$applyTo = (function (seq69832){
+var G__69833 = cljs.core.first.call(null,seq69832);
+var seq69832__$1 = cljs.core.next.call(null,seq69832);
+return om.dom.address.cljs$core$IFn$_invoke$arity$variadic(G__69833,seq69832__$1);
 });
 
 om.dom.area = (function om$dom$area(){
@@ -65,10 +65,10 @@ return React.DOM.area.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.area.cljs$lang$maxFixedArity = (1);
 
-om.dom.area.cljs$lang$applyTo = (function (seq43095){
-var G__43096 = cljs.core.first.call(null,seq43095);
-var seq43095__$1 = cljs.core.next.call(null,seq43095);
-return om.dom.area.cljs$core$IFn$_invoke$arity$variadic(G__43096,seq43095__$1);
+om.dom.area.cljs$lang$applyTo = (function (seq69834){
+var G__69835 = cljs.core.first.call(null,seq69834);
+var seq69834__$1 = cljs.core.next.call(null,seq69834);
+return om.dom.area.cljs$core$IFn$_invoke$arity$variadic(G__69835,seq69834__$1);
 });
 
 om.dom.article = (function om$dom$article(){
@@ -82,10 +82,10 @@ return React.DOM.article.apply(null,cljs.core.into_array.call(null,cljs.core.con
 
 om.dom.article.cljs$lang$maxFixedArity = (1);
 
-om.dom.article.cljs$lang$applyTo = (function (seq43097){
-var G__43098 = cljs.core.first.call(null,seq43097);
-var seq43097__$1 = cljs.core.next.call(null,seq43097);
-return om.dom.article.cljs$core$IFn$_invoke$arity$variadic(G__43098,seq43097__$1);
+om.dom.article.cljs$lang$applyTo = (function (seq69836){
+var G__69837 = cljs.core.first.call(null,seq69836);
+var seq69836__$1 = cljs.core.next.call(null,seq69836);
+return om.dom.article.cljs$core$IFn$_invoke$arity$variadic(G__69837,seq69836__$1);
 });
 
 om.dom.aside = (function om$dom$aside(){
@@ -99,10 +99,10 @@ return React.DOM.aside.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.aside.cljs$lang$maxFixedArity = (1);
 
-om.dom.aside.cljs$lang$applyTo = (function (seq43099){
-var G__43100 = cljs.core.first.call(null,seq43099);
-var seq43099__$1 = cljs.core.next.call(null,seq43099);
-return om.dom.aside.cljs$core$IFn$_invoke$arity$variadic(G__43100,seq43099__$1);
+om.dom.aside.cljs$lang$applyTo = (function (seq69838){
+var G__69839 = cljs.core.first.call(null,seq69838);
+var seq69838__$1 = cljs.core.next.call(null,seq69838);
+return om.dom.aside.cljs$core$IFn$_invoke$arity$variadic(G__69839,seq69838__$1);
 });
 
 om.dom.audio = (function om$dom$audio(){
@@ -116,10 +116,10 @@ return React.DOM.audio.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.audio.cljs$lang$maxFixedArity = (1);
 
-om.dom.audio.cljs$lang$applyTo = (function (seq43101){
-var G__43102 = cljs.core.first.call(null,seq43101);
-var seq43101__$1 = cljs.core.next.call(null,seq43101);
-return om.dom.audio.cljs$core$IFn$_invoke$arity$variadic(G__43102,seq43101__$1);
+om.dom.audio.cljs$lang$applyTo = (function (seq69840){
+var G__69841 = cljs.core.first.call(null,seq69840);
+var seq69840__$1 = cljs.core.next.call(null,seq69840);
+return om.dom.audio.cljs$core$IFn$_invoke$arity$variadic(G__69841,seq69840__$1);
 });
 
 om.dom.b = (function om$dom$b(){
@@ -133,10 +133,10 @@ return React.DOM.b.apply(null,cljs.core.into_array.call(null,cljs.core.cons.call
 
 om.dom.b.cljs$lang$maxFixedArity = (1);
 
-om.dom.b.cljs$lang$applyTo = (function (seq43103){
-var G__43104 = cljs.core.first.call(null,seq43103);
-var seq43103__$1 = cljs.core.next.call(null,seq43103);
-return om.dom.b.cljs$core$IFn$_invoke$arity$variadic(G__43104,seq43103__$1);
+om.dom.b.cljs$lang$applyTo = (function (seq69842){
+var G__69843 = cljs.core.first.call(null,seq69842);
+var seq69842__$1 = cljs.core.next.call(null,seq69842);
+return om.dom.b.cljs$core$IFn$_invoke$arity$variadic(G__69843,seq69842__$1);
 });
 
 om.dom.base = (function om$dom$base(){
@@ -150,10 +150,10 @@ return React.DOM.base.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.base.cljs$lang$maxFixedArity = (1);
 
-om.dom.base.cljs$lang$applyTo = (function (seq43105){
-var G__43106 = cljs.core.first.call(null,seq43105);
-var seq43105__$1 = cljs.core.next.call(null,seq43105);
-return om.dom.base.cljs$core$IFn$_invoke$arity$variadic(G__43106,seq43105__$1);
+om.dom.base.cljs$lang$applyTo = (function (seq69844){
+var G__69845 = cljs.core.first.call(null,seq69844);
+var seq69844__$1 = cljs.core.next.call(null,seq69844);
+return om.dom.base.cljs$core$IFn$_invoke$arity$variadic(G__69845,seq69844__$1);
 });
 
 om.dom.bdi = (function om$dom$bdi(){
@@ -167,10 +167,10 @@ return React.DOM.bdi.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.bdi.cljs$lang$maxFixedArity = (1);
 
-om.dom.bdi.cljs$lang$applyTo = (function (seq43107){
-var G__43108 = cljs.core.first.call(null,seq43107);
-var seq43107__$1 = cljs.core.next.call(null,seq43107);
-return om.dom.bdi.cljs$core$IFn$_invoke$arity$variadic(G__43108,seq43107__$1);
+om.dom.bdi.cljs$lang$applyTo = (function (seq69846){
+var G__69847 = cljs.core.first.call(null,seq69846);
+var seq69846__$1 = cljs.core.next.call(null,seq69846);
+return om.dom.bdi.cljs$core$IFn$_invoke$arity$variadic(G__69847,seq69846__$1);
 });
 
 om.dom.bdo = (function om$dom$bdo(){
@@ -184,10 +184,10 @@ return React.DOM.bdo.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.bdo.cljs$lang$maxFixedArity = (1);
 
-om.dom.bdo.cljs$lang$applyTo = (function (seq43109){
-var G__43110 = cljs.core.first.call(null,seq43109);
-var seq43109__$1 = cljs.core.next.call(null,seq43109);
-return om.dom.bdo.cljs$core$IFn$_invoke$arity$variadic(G__43110,seq43109__$1);
+om.dom.bdo.cljs$lang$applyTo = (function (seq69848){
+var G__69849 = cljs.core.first.call(null,seq69848);
+var seq69848__$1 = cljs.core.next.call(null,seq69848);
+return om.dom.bdo.cljs$core$IFn$_invoke$arity$variadic(G__69849,seq69848__$1);
 });
 
 om.dom.big = (function om$dom$big(){
@@ -201,10 +201,10 @@ return React.DOM.big.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.big.cljs$lang$maxFixedArity = (1);
 
-om.dom.big.cljs$lang$applyTo = (function (seq43111){
-var G__43112 = cljs.core.first.call(null,seq43111);
-var seq43111__$1 = cljs.core.next.call(null,seq43111);
-return om.dom.big.cljs$core$IFn$_invoke$arity$variadic(G__43112,seq43111__$1);
+om.dom.big.cljs$lang$applyTo = (function (seq69850){
+var G__69851 = cljs.core.first.call(null,seq69850);
+var seq69850__$1 = cljs.core.next.call(null,seq69850);
+return om.dom.big.cljs$core$IFn$_invoke$arity$variadic(G__69851,seq69850__$1);
 });
 
 om.dom.blockquote = (function om$dom$blockquote(){
@@ -218,10 +218,10 @@ return React.DOM.blockquote.apply(null,cljs.core.into_array.call(null,cljs.core.
 
 om.dom.blockquote.cljs$lang$maxFixedArity = (1);
 
-om.dom.blockquote.cljs$lang$applyTo = (function (seq43113){
-var G__43114 = cljs.core.first.call(null,seq43113);
-var seq43113__$1 = cljs.core.next.call(null,seq43113);
-return om.dom.blockquote.cljs$core$IFn$_invoke$arity$variadic(G__43114,seq43113__$1);
+om.dom.blockquote.cljs$lang$applyTo = (function (seq69852){
+var G__69853 = cljs.core.first.call(null,seq69852);
+var seq69852__$1 = cljs.core.next.call(null,seq69852);
+return om.dom.blockquote.cljs$core$IFn$_invoke$arity$variadic(G__69853,seq69852__$1);
 });
 
 om.dom.body = (function om$dom$body(){
@@ -235,10 +235,10 @@ return React.DOM.body.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.body.cljs$lang$maxFixedArity = (1);
 
-om.dom.body.cljs$lang$applyTo = (function (seq43115){
-var G__43116 = cljs.core.first.call(null,seq43115);
-var seq43115__$1 = cljs.core.next.call(null,seq43115);
-return om.dom.body.cljs$core$IFn$_invoke$arity$variadic(G__43116,seq43115__$1);
+om.dom.body.cljs$lang$applyTo = (function (seq69854){
+var G__69855 = cljs.core.first.call(null,seq69854);
+var seq69854__$1 = cljs.core.next.call(null,seq69854);
+return om.dom.body.cljs$core$IFn$_invoke$arity$variadic(G__69855,seq69854__$1);
 });
 
 om.dom.br = (function om$dom$br(){
@@ -252,10 +252,10 @@ return React.DOM.br.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.br.cljs$lang$maxFixedArity = (1);
 
-om.dom.br.cljs$lang$applyTo = (function (seq43117){
-var G__43118 = cljs.core.first.call(null,seq43117);
-var seq43117__$1 = cljs.core.next.call(null,seq43117);
-return om.dom.br.cljs$core$IFn$_invoke$arity$variadic(G__43118,seq43117__$1);
+om.dom.br.cljs$lang$applyTo = (function (seq69856){
+var G__69857 = cljs.core.first.call(null,seq69856);
+var seq69856__$1 = cljs.core.next.call(null,seq69856);
+return om.dom.br.cljs$core$IFn$_invoke$arity$variadic(G__69857,seq69856__$1);
 });
 
 om.dom.button = (function om$dom$button(){
@@ -269,10 +269,10 @@ return React.DOM.button.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.button.cljs$lang$maxFixedArity = (1);
 
-om.dom.button.cljs$lang$applyTo = (function (seq43119){
-var G__43120 = cljs.core.first.call(null,seq43119);
-var seq43119__$1 = cljs.core.next.call(null,seq43119);
-return om.dom.button.cljs$core$IFn$_invoke$arity$variadic(G__43120,seq43119__$1);
+om.dom.button.cljs$lang$applyTo = (function (seq69858){
+var G__69859 = cljs.core.first.call(null,seq69858);
+var seq69858__$1 = cljs.core.next.call(null,seq69858);
+return om.dom.button.cljs$core$IFn$_invoke$arity$variadic(G__69859,seq69858__$1);
 });
 
 om.dom.canvas = (function om$dom$canvas(){
@@ -286,10 +286,10 @@ return React.DOM.canvas.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.canvas.cljs$lang$maxFixedArity = (1);
 
-om.dom.canvas.cljs$lang$applyTo = (function (seq43121){
-var G__43122 = cljs.core.first.call(null,seq43121);
-var seq43121__$1 = cljs.core.next.call(null,seq43121);
-return om.dom.canvas.cljs$core$IFn$_invoke$arity$variadic(G__43122,seq43121__$1);
+om.dom.canvas.cljs$lang$applyTo = (function (seq69860){
+var G__69861 = cljs.core.first.call(null,seq69860);
+var seq69860__$1 = cljs.core.next.call(null,seq69860);
+return om.dom.canvas.cljs$core$IFn$_invoke$arity$variadic(G__69861,seq69860__$1);
 });
 
 om.dom.caption = (function om$dom$caption(){
@@ -303,10 +303,10 @@ return React.DOM.caption.apply(null,cljs.core.into_array.call(null,cljs.core.con
 
 om.dom.caption.cljs$lang$maxFixedArity = (1);
 
-om.dom.caption.cljs$lang$applyTo = (function (seq43123){
-var G__43124 = cljs.core.first.call(null,seq43123);
-var seq43123__$1 = cljs.core.next.call(null,seq43123);
-return om.dom.caption.cljs$core$IFn$_invoke$arity$variadic(G__43124,seq43123__$1);
+om.dom.caption.cljs$lang$applyTo = (function (seq69862){
+var G__69863 = cljs.core.first.call(null,seq69862);
+var seq69862__$1 = cljs.core.next.call(null,seq69862);
+return om.dom.caption.cljs$core$IFn$_invoke$arity$variadic(G__69863,seq69862__$1);
 });
 
 om.dom.cite = (function om$dom$cite(){
@@ -320,10 +320,10 @@ return React.DOM.cite.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.cite.cljs$lang$maxFixedArity = (1);
 
-om.dom.cite.cljs$lang$applyTo = (function (seq43125){
-var G__43126 = cljs.core.first.call(null,seq43125);
-var seq43125__$1 = cljs.core.next.call(null,seq43125);
-return om.dom.cite.cljs$core$IFn$_invoke$arity$variadic(G__43126,seq43125__$1);
+om.dom.cite.cljs$lang$applyTo = (function (seq69864){
+var G__69865 = cljs.core.first.call(null,seq69864);
+var seq69864__$1 = cljs.core.next.call(null,seq69864);
+return om.dom.cite.cljs$core$IFn$_invoke$arity$variadic(G__69865,seq69864__$1);
 });
 
 om.dom.code = (function om$dom$code(){
@@ -337,10 +337,10 @@ return React.DOM.code.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.code.cljs$lang$maxFixedArity = (1);
 
-om.dom.code.cljs$lang$applyTo = (function (seq43127){
-var G__43128 = cljs.core.first.call(null,seq43127);
-var seq43127__$1 = cljs.core.next.call(null,seq43127);
-return om.dom.code.cljs$core$IFn$_invoke$arity$variadic(G__43128,seq43127__$1);
+om.dom.code.cljs$lang$applyTo = (function (seq69866){
+var G__69867 = cljs.core.first.call(null,seq69866);
+var seq69866__$1 = cljs.core.next.call(null,seq69866);
+return om.dom.code.cljs$core$IFn$_invoke$arity$variadic(G__69867,seq69866__$1);
 });
 
 om.dom.col = (function om$dom$col(){
@@ -354,10 +354,10 @@ return React.DOM.col.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.col.cljs$lang$maxFixedArity = (1);
 
-om.dom.col.cljs$lang$applyTo = (function (seq43129){
-var G__43130 = cljs.core.first.call(null,seq43129);
-var seq43129__$1 = cljs.core.next.call(null,seq43129);
-return om.dom.col.cljs$core$IFn$_invoke$arity$variadic(G__43130,seq43129__$1);
+om.dom.col.cljs$lang$applyTo = (function (seq69868){
+var G__69869 = cljs.core.first.call(null,seq69868);
+var seq69868__$1 = cljs.core.next.call(null,seq69868);
+return om.dom.col.cljs$core$IFn$_invoke$arity$variadic(G__69869,seq69868__$1);
 });
 
 om.dom.colgroup = (function om$dom$colgroup(){
@@ -371,10 +371,10 @@ return React.DOM.colgroup.apply(null,cljs.core.into_array.call(null,cljs.core.co
 
 om.dom.colgroup.cljs$lang$maxFixedArity = (1);
 
-om.dom.colgroup.cljs$lang$applyTo = (function (seq43131){
-var G__43132 = cljs.core.first.call(null,seq43131);
-var seq43131__$1 = cljs.core.next.call(null,seq43131);
-return om.dom.colgroup.cljs$core$IFn$_invoke$arity$variadic(G__43132,seq43131__$1);
+om.dom.colgroup.cljs$lang$applyTo = (function (seq69870){
+var G__69871 = cljs.core.first.call(null,seq69870);
+var seq69870__$1 = cljs.core.next.call(null,seq69870);
+return om.dom.colgroup.cljs$core$IFn$_invoke$arity$variadic(G__69871,seq69870__$1);
 });
 
 om.dom.data = (function om$dom$data(){
@@ -388,10 +388,10 @@ return React.DOM.data.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.data.cljs$lang$maxFixedArity = (1);
 
-om.dom.data.cljs$lang$applyTo = (function (seq43133){
-var G__43134 = cljs.core.first.call(null,seq43133);
-var seq43133__$1 = cljs.core.next.call(null,seq43133);
-return om.dom.data.cljs$core$IFn$_invoke$arity$variadic(G__43134,seq43133__$1);
+om.dom.data.cljs$lang$applyTo = (function (seq69872){
+var G__69873 = cljs.core.first.call(null,seq69872);
+var seq69872__$1 = cljs.core.next.call(null,seq69872);
+return om.dom.data.cljs$core$IFn$_invoke$arity$variadic(G__69873,seq69872__$1);
 });
 
 om.dom.datalist = (function om$dom$datalist(){
@@ -405,10 +405,10 @@ return React.DOM.datalist.apply(null,cljs.core.into_array.call(null,cljs.core.co
 
 om.dom.datalist.cljs$lang$maxFixedArity = (1);
 
-om.dom.datalist.cljs$lang$applyTo = (function (seq43135){
-var G__43136 = cljs.core.first.call(null,seq43135);
-var seq43135__$1 = cljs.core.next.call(null,seq43135);
-return om.dom.datalist.cljs$core$IFn$_invoke$arity$variadic(G__43136,seq43135__$1);
+om.dom.datalist.cljs$lang$applyTo = (function (seq69874){
+var G__69875 = cljs.core.first.call(null,seq69874);
+var seq69874__$1 = cljs.core.next.call(null,seq69874);
+return om.dom.datalist.cljs$core$IFn$_invoke$arity$variadic(G__69875,seq69874__$1);
 });
 
 om.dom.dd = (function om$dom$dd(){
@@ -422,10 +422,10 @@ return React.DOM.dd.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.dd.cljs$lang$maxFixedArity = (1);
 
-om.dom.dd.cljs$lang$applyTo = (function (seq43137){
-var G__43138 = cljs.core.first.call(null,seq43137);
-var seq43137__$1 = cljs.core.next.call(null,seq43137);
-return om.dom.dd.cljs$core$IFn$_invoke$arity$variadic(G__43138,seq43137__$1);
+om.dom.dd.cljs$lang$applyTo = (function (seq69876){
+var G__69877 = cljs.core.first.call(null,seq69876);
+var seq69876__$1 = cljs.core.next.call(null,seq69876);
+return om.dom.dd.cljs$core$IFn$_invoke$arity$variadic(G__69877,seq69876__$1);
 });
 
 om.dom.del = (function om$dom$del(){
@@ -439,10 +439,10 @@ return React.DOM.del.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.del.cljs$lang$maxFixedArity = (1);
 
-om.dom.del.cljs$lang$applyTo = (function (seq43139){
-var G__43140 = cljs.core.first.call(null,seq43139);
-var seq43139__$1 = cljs.core.next.call(null,seq43139);
-return om.dom.del.cljs$core$IFn$_invoke$arity$variadic(G__43140,seq43139__$1);
+om.dom.del.cljs$lang$applyTo = (function (seq69878){
+var G__69879 = cljs.core.first.call(null,seq69878);
+var seq69878__$1 = cljs.core.next.call(null,seq69878);
+return om.dom.del.cljs$core$IFn$_invoke$arity$variadic(G__69879,seq69878__$1);
 });
 
 om.dom.dfn = (function om$dom$dfn(){
@@ -456,10 +456,10 @@ return React.DOM.dfn.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.dfn.cljs$lang$maxFixedArity = (1);
 
-om.dom.dfn.cljs$lang$applyTo = (function (seq43141){
-var G__43142 = cljs.core.first.call(null,seq43141);
-var seq43141__$1 = cljs.core.next.call(null,seq43141);
-return om.dom.dfn.cljs$core$IFn$_invoke$arity$variadic(G__43142,seq43141__$1);
+om.dom.dfn.cljs$lang$applyTo = (function (seq69880){
+var G__69881 = cljs.core.first.call(null,seq69880);
+var seq69880__$1 = cljs.core.next.call(null,seq69880);
+return om.dom.dfn.cljs$core$IFn$_invoke$arity$variadic(G__69881,seq69880__$1);
 });
 
 om.dom.div = (function om$dom$div(){
@@ -473,10 +473,10 @@ return React.DOM.div.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.div.cljs$lang$maxFixedArity = (1);
 
-om.dom.div.cljs$lang$applyTo = (function (seq43143){
-var G__43144 = cljs.core.first.call(null,seq43143);
-var seq43143__$1 = cljs.core.next.call(null,seq43143);
-return om.dom.div.cljs$core$IFn$_invoke$arity$variadic(G__43144,seq43143__$1);
+om.dom.div.cljs$lang$applyTo = (function (seq69882){
+var G__69883 = cljs.core.first.call(null,seq69882);
+var seq69882__$1 = cljs.core.next.call(null,seq69882);
+return om.dom.div.cljs$core$IFn$_invoke$arity$variadic(G__69883,seq69882__$1);
 });
 
 om.dom.dl = (function om$dom$dl(){
@@ -490,10 +490,10 @@ return React.DOM.dl.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.dl.cljs$lang$maxFixedArity = (1);
 
-om.dom.dl.cljs$lang$applyTo = (function (seq43145){
-var G__43146 = cljs.core.first.call(null,seq43145);
-var seq43145__$1 = cljs.core.next.call(null,seq43145);
-return om.dom.dl.cljs$core$IFn$_invoke$arity$variadic(G__43146,seq43145__$1);
+om.dom.dl.cljs$lang$applyTo = (function (seq69884){
+var G__69885 = cljs.core.first.call(null,seq69884);
+var seq69884__$1 = cljs.core.next.call(null,seq69884);
+return om.dom.dl.cljs$core$IFn$_invoke$arity$variadic(G__69885,seq69884__$1);
 });
 
 om.dom.dt = (function om$dom$dt(){
@@ -507,10 +507,10 @@ return React.DOM.dt.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.dt.cljs$lang$maxFixedArity = (1);
 
-om.dom.dt.cljs$lang$applyTo = (function (seq43147){
-var G__43148 = cljs.core.first.call(null,seq43147);
-var seq43147__$1 = cljs.core.next.call(null,seq43147);
-return om.dom.dt.cljs$core$IFn$_invoke$arity$variadic(G__43148,seq43147__$1);
+om.dom.dt.cljs$lang$applyTo = (function (seq69886){
+var G__69887 = cljs.core.first.call(null,seq69886);
+var seq69886__$1 = cljs.core.next.call(null,seq69886);
+return om.dom.dt.cljs$core$IFn$_invoke$arity$variadic(G__69887,seq69886__$1);
 });
 
 om.dom.em = (function om$dom$em(){
@@ -524,10 +524,10 @@ return React.DOM.em.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.em.cljs$lang$maxFixedArity = (1);
 
-om.dom.em.cljs$lang$applyTo = (function (seq43149){
-var G__43150 = cljs.core.first.call(null,seq43149);
-var seq43149__$1 = cljs.core.next.call(null,seq43149);
-return om.dom.em.cljs$core$IFn$_invoke$arity$variadic(G__43150,seq43149__$1);
+om.dom.em.cljs$lang$applyTo = (function (seq69888){
+var G__69889 = cljs.core.first.call(null,seq69888);
+var seq69888__$1 = cljs.core.next.call(null,seq69888);
+return om.dom.em.cljs$core$IFn$_invoke$arity$variadic(G__69889,seq69888__$1);
 });
 
 om.dom.embed = (function om$dom$embed(){
@@ -541,10 +541,10 @@ return React.DOM.embed.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.embed.cljs$lang$maxFixedArity = (1);
 
-om.dom.embed.cljs$lang$applyTo = (function (seq43151){
-var G__43152 = cljs.core.first.call(null,seq43151);
-var seq43151__$1 = cljs.core.next.call(null,seq43151);
-return om.dom.embed.cljs$core$IFn$_invoke$arity$variadic(G__43152,seq43151__$1);
+om.dom.embed.cljs$lang$applyTo = (function (seq69890){
+var G__69891 = cljs.core.first.call(null,seq69890);
+var seq69890__$1 = cljs.core.next.call(null,seq69890);
+return om.dom.embed.cljs$core$IFn$_invoke$arity$variadic(G__69891,seq69890__$1);
 });
 
 om.dom.fieldset = (function om$dom$fieldset(){
@@ -558,10 +558,10 @@ return React.DOM.fieldset.apply(null,cljs.core.into_array.call(null,cljs.core.co
 
 om.dom.fieldset.cljs$lang$maxFixedArity = (1);
 
-om.dom.fieldset.cljs$lang$applyTo = (function (seq43155){
-var G__43156 = cljs.core.first.call(null,seq43155);
-var seq43155__$1 = cljs.core.next.call(null,seq43155);
-return om.dom.fieldset.cljs$core$IFn$_invoke$arity$variadic(G__43156,seq43155__$1);
+om.dom.fieldset.cljs$lang$applyTo = (function (seq69894){
+var G__69895 = cljs.core.first.call(null,seq69894);
+var seq69894__$1 = cljs.core.next.call(null,seq69894);
+return om.dom.fieldset.cljs$core$IFn$_invoke$arity$variadic(G__69895,seq69894__$1);
 });
 
 om.dom.figcaption = (function om$dom$figcaption(){
@@ -575,10 +575,10 @@ return React.DOM.figcaption.apply(null,cljs.core.into_array.call(null,cljs.core.
 
 om.dom.figcaption.cljs$lang$maxFixedArity = (1);
 
-om.dom.figcaption.cljs$lang$applyTo = (function (seq43157){
-var G__43158 = cljs.core.first.call(null,seq43157);
-var seq43157__$1 = cljs.core.next.call(null,seq43157);
-return om.dom.figcaption.cljs$core$IFn$_invoke$arity$variadic(G__43158,seq43157__$1);
+om.dom.figcaption.cljs$lang$applyTo = (function (seq69896){
+var G__69897 = cljs.core.first.call(null,seq69896);
+var seq69896__$1 = cljs.core.next.call(null,seq69896);
+return om.dom.figcaption.cljs$core$IFn$_invoke$arity$variadic(G__69897,seq69896__$1);
 });
 
 om.dom.figure = (function om$dom$figure(){
@@ -592,10 +592,10 @@ return React.DOM.figure.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.figure.cljs$lang$maxFixedArity = (1);
 
-om.dom.figure.cljs$lang$applyTo = (function (seq43159){
-var G__43160 = cljs.core.first.call(null,seq43159);
-var seq43159__$1 = cljs.core.next.call(null,seq43159);
-return om.dom.figure.cljs$core$IFn$_invoke$arity$variadic(G__43160,seq43159__$1);
+om.dom.figure.cljs$lang$applyTo = (function (seq69898){
+var G__69899 = cljs.core.first.call(null,seq69898);
+var seq69898__$1 = cljs.core.next.call(null,seq69898);
+return om.dom.figure.cljs$core$IFn$_invoke$arity$variadic(G__69899,seq69898__$1);
 });
 
 om.dom.footer = (function om$dom$footer(){
@@ -609,10 +609,10 @@ return React.DOM.footer.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.footer.cljs$lang$maxFixedArity = (1);
 
-om.dom.footer.cljs$lang$applyTo = (function (seq43161){
-var G__43162 = cljs.core.first.call(null,seq43161);
-var seq43161__$1 = cljs.core.next.call(null,seq43161);
-return om.dom.footer.cljs$core$IFn$_invoke$arity$variadic(G__43162,seq43161__$1);
+om.dom.footer.cljs$lang$applyTo = (function (seq69900){
+var G__69901 = cljs.core.first.call(null,seq69900);
+var seq69900__$1 = cljs.core.next.call(null,seq69900);
+return om.dom.footer.cljs$core$IFn$_invoke$arity$variadic(G__69901,seq69900__$1);
 });
 
 om.dom.form = (function om$dom$form(){
@@ -626,10 +626,10 @@ return React.DOM.form.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.form.cljs$lang$maxFixedArity = (1);
 
-om.dom.form.cljs$lang$applyTo = (function (seq43163){
-var G__43164 = cljs.core.first.call(null,seq43163);
-var seq43163__$1 = cljs.core.next.call(null,seq43163);
-return om.dom.form.cljs$core$IFn$_invoke$arity$variadic(G__43164,seq43163__$1);
+om.dom.form.cljs$lang$applyTo = (function (seq69902){
+var G__69903 = cljs.core.first.call(null,seq69902);
+var seq69902__$1 = cljs.core.next.call(null,seq69902);
+return om.dom.form.cljs$core$IFn$_invoke$arity$variadic(G__69903,seq69902__$1);
 });
 
 om.dom.h1 = (function om$dom$h1(){
@@ -643,10 +643,10 @@ return React.DOM.h1.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.h1.cljs$lang$maxFixedArity = (1);
 
-om.dom.h1.cljs$lang$applyTo = (function (seq43165){
-var G__43166 = cljs.core.first.call(null,seq43165);
-var seq43165__$1 = cljs.core.next.call(null,seq43165);
-return om.dom.h1.cljs$core$IFn$_invoke$arity$variadic(G__43166,seq43165__$1);
+om.dom.h1.cljs$lang$applyTo = (function (seq69904){
+var G__69905 = cljs.core.first.call(null,seq69904);
+var seq69904__$1 = cljs.core.next.call(null,seq69904);
+return om.dom.h1.cljs$core$IFn$_invoke$arity$variadic(G__69905,seq69904__$1);
 });
 
 om.dom.h2 = (function om$dom$h2(){
@@ -660,10 +660,10 @@ return React.DOM.h2.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.h2.cljs$lang$maxFixedArity = (1);
 
-om.dom.h2.cljs$lang$applyTo = (function (seq43167){
-var G__43168 = cljs.core.first.call(null,seq43167);
-var seq43167__$1 = cljs.core.next.call(null,seq43167);
-return om.dom.h2.cljs$core$IFn$_invoke$arity$variadic(G__43168,seq43167__$1);
+om.dom.h2.cljs$lang$applyTo = (function (seq69906){
+var G__69907 = cljs.core.first.call(null,seq69906);
+var seq69906__$1 = cljs.core.next.call(null,seq69906);
+return om.dom.h2.cljs$core$IFn$_invoke$arity$variadic(G__69907,seq69906__$1);
 });
 
 om.dom.h3 = (function om$dom$h3(){
@@ -677,10 +677,10 @@ return React.DOM.h3.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.h3.cljs$lang$maxFixedArity = (1);
 
-om.dom.h3.cljs$lang$applyTo = (function (seq43169){
-var G__43170 = cljs.core.first.call(null,seq43169);
-var seq43169__$1 = cljs.core.next.call(null,seq43169);
-return om.dom.h3.cljs$core$IFn$_invoke$arity$variadic(G__43170,seq43169__$1);
+om.dom.h3.cljs$lang$applyTo = (function (seq69908){
+var G__69909 = cljs.core.first.call(null,seq69908);
+var seq69908__$1 = cljs.core.next.call(null,seq69908);
+return om.dom.h3.cljs$core$IFn$_invoke$arity$variadic(G__69909,seq69908__$1);
 });
 
 om.dom.h4 = (function om$dom$h4(){
@@ -694,10 +694,10 @@ return React.DOM.h4.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.h4.cljs$lang$maxFixedArity = (1);
 
-om.dom.h4.cljs$lang$applyTo = (function (seq43171){
-var G__43172 = cljs.core.first.call(null,seq43171);
-var seq43171__$1 = cljs.core.next.call(null,seq43171);
-return om.dom.h4.cljs$core$IFn$_invoke$arity$variadic(G__43172,seq43171__$1);
+om.dom.h4.cljs$lang$applyTo = (function (seq69910){
+var G__69911 = cljs.core.first.call(null,seq69910);
+var seq69910__$1 = cljs.core.next.call(null,seq69910);
+return om.dom.h4.cljs$core$IFn$_invoke$arity$variadic(G__69911,seq69910__$1);
 });
 
 om.dom.h5 = (function om$dom$h5(){
@@ -711,10 +711,10 @@ return React.DOM.h5.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.h5.cljs$lang$maxFixedArity = (1);
 
-om.dom.h5.cljs$lang$applyTo = (function (seq43173){
-var G__43174 = cljs.core.first.call(null,seq43173);
-var seq43173__$1 = cljs.core.next.call(null,seq43173);
-return om.dom.h5.cljs$core$IFn$_invoke$arity$variadic(G__43174,seq43173__$1);
+om.dom.h5.cljs$lang$applyTo = (function (seq69912){
+var G__69913 = cljs.core.first.call(null,seq69912);
+var seq69912__$1 = cljs.core.next.call(null,seq69912);
+return om.dom.h5.cljs$core$IFn$_invoke$arity$variadic(G__69913,seq69912__$1);
 });
 
 om.dom.h6 = (function om$dom$h6(){
@@ -728,10 +728,10 @@ return React.DOM.h6.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.h6.cljs$lang$maxFixedArity = (1);
 
-om.dom.h6.cljs$lang$applyTo = (function (seq43175){
-var G__43176 = cljs.core.first.call(null,seq43175);
-var seq43175__$1 = cljs.core.next.call(null,seq43175);
-return om.dom.h6.cljs$core$IFn$_invoke$arity$variadic(G__43176,seq43175__$1);
+om.dom.h6.cljs$lang$applyTo = (function (seq69914){
+var G__69915 = cljs.core.first.call(null,seq69914);
+var seq69914__$1 = cljs.core.next.call(null,seq69914);
+return om.dom.h6.cljs$core$IFn$_invoke$arity$variadic(G__69915,seq69914__$1);
 });
 
 om.dom.head = (function om$dom$head(){
@@ -745,10 +745,10 @@ return React.DOM.head.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.head.cljs$lang$maxFixedArity = (1);
 
-om.dom.head.cljs$lang$applyTo = (function (seq43177){
-var G__43178 = cljs.core.first.call(null,seq43177);
-var seq43177__$1 = cljs.core.next.call(null,seq43177);
-return om.dom.head.cljs$core$IFn$_invoke$arity$variadic(G__43178,seq43177__$1);
+om.dom.head.cljs$lang$applyTo = (function (seq69916){
+var G__69917 = cljs.core.first.call(null,seq69916);
+var seq69916__$1 = cljs.core.next.call(null,seq69916);
+return om.dom.head.cljs$core$IFn$_invoke$arity$variadic(G__69917,seq69916__$1);
 });
 
 om.dom.header = (function om$dom$header(){
@@ -762,10 +762,10 @@ return React.DOM.header.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.header.cljs$lang$maxFixedArity = (1);
 
-om.dom.header.cljs$lang$applyTo = (function (seq43179){
-var G__43180 = cljs.core.first.call(null,seq43179);
-var seq43179__$1 = cljs.core.next.call(null,seq43179);
-return om.dom.header.cljs$core$IFn$_invoke$arity$variadic(G__43180,seq43179__$1);
+om.dom.header.cljs$lang$applyTo = (function (seq69918){
+var G__69919 = cljs.core.first.call(null,seq69918);
+var seq69918__$1 = cljs.core.next.call(null,seq69918);
+return om.dom.header.cljs$core$IFn$_invoke$arity$variadic(G__69919,seq69918__$1);
 });
 
 om.dom.hr = (function om$dom$hr(){
@@ -779,10 +779,10 @@ return React.DOM.hr.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.hr.cljs$lang$maxFixedArity = (1);
 
-om.dom.hr.cljs$lang$applyTo = (function (seq43181){
-var G__43182 = cljs.core.first.call(null,seq43181);
-var seq43181__$1 = cljs.core.next.call(null,seq43181);
-return om.dom.hr.cljs$core$IFn$_invoke$arity$variadic(G__43182,seq43181__$1);
+om.dom.hr.cljs$lang$applyTo = (function (seq69920){
+var G__69921 = cljs.core.first.call(null,seq69920);
+var seq69920__$1 = cljs.core.next.call(null,seq69920);
+return om.dom.hr.cljs$core$IFn$_invoke$arity$variadic(G__69921,seq69920__$1);
 });
 
 om.dom.html = (function om$dom$html(){
@@ -796,10 +796,10 @@ return React.DOM.html.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.html.cljs$lang$maxFixedArity = (1);
 
-om.dom.html.cljs$lang$applyTo = (function (seq43183){
-var G__43184 = cljs.core.first.call(null,seq43183);
-var seq43183__$1 = cljs.core.next.call(null,seq43183);
-return om.dom.html.cljs$core$IFn$_invoke$arity$variadic(G__43184,seq43183__$1);
+om.dom.html.cljs$lang$applyTo = (function (seq69922){
+var G__69923 = cljs.core.first.call(null,seq69922);
+var seq69922__$1 = cljs.core.next.call(null,seq69922);
+return om.dom.html.cljs$core$IFn$_invoke$arity$variadic(G__69923,seq69922__$1);
 });
 
 om.dom.i = (function om$dom$i(){
@@ -813,10 +813,10 @@ return React.DOM.i.apply(null,cljs.core.into_array.call(null,cljs.core.cons.call
 
 om.dom.i.cljs$lang$maxFixedArity = (1);
 
-om.dom.i.cljs$lang$applyTo = (function (seq43185){
-var G__43186 = cljs.core.first.call(null,seq43185);
-var seq43185__$1 = cljs.core.next.call(null,seq43185);
-return om.dom.i.cljs$core$IFn$_invoke$arity$variadic(G__43186,seq43185__$1);
+om.dom.i.cljs$lang$applyTo = (function (seq69924){
+var G__69925 = cljs.core.first.call(null,seq69924);
+var seq69924__$1 = cljs.core.next.call(null,seq69924);
+return om.dom.i.cljs$core$IFn$_invoke$arity$variadic(G__69925,seq69924__$1);
 });
 
 om.dom.iframe = (function om$dom$iframe(){
@@ -830,10 +830,10 @@ return React.DOM.iframe.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.iframe.cljs$lang$maxFixedArity = (1);
 
-om.dom.iframe.cljs$lang$applyTo = (function (seq43187){
-var G__43188 = cljs.core.first.call(null,seq43187);
-var seq43187__$1 = cljs.core.next.call(null,seq43187);
-return om.dom.iframe.cljs$core$IFn$_invoke$arity$variadic(G__43188,seq43187__$1);
+om.dom.iframe.cljs$lang$applyTo = (function (seq69926){
+var G__69927 = cljs.core.first.call(null,seq69926);
+var seq69926__$1 = cljs.core.next.call(null,seq69926);
+return om.dom.iframe.cljs$core$IFn$_invoke$arity$variadic(G__69927,seq69926__$1);
 });
 
 om.dom.img = (function om$dom$img(){
@@ -847,10 +847,10 @@ return React.DOM.img.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.img.cljs$lang$maxFixedArity = (1);
 
-om.dom.img.cljs$lang$applyTo = (function (seq43189){
-var G__43190 = cljs.core.first.call(null,seq43189);
-var seq43189__$1 = cljs.core.next.call(null,seq43189);
-return om.dom.img.cljs$core$IFn$_invoke$arity$variadic(G__43190,seq43189__$1);
+om.dom.img.cljs$lang$applyTo = (function (seq69928){
+var G__69929 = cljs.core.first.call(null,seq69928);
+var seq69928__$1 = cljs.core.next.call(null,seq69928);
+return om.dom.img.cljs$core$IFn$_invoke$arity$variadic(G__69929,seq69928__$1);
 });
 
 om.dom.ins = (function om$dom$ins(){
@@ -864,10 +864,10 @@ return React.DOM.ins.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.ins.cljs$lang$maxFixedArity = (1);
 
-om.dom.ins.cljs$lang$applyTo = (function (seq43191){
-var G__43192 = cljs.core.first.call(null,seq43191);
-var seq43191__$1 = cljs.core.next.call(null,seq43191);
-return om.dom.ins.cljs$core$IFn$_invoke$arity$variadic(G__43192,seq43191__$1);
+om.dom.ins.cljs$lang$applyTo = (function (seq69930){
+var G__69931 = cljs.core.first.call(null,seq69930);
+var seq69930__$1 = cljs.core.next.call(null,seq69930);
+return om.dom.ins.cljs$core$IFn$_invoke$arity$variadic(G__69931,seq69930__$1);
 });
 
 om.dom.kbd = (function om$dom$kbd(){
@@ -881,10 +881,10 @@ return React.DOM.kbd.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.kbd.cljs$lang$maxFixedArity = (1);
 
-om.dom.kbd.cljs$lang$applyTo = (function (seq43193){
-var G__43194 = cljs.core.first.call(null,seq43193);
-var seq43193__$1 = cljs.core.next.call(null,seq43193);
-return om.dom.kbd.cljs$core$IFn$_invoke$arity$variadic(G__43194,seq43193__$1);
+om.dom.kbd.cljs$lang$applyTo = (function (seq69932){
+var G__69933 = cljs.core.first.call(null,seq69932);
+var seq69932__$1 = cljs.core.next.call(null,seq69932);
+return om.dom.kbd.cljs$core$IFn$_invoke$arity$variadic(G__69933,seq69932__$1);
 });
 
 om.dom.keygen = (function om$dom$keygen(){
@@ -898,10 +898,10 @@ return React.DOM.keygen.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.keygen.cljs$lang$maxFixedArity = (1);
 
-om.dom.keygen.cljs$lang$applyTo = (function (seq43195){
-var G__43196 = cljs.core.first.call(null,seq43195);
-var seq43195__$1 = cljs.core.next.call(null,seq43195);
-return om.dom.keygen.cljs$core$IFn$_invoke$arity$variadic(G__43196,seq43195__$1);
+om.dom.keygen.cljs$lang$applyTo = (function (seq69934){
+var G__69935 = cljs.core.first.call(null,seq69934);
+var seq69934__$1 = cljs.core.next.call(null,seq69934);
+return om.dom.keygen.cljs$core$IFn$_invoke$arity$variadic(G__69935,seq69934__$1);
 });
 
 om.dom.label = (function om$dom$label(){
@@ -915,10 +915,10 @@ return React.DOM.label.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.label.cljs$lang$maxFixedArity = (1);
 
-om.dom.label.cljs$lang$applyTo = (function (seq43197){
-var G__43198 = cljs.core.first.call(null,seq43197);
-var seq43197__$1 = cljs.core.next.call(null,seq43197);
-return om.dom.label.cljs$core$IFn$_invoke$arity$variadic(G__43198,seq43197__$1);
+om.dom.label.cljs$lang$applyTo = (function (seq69936){
+var G__69937 = cljs.core.first.call(null,seq69936);
+var seq69936__$1 = cljs.core.next.call(null,seq69936);
+return om.dom.label.cljs$core$IFn$_invoke$arity$variadic(G__69937,seq69936__$1);
 });
 
 om.dom.legend = (function om$dom$legend(){
@@ -932,10 +932,10 @@ return React.DOM.legend.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.legend.cljs$lang$maxFixedArity = (1);
 
-om.dom.legend.cljs$lang$applyTo = (function (seq43199){
-var G__43200 = cljs.core.first.call(null,seq43199);
-var seq43199__$1 = cljs.core.next.call(null,seq43199);
-return om.dom.legend.cljs$core$IFn$_invoke$arity$variadic(G__43200,seq43199__$1);
+om.dom.legend.cljs$lang$applyTo = (function (seq69938){
+var G__69939 = cljs.core.first.call(null,seq69938);
+var seq69938__$1 = cljs.core.next.call(null,seq69938);
+return om.dom.legend.cljs$core$IFn$_invoke$arity$variadic(G__69939,seq69938__$1);
 });
 
 om.dom.li = (function om$dom$li(){
@@ -949,10 +949,10 @@ return React.DOM.li.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.li.cljs$lang$maxFixedArity = (1);
 
-om.dom.li.cljs$lang$applyTo = (function (seq43201){
-var G__43202 = cljs.core.first.call(null,seq43201);
-var seq43201__$1 = cljs.core.next.call(null,seq43201);
-return om.dom.li.cljs$core$IFn$_invoke$arity$variadic(G__43202,seq43201__$1);
+om.dom.li.cljs$lang$applyTo = (function (seq69940){
+var G__69941 = cljs.core.first.call(null,seq69940);
+var seq69940__$1 = cljs.core.next.call(null,seq69940);
+return om.dom.li.cljs$core$IFn$_invoke$arity$variadic(G__69941,seq69940__$1);
 });
 
 om.dom.link = (function om$dom$link(){
@@ -966,10 +966,10 @@ return React.DOM.link.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.link.cljs$lang$maxFixedArity = (1);
 
-om.dom.link.cljs$lang$applyTo = (function (seq43203){
-var G__43204 = cljs.core.first.call(null,seq43203);
-var seq43203__$1 = cljs.core.next.call(null,seq43203);
-return om.dom.link.cljs$core$IFn$_invoke$arity$variadic(G__43204,seq43203__$1);
+om.dom.link.cljs$lang$applyTo = (function (seq69942){
+var G__69943 = cljs.core.first.call(null,seq69942);
+var seq69942__$1 = cljs.core.next.call(null,seq69942);
+return om.dom.link.cljs$core$IFn$_invoke$arity$variadic(G__69943,seq69942__$1);
 });
 
 om.dom.main = (function om$dom$main(){
@@ -983,10 +983,10 @@ return React.DOM.main.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.main.cljs$lang$maxFixedArity = (1);
 
-om.dom.main.cljs$lang$applyTo = (function (seq43205){
-var G__43206 = cljs.core.first.call(null,seq43205);
-var seq43205__$1 = cljs.core.next.call(null,seq43205);
-return om.dom.main.cljs$core$IFn$_invoke$arity$variadic(G__43206,seq43205__$1);
+om.dom.main.cljs$lang$applyTo = (function (seq69944){
+var G__69945 = cljs.core.first.call(null,seq69944);
+var seq69944__$1 = cljs.core.next.call(null,seq69944);
+return om.dom.main.cljs$core$IFn$_invoke$arity$variadic(G__69945,seq69944__$1);
 });
 
 om.dom.map = (function om$dom$map(){
@@ -1000,10 +1000,10 @@ return React.DOM.map.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.map.cljs$lang$maxFixedArity = (1);
 
-om.dom.map.cljs$lang$applyTo = (function (seq43207){
-var G__43208 = cljs.core.first.call(null,seq43207);
-var seq43207__$1 = cljs.core.next.call(null,seq43207);
-return om.dom.map.cljs$core$IFn$_invoke$arity$variadic(G__43208,seq43207__$1);
+om.dom.map.cljs$lang$applyTo = (function (seq69946){
+var G__69947 = cljs.core.first.call(null,seq69946);
+var seq69946__$1 = cljs.core.next.call(null,seq69946);
+return om.dom.map.cljs$core$IFn$_invoke$arity$variadic(G__69947,seq69946__$1);
 });
 
 om.dom.mark = (function om$dom$mark(){
@@ -1017,10 +1017,10 @@ return React.DOM.mark.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.mark.cljs$lang$maxFixedArity = (1);
 
-om.dom.mark.cljs$lang$applyTo = (function (seq43209){
-var G__43210 = cljs.core.first.call(null,seq43209);
-var seq43209__$1 = cljs.core.next.call(null,seq43209);
-return om.dom.mark.cljs$core$IFn$_invoke$arity$variadic(G__43210,seq43209__$1);
+om.dom.mark.cljs$lang$applyTo = (function (seq69948){
+var G__69949 = cljs.core.first.call(null,seq69948);
+var seq69948__$1 = cljs.core.next.call(null,seq69948);
+return om.dom.mark.cljs$core$IFn$_invoke$arity$variadic(G__69949,seq69948__$1);
 });
 
 om.dom.marquee = (function om$dom$marquee(){
@@ -1034,10 +1034,10 @@ return React.DOM.marquee.apply(null,cljs.core.into_array.call(null,cljs.core.con
 
 om.dom.marquee.cljs$lang$maxFixedArity = (1);
 
-om.dom.marquee.cljs$lang$applyTo = (function (seq43211){
-var G__43212 = cljs.core.first.call(null,seq43211);
-var seq43211__$1 = cljs.core.next.call(null,seq43211);
-return om.dom.marquee.cljs$core$IFn$_invoke$arity$variadic(G__43212,seq43211__$1);
+om.dom.marquee.cljs$lang$applyTo = (function (seq69950){
+var G__69951 = cljs.core.first.call(null,seq69950);
+var seq69950__$1 = cljs.core.next.call(null,seq69950);
+return om.dom.marquee.cljs$core$IFn$_invoke$arity$variadic(G__69951,seq69950__$1);
 });
 
 om.dom.menu = (function om$dom$menu(){
@@ -1051,10 +1051,10 @@ return React.DOM.menu.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.menu.cljs$lang$maxFixedArity = (1);
 
-om.dom.menu.cljs$lang$applyTo = (function (seq43213){
-var G__43214 = cljs.core.first.call(null,seq43213);
-var seq43213__$1 = cljs.core.next.call(null,seq43213);
-return om.dom.menu.cljs$core$IFn$_invoke$arity$variadic(G__43214,seq43213__$1);
+om.dom.menu.cljs$lang$applyTo = (function (seq69952){
+var G__69953 = cljs.core.first.call(null,seq69952);
+var seq69952__$1 = cljs.core.next.call(null,seq69952);
+return om.dom.menu.cljs$core$IFn$_invoke$arity$variadic(G__69953,seq69952__$1);
 });
 
 om.dom.menuitem = (function om$dom$menuitem(){
@@ -1068,10 +1068,10 @@ return React.DOM.menuitem.apply(null,cljs.core.into_array.call(null,cljs.core.co
 
 om.dom.menuitem.cljs$lang$maxFixedArity = (1);
 
-om.dom.menuitem.cljs$lang$applyTo = (function (seq43215){
-var G__43216 = cljs.core.first.call(null,seq43215);
-var seq43215__$1 = cljs.core.next.call(null,seq43215);
-return om.dom.menuitem.cljs$core$IFn$_invoke$arity$variadic(G__43216,seq43215__$1);
+om.dom.menuitem.cljs$lang$applyTo = (function (seq69954){
+var G__69955 = cljs.core.first.call(null,seq69954);
+var seq69954__$1 = cljs.core.next.call(null,seq69954);
+return om.dom.menuitem.cljs$core$IFn$_invoke$arity$variadic(G__69955,seq69954__$1);
 });
 
 om.dom.meta = (function om$dom$meta(){
@@ -1085,10 +1085,10 @@ return React.DOM.meta.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.meta.cljs$lang$maxFixedArity = (1);
 
-om.dom.meta.cljs$lang$applyTo = (function (seq43217){
-var G__43218 = cljs.core.first.call(null,seq43217);
-var seq43217__$1 = cljs.core.next.call(null,seq43217);
-return om.dom.meta.cljs$core$IFn$_invoke$arity$variadic(G__43218,seq43217__$1);
+om.dom.meta.cljs$lang$applyTo = (function (seq69956){
+var G__69957 = cljs.core.first.call(null,seq69956);
+var seq69956__$1 = cljs.core.next.call(null,seq69956);
+return om.dom.meta.cljs$core$IFn$_invoke$arity$variadic(G__69957,seq69956__$1);
 });
 
 om.dom.meter = (function om$dom$meter(){
@@ -1102,10 +1102,10 @@ return React.DOM.meter.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.meter.cljs$lang$maxFixedArity = (1);
 
-om.dom.meter.cljs$lang$applyTo = (function (seq43219){
-var G__43220 = cljs.core.first.call(null,seq43219);
-var seq43219__$1 = cljs.core.next.call(null,seq43219);
-return om.dom.meter.cljs$core$IFn$_invoke$arity$variadic(G__43220,seq43219__$1);
+om.dom.meter.cljs$lang$applyTo = (function (seq69958){
+var G__69959 = cljs.core.first.call(null,seq69958);
+var seq69958__$1 = cljs.core.next.call(null,seq69958);
+return om.dom.meter.cljs$core$IFn$_invoke$arity$variadic(G__69959,seq69958__$1);
 });
 
 om.dom.nav = (function om$dom$nav(){
@@ -1119,10 +1119,10 @@ return React.DOM.nav.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.nav.cljs$lang$maxFixedArity = (1);
 
-om.dom.nav.cljs$lang$applyTo = (function (seq43221){
-var G__43222 = cljs.core.first.call(null,seq43221);
-var seq43221__$1 = cljs.core.next.call(null,seq43221);
-return om.dom.nav.cljs$core$IFn$_invoke$arity$variadic(G__43222,seq43221__$1);
+om.dom.nav.cljs$lang$applyTo = (function (seq69960){
+var G__69961 = cljs.core.first.call(null,seq69960);
+var seq69960__$1 = cljs.core.next.call(null,seq69960);
+return om.dom.nav.cljs$core$IFn$_invoke$arity$variadic(G__69961,seq69960__$1);
 });
 
 om.dom.noscript = (function om$dom$noscript(){
@@ -1136,10 +1136,10 @@ return React.DOM.noscript.apply(null,cljs.core.into_array.call(null,cljs.core.co
 
 om.dom.noscript.cljs$lang$maxFixedArity = (1);
 
-om.dom.noscript.cljs$lang$applyTo = (function (seq43223){
-var G__43224 = cljs.core.first.call(null,seq43223);
-var seq43223__$1 = cljs.core.next.call(null,seq43223);
-return om.dom.noscript.cljs$core$IFn$_invoke$arity$variadic(G__43224,seq43223__$1);
+om.dom.noscript.cljs$lang$applyTo = (function (seq69962){
+var G__69963 = cljs.core.first.call(null,seq69962);
+var seq69962__$1 = cljs.core.next.call(null,seq69962);
+return om.dom.noscript.cljs$core$IFn$_invoke$arity$variadic(G__69963,seq69962__$1);
 });
 
 om.dom.object = (function om$dom$object(){
@@ -1153,10 +1153,10 @@ return React.DOM.object.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.object.cljs$lang$maxFixedArity = (1);
 
-om.dom.object.cljs$lang$applyTo = (function (seq43225){
-var G__43226 = cljs.core.first.call(null,seq43225);
-var seq43225__$1 = cljs.core.next.call(null,seq43225);
-return om.dom.object.cljs$core$IFn$_invoke$arity$variadic(G__43226,seq43225__$1);
+om.dom.object.cljs$lang$applyTo = (function (seq69964){
+var G__69965 = cljs.core.first.call(null,seq69964);
+var seq69964__$1 = cljs.core.next.call(null,seq69964);
+return om.dom.object.cljs$core$IFn$_invoke$arity$variadic(G__69965,seq69964__$1);
 });
 
 om.dom.ol = (function om$dom$ol(){
@@ -1170,10 +1170,10 @@ return React.DOM.ol.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.ol.cljs$lang$maxFixedArity = (1);
 
-om.dom.ol.cljs$lang$applyTo = (function (seq43227){
-var G__43228 = cljs.core.first.call(null,seq43227);
-var seq43227__$1 = cljs.core.next.call(null,seq43227);
-return om.dom.ol.cljs$core$IFn$_invoke$arity$variadic(G__43228,seq43227__$1);
+om.dom.ol.cljs$lang$applyTo = (function (seq69966){
+var G__69967 = cljs.core.first.call(null,seq69966);
+var seq69966__$1 = cljs.core.next.call(null,seq69966);
+return om.dom.ol.cljs$core$IFn$_invoke$arity$variadic(G__69967,seq69966__$1);
 });
 
 om.dom.optgroup = (function om$dom$optgroup(){
@@ -1187,10 +1187,10 @@ return React.DOM.optgroup.apply(null,cljs.core.into_array.call(null,cljs.core.co
 
 om.dom.optgroup.cljs$lang$maxFixedArity = (1);
 
-om.dom.optgroup.cljs$lang$applyTo = (function (seq43229){
-var G__43230 = cljs.core.first.call(null,seq43229);
-var seq43229__$1 = cljs.core.next.call(null,seq43229);
-return om.dom.optgroup.cljs$core$IFn$_invoke$arity$variadic(G__43230,seq43229__$1);
+om.dom.optgroup.cljs$lang$applyTo = (function (seq69968){
+var G__69969 = cljs.core.first.call(null,seq69968);
+var seq69968__$1 = cljs.core.next.call(null,seq69968);
+return om.dom.optgroup.cljs$core$IFn$_invoke$arity$variadic(G__69969,seq69968__$1);
 });
 
 om.dom.output = (function om$dom$output(){
@@ -1204,10 +1204,10 @@ return React.DOM.output.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.output.cljs$lang$maxFixedArity = (1);
 
-om.dom.output.cljs$lang$applyTo = (function (seq43231){
-var G__43232 = cljs.core.first.call(null,seq43231);
-var seq43231__$1 = cljs.core.next.call(null,seq43231);
-return om.dom.output.cljs$core$IFn$_invoke$arity$variadic(G__43232,seq43231__$1);
+om.dom.output.cljs$lang$applyTo = (function (seq69970){
+var G__69971 = cljs.core.first.call(null,seq69970);
+var seq69970__$1 = cljs.core.next.call(null,seq69970);
+return om.dom.output.cljs$core$IFn$_invoke$arity$variadic(G__69971,seq69970__$1);
 });
 
 om.dom.p = (function om$dom$p(){
@@ -1221,10 +1221,10 @@ return React.DOM.p.apply(null,cljs.core.into_array.call(null,cljs.core.cons.call
 
 om.dom.p.cljs$lang$maxFixedArity = (1);
 
-om.dom.p.cljs$lang$applyTo = (function (seq43233){
-var G__43234 = cljs.core.first.call(null,seq43233);
-var seq43233__$1 = cljs.core.next.call(null,seq43233);
-return om.dom.p.cljs$core$IFn$_invoke$arity$variadic(G__43234,seq43233__$1);
+om.dom.p.cljs$lang$applyTo = (function (seq69972){
+var G__69973 = cljs.core.first.call(null,seq69972);
+var seq69972__$1 = cljs.core.next.call(null,seq69972);
+return om.dom.p.cljs$core$IFn$_invoke$arity$variadic(G__69973,seq69972__$1);
 });
 
 om.dom.param = (function om$dom$param(){
@@ -1238,10 +1238,10 @@ return React.DOM.param.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.param.cljs$lang$maxFixedArity = (1);
 
-om.dom.param.cljs$lang$applyTo = (function (seq43235){
-var G__43236 = cljs.core.first.call(null,seq43235);
-var seq43235__$1 = cljs.core.next.call(null,seq43235);
-return om.dom.param.cljs$core$IFn$_invoke$arity$variadic(G__43236,seq43235__$1);
+om.dom.param.cljs$lang$applyTo = (function (seq69974){
+var G__69975 = cljs.core.first.call(null,seq69974);
+var seq69974__$1 = cljs.core.next.call(null,seq69974);
+return om.dom.param.cljs$core$IFn$_invoke$arity$variadic(G__69975,seq69974__$1);
 });
 
 om.dom.pre = (function om$dom$pre(){
@@ -1255,10 +1255,10 @@ return React.DOM.pre.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.pre.cljs$lang$maxFixedArity = (1);
 
-om.dom.pre.cljs$lang$applyTo = (function (seq43237){
-var G__43238 = cljs.core.first.call(null,seq43237);
-var seq43237__$1 = cljs.core.next.call(null,seq43237);
-return om.dom.pre.cljs$core$IFn$_invoke$arity$variadic(G__43238,seq43237__$1);
+om.dom.pre.cljs$lang$applyTo = (function (seq69976){
+var G__69977 = cljs.core.first.call(null,seq69976);
+var seq69976__$1 = cljs.core.next.call(null,seq69976);
+return om.dom.pre.cljs$core$IFn$_invoke$arity$variadic(G__69977,seq69976__$1);
 });
 
 om.dom.progress = (function om$dom$progress(){
@@ -1272,10 +1272,10 @@ return React.DOM.progress.apply(null,cljs.core.into_array.call(null,cljs.core.co
 
 om.dom.progress.cljs$lang$maxFixedArity = (1);
 
-om.dom.progress.cljs$lang$applyTo = (function (seq43239){
-var G__43240 = cljs.core.first.call(null,seq43239);
-var seq43239__$1 = cljs.core.next.call(null,seq43239);
-return om.dom.progress.cljs$core$IFn$_invoke$arity$variadic(G__43240,seq43239__$1);
+om.dom.progress.cljs$lang$applyTo = (function (seq69978){
+var G__69979 = cljs.core.first.call(null,seq69978);
+var seq69978__$1 = cljs.core.next.call(null,seq69978);
+return om.dom.progress.cljs$core$IFn$_invoke$arity$variadic(G__69979,seq69978__$1);
 });
 
 om.dom.q = (function om$dom$q(){
@@ -1289,10 +1289,10 @@ return React.DOM.q.apply(null,cljs.core.into_array.call(null,cljs.core.cons.call
 
 om.dom.q.cljs$lang$maxFixedArity = (1);
 
-om.dom.q.cljs$lang$applyTo = (function (seq43241){
-var G__43242 = cljs.core.first.call(null,seq43241);
-var seq43241__$1 = cljs.core.next.call(null,seq43241);
-return om.dom.q.cljs$core$IFn$_invoke$arity$variadic(G__43242,seq43241__$1);
+om.dom.q.cljs$lang$applyTo = (function (seq69980){
+var G__69981 = cljs.core.first.call(null,seq69980);
+var seq69980__$1 = cljs.core.next.call(null,seq69980);
+return om.dom.q.cljs$core$IFn$_invoke$arity$variadic(G__69981,seq69980__$1);
 });
 
 om.dom.rp = (function om$dom$rp(){
@@ -1306,10 +1306,10 @@ return React.DOM.rp.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.rp.cljs$lang$maxFixedArity = (1);
 
-om.dom.rp.cljs$lang$applyTo = (function (seq43243){
-var G__43244 = cljs.core.first.call(null,seq43243);
-var seq43243__$1 = cljs.core.next.call(null,seq43243);
-return om.dom.rp.cljs$core$IFn$_invoke$arity$variadic(G__43244,seq43243__$1);
+om.dom.rp.cljs$lang$applyTo = (function (seq69982){
+var G__69983 = cljs.core.first.call(null,seq69982);
+var seq69982__$1 = cljs.core.next.call(null,seq69982);
+return om.dom.rp.cljs$core$IFn$_invoke$arity$variadic(G__69983,seq69982__$1);
 });
 
 om.dom.rt = (function om$dom$rt(){
@@ -1323,10 +1323,10 @@ return React.DOM.rt.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.rt.cljs$lang$maxFixedArity = (1);
 
-om.dom.rt.cljs$lang$applyTo = (function (seq43245){
-var G__43246 = cljs.core.first.call(null,seq43245);
-var seq43245__$1 = cljs.core.next.call(null,seq43245);
-return om.dom.rt.cljs$core$IFn$_invoke$arity$variadic(G__43246,seq43245__$1);
+om.dom.rt.cljs$lang$applyTo = (function (seq69984){
+var G__69985 = cljs.core.first.call(null,seq69984);
+var seq69984__$1 = cljs.core.next.call(null,seq69984);
+return om.dom.rt.cljs$core$IFn$_invoke$arity$variadic(G__69985,seq69984__$1);
 });
 
 om.dom.ruby = (function om$dom$ruby(){
@@ -1340,10 +1340,10 @@ return React.DOM.ruby.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.ruby.cljs$lang$maxFixedArity = (1);
 
-om.dom.ruby.cljs$lang$applyTo = (function (seq43247){
-var G__43248 = cljs.core.first.call(null,seq43247);
-var seq43247__$1 = cljs.core.next.call(null,seq43247);
-return om.dom.ruby.cljs$core$IFn$_invoke$arity$variadic(G__43248,seq43247__$1);
+om.dom.ruby.cljs$lang$applyTo = (function (seq69986){
+var G__69987 = cljs.core.first.call(null,seq69986);
+var seq69986__$1 = cljs.core.next.call(null,seq69986);
+return om.dom.ruby.cljs$core$IFn$_invoke$arity$variadic(G__69987,seq69986__$1);
 });
 
 om.dom.s = (function om$dom$s(){
@@ -1357,10 +1357,10 @@ return React.DOM.s.apply(null,cljs.core.into_array.call(null,cljs.core.cons.call
 
 om.dom.s.cljs$lang$maxFixedArity = (1);
 
-om.dom.s.cljs$lang$applyTo = (function (seq43249){
-var G__43250 = cljs.core.first.call(null,seq43249);
-var seq43249__$1 = cljs.core.next.call(null,seq43249);
-return om.dom.s.cljs$core$IFn$_invoke$arity$variadic(G__43250,seq43249__$1);
+om.dom.s.cljs$lang$applyTo = (function (seq69988){
+var G__69989 = cljs.core.first.call(null,seq69988);
+var seq69988__$1 = cljs.core.next.call(null,seq69988);
+return om.dom.s.cljs$core$IFn$_invoke$arity$variadic(G__69989,seq69988__$1);
 });
 
 om.dom.samp = (function om$dom$samp(){
@@ -1374,10 +1374,10 @@ return React.DOM.samp.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.samp.cljs$lang$maxFixedArity = (1);
 
-om.dom.samp.cljs$lang$applyTo = (function (seq43251){
-var G__43252 = cljs.core.first.call(null,seq43251);
-var seq43251__$1 = cljs.core.next.call(null,seq43251);
-return om.dom.samp.cljs$core$IFn$_invoke$arity$variadic(G__43252,seq43251__$1);
+om.dom.samp.cljs$lang$applyTo = (function (seq69990){
+var G__69991 = cljs.core.first.call(null,seq69990);
+var seq69990__$1 = cljs.core.next.call(null,seq69990);
+return om.dom.samp.cljs$core$IFn$_invoke$arity$variadic(G__69991,seq69990__$1);
 });
 
 om.dom.script = (function om$dom$script(){
@@ -1391,10 +1391,10 @@ return React.DOM.script.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.script.cljs$lang$maxFixedArity = (1);
 
-om.dom.script.cljs$lang$applyTo = (function (seq43253){
-var G__43254 = cljs.core.first.call(null,seq43253);
-var seq43253__$1 = cljs.core.next.call(null,seq43253);
-return om.dom.script.cljs$core$IFn$_invoke$arity$variadic(G__43254,seq43253__$1);
+om.dom.script.cljs$lang$applyTo = (function (seq69992){
+var G__69993 = cljs.core.first.call(null,seq69992);
+var seq69992__$1 = cljs.core.next.call(null,seq69992);
+return om.dom.script.cljs$core$IFn$_invoke$arity$variadic(G__69993,seq69992__$1);
 });
 
 om.dom.section = (function om$dom$section(){
@@ -1408,10 +1408,10 @@ return React.DOM.section.apply(null,cljs.core.into_array.call(null,cljs.core.con
 
 om.dom.section.cljs$lang$maxFixedArity = (1);
 
-om.dom.section.cljs$lang$applyTo = (function (seq43255){
-var G__43256 = cljs.core.first.call(null,seq43255);
-var seq43255__$1 = cljs.core.next.call(null,seq43255);
-return om.dom.section.cljs$core$IFn$_invoke$arity$variadic(G__43256,seq43255__$1);
+om.dom.section.cljs$lang$applyTo = (function (seq69994){
+var G__69995 = cljs.core.first.call(null,seq69994);
+var seq69994__$1 = cljs.core.next.call(null,seq69994);
+return om.dom.section.cljs$core$IFn$_invoke$arity$variadic(G__69995,seq69994__$1);
 });
 
 om.dom.select = (function om$dom$select(){
@@ -1425,10 +1425,10 @@ return React.DOM.select.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.select.cljs$lang$maxFixedArity = (1);
 
-om.dom.select.cljs$lang$applyTo = (function (seq43257){
-var G__43258 = cljs.core.first.call(null,seq43257);
-var seq43257__$1 = cljs.core.next.call(null,seq43257);
-return om.dom.select.cljs$core$IFn$_invoke$arity$variadic(G__43258,seq43257__$1);
+om.dom.select.cljs$lang$applyTo = (function (seq69996){
+var G__69997 = cljs.core.first.call(null,seq69996);
+var seq69996__$1 = cljs.core.next.call(null,seq69996);
+return om.dom.select.cljs$core$IFn$_invoke$arity$variadic(G__69997,seq69996__$1);
 });
 
 om.dom.small = (function om$dom$small(){
@@ -1442,10 +1442,10 @@ return React.DOM.small.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.small.cljs$lang$maxFixedArity = (1);
 
-om.dom.small.cljs$lang$applyTo = (function (seq43259){
-var G__43260 = cljs.core.first.call(null,seq43259);
-var seq43259__$1 = cljs.core.next.call(null,seq43259);
-return om.dom.small.cljs$core$IFn$_invoke$arity$variadic(G__43260,seq43259__$1);
+om.dom.small.cljs$lang$applyTo = (function (seq69998){
+var G__69999 = cljs.core.first.call(null,seq69998);
+var seq69998__$1 = cljs.core.next.call(null,seq69998);
+return om.dom.small.cljs$core$IFn$_invoke$arity$variadic(G__69999,seq69998__$1);
 });
 
 om.dom.source = (function om$dom$source(){
@@ -1459,10 +1459,10 @@ return React.DOM.source.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.source.cljs$lang$maxFixedArity = (1);
 
-om.dom.source.cljs$lang$applyTo = (function (seq43261){
-var G__43262 = cljs.core.first.call(null,seq43261);
-var seq43261__$1 = cljs.core.next.call(null,seq43261);
-return om.dom.source.cljs$core$IFn$_invoke$arity$variadic(G__43262,seq43261__$1);
+om.dom.source.cljs$lang$applyTo = (function (seq70000){
+var G__70001 = cljs.core.first.call(null,seq70000);
+var seq70000__$1 = cljs.core.next.call(null,seq70000);
+return om.dom.source.cljs$core$IFn$_invoke$arity$variadic(G__70001,seq70000__$1);
 });
 
 om.dom.span = (function om$dom$span(){
@@ -1476,10 +1476,10 @@ return React.DOM.span.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.span.cljs$lang$maxFixedArity = (1);
 
-om.dom.span.cljs$lang$applyTo = (function (seq43263){
-var G__43264 = cljs.core.first.call(null,seq43263);
-var seq43263__$1 = cljs.core.next.call(null,seq43263);
-return om.dom.span.cljs$core$IFn$_invoke$arity$variadic(G__43264,seq43263__$1);
+om.dom.span.cljs$lang$applyTo = (function (seq70002){
+var G__70003 = cljs.core.first.call(null,seq70002);
+var seq70002__$1 = cljs.core.next.call(null,seq70002);
+return om.dom.span.cljs$core$IFn$_invoke$arity$variadic(G__70003,seq70002__$1);
 });
 
 om.dom.strong = (function om$dom$strong(){
@@ -1493,10 +1493,10 @@ return React.DOM.strong.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.strong.cljs$lang$maxFixedArity = (1);
 
-om.dom.strong.cljs$lang$applyTo = (function (seq43265){
-var G__43266 = cljs.core.first.call(null,seq43265);
-var seq43265__$1 = cljs.core.next.call(null,seq43265);
-return om.dom.strong.cljs$core$IFn$_invoke$arity$variadic(G__43266,seq43265__$1);
+om.dom.strong.cljs$lang$applyTo = (function (seq70004){
+var G__70005 = cljs.core.first.call(null,seq70004);
+var seq70004__$1 = cljs.core.next.call(null,seq70004);
+return om.dom.strong.cljs$core$IFn$_invoke$arity$variadic(G__70005,seq70004__$1);
 });
 
 om.dom.style = (function om$dom$style(){
@@ -1510,10 +1510,10 @@ return React.DOM.style.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.style.cljs$lang$maxFixedArity = (1);
 
-om.dom.style.cljs$lang$applyTo = (function (seq43267){
-var G__43268 = cljs.core.first.call(null,seq43267);
-var seq43267__$1 = cljs.core.next.call(null,seq43267);
-return om.dom.style.cljs$core$IFn$_invoke$arity$variadic(G__43268,seq43267__$1);
+om.dom.style.cljs$lang$applyTo = (function (seq70006){
+var G__70007 = cljs.core.first.call(null,seq70006);
+var seq70006__$1 = cljs.core.next.call(null,seq70006);
+return om.dom.style.cljs$core$IFn$_invoke$arity$variadic(G__70007,seq70006__$1);
 });
 
 om.dom.sub = (function om$dom$sub(){
@@ -1527,10 +1527,10 @@ return React.DOM.sub.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.sub.cljs$lang$maxFixedArity = (1);
 
-om.dom.sub.cljs$lang$applyTo = (function (seq43269){
-var G__43270 = cljs.core.first.call(null,seq43269);
-var seq43269__$1 = cljs.core.next.call(null,seq43269);
-return om.dom.sub.cljs$core$IFn$_invoke$arity$variadic(G__43270,seq43269__$1);
+om.dom.sub.cljs$lang$applyTo = (function (seq70008){
+var G__70009 = cljs.core.first.call(null,seq70008);
+var seq70008__$1 = cljs.core.next.call(null,seq70008);
+return om.dom.sub.cljs$core$IFn$_invoke$arity$variadic(G__70009,seq70008__$1);
 });
 
 om.dom.summary = (function om$dom$summary(){
@@ -1544,10 +1544,10 @@ return React.DOM.summary.apply(null,cljs.core.into_array.call(null,cljs.core.con
 
 om.dom.summary.cljs$lang$maxFixedArity = (1);
 
-om.dom.summary.cljs$lang$applyTo = (function (seq43271){
-var G__43272 = cljs.core.first.call(null,seq43271);
-var seq43271__$1 = cljs.core.next.call(null,seq43271);
-return om.dom.summary.cljs$core$IFn$_invoke$arity$variadic(G__43272,seq43271__$1);
+om.dom.summary.cljs$lang$applyTo = (function (seq70010){
+var G__70011 = cljs.core.first.call(null,seq70010);
+var seq70010__$1 = cljs.core.next.call(null,seq70010);
+return om.dom.summary.cljs$core$IFn$_invoke$arity$variadic(G__70011,seq70010__$1);
 });
 
 om.dom.sup = (function om$dom$sup(){
@@ -1561,10 +1561,10 @@ return React.DOM.sup.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.sup.cljs$lang$maxFixedArity = (1);
 
-om.dom.sup.cljs$lang$applyTo = (function (seq43273){
-var G__43274 = cljs.core.first.call(null,seq43273);
-var seq43273__$1 = cljs.core.next.call(null,seq43273);
-return om.dom.sup.cljs$core$IFn$_invoke$arity$variadic(G__43274,seq43273__$1);
+om.dom.sup.cljs$lang$applyTo = (function (seq70012){
+var G__70013 = cljs.core.first.call(null,seq70012);
+var seq70012__$1 = cljs.core.next.call(null,seq70012);
+return om.dom.sup.cljs$core$IFn$_invoke$arity$variadic(G__70013,seq70012__$1);
 });
 
 om.dom.table = (function om$dom$table(){
@@ -1578,10 +1578,10 @@ return React.DOM.table.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.table.cljs$lang$maxFixedArity = (1);
 
-om.dom.table.cljs$lang$applyTo = (function (seq43275){
-var G__43276 = cljs.core.first.call(null,seq43275);
-var seq43275__$1 = cljs.core.next.call(null,seq43275);
-return om.dom.table.cljs$core$IFn$_invoke$arity$variadic(G__43276,seq43275__$1);
+om.dom.table.cljs$lang$applyTo = (function (seq70014){
+var G__70015 = cljs.core.first.call(null,seq70014);
+var seq70014__$1 = cljs.core.next.call(null,seq70014);
+return om.dom.table.cljs$core$IFn$_invoke$arity$variadic(G__70015,seq70014__$1);
 });
 
 om.dom.tbody = (function om$dom$tbody(){
@@ -1595,10 +1595,10 @@ return React.DOM.tbody.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.tbody.cljs$lang$maxFixedArity = (1);
 
-om.dom.tbody.cljs$lang$applyTo = (function (seq43277){
-var G__43278 = cljs.core.first.call(null,seq43277);
-var seq43277__$1 = cljs.core.next.call(null,seq43277);
-return om.dom.tbody.cljs$core$IFn$_invoke$arity$variadic(G__43278,seq43277__$1);
+om.dom.tbody.cljs$lang$applyTo = (function (seq70016){
+var G__70017 = cljs.core.first.call(null,seq70016);
+var seq70016__$1 = cljs.core.next.call(null,seq70016);
+return om.dom.tbody.cljs$core$IFn$_invoke$arity$variadic(G__70017,seq70016__$1);
 });
 
 om.dom.td = (function om$dom$td(){
@@ -1612,10 +1612,10 @@ return React.DOM.td.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.td.cljs$lang$maxFixedArity = (1);
 
-om.dom.td.cljs$lang$applyTo = (function (seq43279){
-var G__43280 = cljs.core.first.call(null,seq43279);
-var seq43279__$1 = cljs.core.next.call(null,seq43279);
-return om.dom.td.cljs$core$IFn$_invoke$arity$variadic(G__43280,seq43279__$1);
+om.dom.td.cljs$lang$applyTo = (function (seq70018){
+var G__70019 = cljs.core.first.call(null,seq70018);
+var seq70018__$1 = cljs.core.next.call(null,seq70018);
+return om.dom.td.cljs$core$IFn$_invoke$arity$variadic(G__70019,seq70018__$1);
 });
 
 om.dom.tfoot = (function om$dom$tfoot(){
@@ -1629,10 +1629,10 @@ return React.DOM.tfoot.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.tfoot.cljs$lang$maxFixedArity = (1);
 
-om.dom.tfoot.cljs$lang$applyTo = (function (seq43281){
-var G__43282 = cljs.core.first.call(null,seq43281);
-var seq43281__$1 = cljs.core.next.call(null,seq43281);
-return om.dom.tfoot.cljs$core$IFn$_invoke$arity$variadic(G__43282,seq43281__$1);
+om.dom.tfoot.cljs$lang$applyTo = (function (seq70020){
+var G__70021 = cljs.core.first.call(null,seq70020);
+var seq70020__$1 = cljs.core.next.call(null,seq70020);
+return om.dom.tfoot.cljs$core$IFn$_invoke$arity$variadic(G__70021,seq70020__$1);
 });
 
 om.dom.th = (function om$dom$th(){
@@ -1646,10 +1646,10 @@ return React.DOM.th.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.th.cljs$lang$maxFixedArity = (1);
 
-om.dom.th.cljs$lang$applyTo = (function (seq43283){
-var G__43284 = cljs.core.first.call(null,seq43283);
-var seq43283__$1 = cljs.core.next.call(null,seq43283);
-return om.dom.th.cljs$core$IFn$_invoke$arity$variadic(G__43284,seq43283__$1);
+om.dom.th.cljs$lang$applyTo = (function (seq70022){
+var G__70023 = cljs.core.first.call(null,seq70022);
+var seq70022__$1 = cljs.core.next.call(null,seq70022);
+return om.dom.th.cljs$core$IFn$_invoke$arity$variadic(G__70023,seq70022__$1);
 });
 
 om.dom.thead = (function om$dom$thead(){
@@ -1663,10 +1663,10 @@ return React.DOM.thead.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.thead.cljs$lang$maxFixedArity = (1);
 
-om.dom.thead.cljs$lang$applyTo = (function (seq43285){
-var G__43286 = cljs.core.first.call(null,seq43285);
-var seq43285__$1 = cljs.core.next.call(null,seq43285);
-return om.dom.thead.cljs$core$IFn$_invoke$arity$variadic(G__43286,seq43285__$1);
+om.dom.thead.cljs$lang$applyTo = (function (seq70024){
+var G__70025 = cljs.core.first.call(null,seq70024);
+var seq70024__$1 = cljs.core.next.call(null,seq70024);
+return om.dom.thead.cljs$core$IFn$_invoke$arity$variadic(G__70025,seq70024__$1);
 });
 
 om.dom.time = (function om$dom$time(){
@@ -1680,10 +1680,10 @@ return React.DOM.time.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.time.cljs$lang$maxFixedArity = (1);
 
-om.dom.time.cljs$lang$applyTo = (function (seq43287){
-var G__43288 = cljs.core.first.call(null,seq43287);
-var seq43287__$1 = cljs.core.next.call(null,seq43287);
-return om.dom.time.cljs$core$IFn$_invoke$arity$variadic(G__43288,seq43287__$1);
+om.dom.time.cljs$lang$applyTo = (function (seq70026){
+var G__70027 = cljs.core.first.call(null,seq70026);
+var seq70026__$1 = cljs.core.next.call(null,seq70026);
+return om.dom.time.cljs$core$IFn$_invoke$arity$variadic(G__70027,seq70026__$1);
 });
 
 om.dom.title = (function om$dom$title(){
@@ -1697,10 +1697,10 @@ return React.DOM.title.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.title.cljs$lang$maxFixedArity = (1);
 
-om.dom.title.cljs$lang$applyTo = (function (seq43289){
-var G__43290 = cljs.core.first.call(null,seq43289);
-var seq43289__$1 = cljs.core.next.call(null,seq43289);
-return om.dom.title.cljs$core$IFn$_invoke$arity$variadic(G__43290,seq43289__$1);
+om.dom.title.cljs$lang$applyTo = (function (seq70028){
+var G__70029 = cljs.core.first.call(null,seq70028);
+var seq70028__$1 = cljs.core.next.call(null,seq70028);
+return om.dom.title.cljs$core$IFn$_invoke$arity$variadic(G__70029,seq70028__$1);
 });
 
 om.dom.tr = (function om$dom$tr(){
@@ -1714,10 +1714,10 @@ return React.DOM.tr.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.tr.cljs$lang$maxFixedArity = (1);
 
-om.dom.tr.cljs$lang$applyTo = (function (seq43291){
-var G__43292 = cljs.core.first.call(null,seq43291);
-var seq43291__$1 = cljs.core.next.call(null,seq43291);
-return om.dom.tr.cljs$core$IFn$_invoke$arity$variadic(G__43292,seq43291__$1);
+om.dom.tr.cljs$lang$applyTo = (function (seq70030){
+var G__70031 = cljs.core.first.call(null,seq70030);
+var seq70030__$1 = cljs.core.next.call(null,seq70030);
+return om.dom.tr.cljs$core$IFn$_invoke$arity$variadic(G__70031,seq70030__$1);
 });
 
 om.dom.track = (function om$dom$track(){
@@ -1731,10 +1731,10 @@ return React.DOM.track.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.track.cljs$lang$maxFixedArity = (1);
 
-om.dom.track.cljs$lang$applyTo = (function (seq43293){
-var G__43294 = cljs.core.first.call(null,seq43293);
-var seq43293__$1 = cljs.core.next.call(null,seq43293);
-return om.dom.track.cljs$core$IFn$_invoke$arity$variadic(G__43294,seq43293__$1);
+om.dom.track.cljs$lang$applyTo = (function (seq70032){
+var G__70033 = cljs.core.first.call(null,seq70032);
+var seq70032__$1 = cljs.core.next.call(null,seq70032);
+return om.dom.track.cljs$core$IFn$_invoke$arity$variadic(G__70033,seq70032__$1);
 });
 
 om.dom.u = (function om$dom$u(){
@@ -1748,10 +1748,10 @@ return React.DOM.u.apply(null,cljs.core.into_array.call(null,cljs.core.cons.call
 
 om.dom.u.cljs$lang$maxFixedArity = (1);
 
-om.dom.u.cljs$lang$applyTo = (function (seq43295){
-var G__43296 = cljs.core.first.call(null,seq43295);
-var seq43295__$1 = cljs.core.next.call(null,seq43295);
-return om.dom.u.cljs$core$IFn$_invoke$arity$variadic(G__43296,seq43295__$1);
+om.dom.u.cljs$lang$applyTo = (function (seq70034){
+var G__70035 = cljs.core.first.call(null,seq70034);
+var seq70034__$1 = cljs.core.next.call(null,seq70034);
+return om.dom.u.cljs$core$IFn$_invoke$arity$variadic(G__70035,seq70034__$1);
 });
 
 om.dom.ul = (function om$dom$ul(){
@@ -1765,10 +1765,10 @@ return React.DOM.ul.apply(null,cljs.core.into_array.call(null,cljs.core.cons.cal
 
 om.dom.ul.cljs$lang$maxFixedArity = (1);
 
-om.dom.ul.cljs$lang$applyTo = (function (seq43297){
-var G__43298 = cljs.core.first.call(null,seq43297);
-var seq43297__$1 = cljs.core.next.call(null,seq43297);
-return om.dom.ul.cljs$core$IFn$_invoke$arity$variadic(G__43298,seq43297__$1);
+om.dom.ul.cljs$lang$applyTo = (function (seq70036){
+var G__70037 = cljs.core.first.call(null,seq70036);
+var seq70036__$1 = cljs.core.next.call(null,seq70036);
+return om.dom.ul.cljs$core$IFn$_invoke$arity$variadic(G__70037,seq70036__$1);
 });
 
 om.dom.var$ = (function om$dom$var(){
@@ -1782,10 +1782,10 @@ return React.DOM.var$.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.var$.cljs$lang$maxFixedArity = (1);
 
-om.dom.var$.cljs$lang$applyTo = (function (seq43299){
-var G__43300 = cljs.core.first.call(null,seq43299);
-var seq43299__$1 = cljs.core.next.call(null,seq43299);
-return om.dom.var$.cljs$core$IFn$_invoke$arity$variadic(G__43300,seq43299__$1);
+om.dom.var$.cljs$lang$applyTo = (function (seq70038){
+var G__70039 = cljs.core.first.call(null,seq70038);
+var seq70038__$1 = cljs.core.next.call(null,seq70038);
+return om.dom.var$.cljs$core$IFn$_invoke$arity$variadic(G__70039,seq70038__$1);
 });
 
 om.dom.video = (function om$dom$video(){
@@ -1799,10 +1799,10 @@ return React.DOM.video.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.video.cljs$lang$maxFixedArity = (1);
 
-om.dom.video.cljs$lang$applyTo = (function (seq43301){
-var G__43302 = cljs.core.first.call(null,seq43301);
-var seq43301__$1 = cljs.core.next.call(null,seq43301);
-return om.dom.video.cljs$core$IFn$_invoke$arity$variadic(G__43302,seq43301__$1);
+om.dom.video.cljs$lang$applyTo = (function (seq70040){
+var G__70041 = cljs.core.first.call(null,seq70040);
+var seq70040__$1 = cljs.core.next.call(null,seq70040);
+return om.dom.video.cljs$core$IFn$_invoke$arity$variadic(G__70041,seq70040__$1);
 });
 
 om.dom.wbr = (function om$dom$wbr(){
@@ -1816,10 +1816,10 @@ return React.DOM.wbr.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.wbr.cljs$lang$maxFixedArity = (1);
 
-om.dom.wbr.cljs$lang$applyTo = (function (seq43303){
-var G__43304 = cljs.core.first.call(null,seq43303);
-var seq43303__$1 = cljs.core.next.call(null,seq43303);
-return om.dom.wbr.cljs$core$IFn$_invoke$arity$variadic(G__43304,seq43303__$1);
+om.dom.wbr.cljs$lang$applyTo = (function (seq70042){
+var G__70043 = cljs.core.first.call(null,seq70042);
+var seq70042__$1 = cljs.core.next.call(null,seq70042);
+return om.dom.wbr.cljs$core$IFn$_invoke$arity$variadic(G__70043,seq70042__$1);
 });
 
 om.dom.circle = (function om$dom$circle(){
@@ -1833,10 +1833,10 @@ return React.DOM.circle.apply(null,cljs.core.into_array.call(null,cljs.core.cons
 
 om.dom.circle.cljs$lang$maxFixedArity = (1);
 
-om.dom.circle.cljs$lang$applyTo = (function (seq43305){
-var G__43306 = cljs.core.first.call(null,seq43305);
-var seq43305__$1 = cljs.core.next.call(null,seq43305);
-return om.dom.circle.cljs$core$IFn$_invoke$arity$variadic(G__43306,seq43305__$1);
+om.dom.circle.cljs$lang$applyTo = (function (seq70044){
+var G__70045 = cljs.core.first.call(null,seq70044);
+var seq70044__$1 = cljs.core.next.call(null,seq70044);
+return om.dom.circle.cljs$core$IFn$_invoke$arity$variadic(G__70045,seq70044__$1);
 });
 
 om.dom.ellipse = (function om$dom$ellipse(){
@@ -1850,10 +1850,10 @@ return React.DOM.ellipse.apply(null,cljs.core.into_array.call(null,cljs.core.con
 
 om.dom.ellipse.cljs$lang$maxFixedArity = (1);
 
-om.dom.ellipse.cljs$lang$applyTo = (function (seq43307){
-var G__43308 = cljs.core.first.call(null,seq43307);
-var seq43307__$1 = cljs.core.next.call(null,seq43307);
-return om.dom.ellipse.cljs$core$IFn$_invoke$arity$variadic(G__43308,seq43307__$1);
+om.dom.ellipse.cljs$lang$applyTo = (function (seq70046){
+var G__70047 = cljs.core.first.call(null,seq70046);
+var seq70046__$1 = cljs.core.next.call(null,seq70046);
+return om.dom.ellipse.cljs$core$IFn$_invoke$arity$variadic(G__70047,seq70046__$1);
 });
 
 om.dom.g = (function om$dom$g(){
@@ -1867,10 +1867,10 @@ return React.DOM.g.apply(null,cljs.core.into_array.call(null,cljs.core.cons.call
 
 om.dom.g.cljs$lang$maxFixedArity = (1);
 
-om.dom.g.cljs$lang$applyTo = (function (seq43309){
-var G__43310 = cljs.core.first.call(null,seq43309);
-var seq43309__$1 = cljs.core.next.call(null,seq43309);
-return om.dom.g.cljs$core$IFn$_invoke$arity$variadic(G__43310,seq43309__$1);
+om.dom.g.cljs$lang$applyTo = (function (seq70048){
+var G__70049 = cljs.core.first.call(null,seq70048);
+var seq70048__$1 = cljs.core.next.call(null,seq70048);
+return om.dom.g.cljs$core$IFn$_invoke$arity$variadic(G__70049,seq70048__$1);
 });
 
 om.dom.line = (function om$dom$line(){
@@ -1884,10 +1884,10 @@ return React.DOM.line.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.line.cljs$lang$maxFixedArity = (1);
 
-om.dom.line.cljs$lang$applyTo = (function (seq43311){
-var G__43312 = cljs.core.first.call(null,seq43311);
-var seq43311__$1 = cljs.core.next.call(null,seq43311);
-return om.dom.line.cljs$core$IFn$_invoke$arity$variadic(G__43312,seq43311__$1);
+om.dom.line.cljs$lang$applyTo = (function (seq70050){
+var G__70051 = cljs.core.first.call(null,seq70050);
+var seq70050__$1 = cljs.core.next.call(null,seq70050);
+return om.dom.line.cljs$core$IFn$_invoke$arity$variadic(G__70051,seq70050__$1);
 });
 
 om.dom.path = (function om$dom$path(){
@@ -1901,10 +1901,10 @@ return React.DOM.path.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.path.cljs$lang$maxFixedArity = (1);
 
-om.dom.path.cljs$lang$applyTo = (function (seq43313){
-var G__43314 = cljs.core.first.call(null,seq43313);
-var seq43313__$1 = cljs.core.next.call(null,seq43313);
-return om.dom.path.cljs$core$IFn$_invoke$arity$variadic(G__43314,seq43313__$1);
+om.dom.path.cljs$lang$applyTo = (function (seq70052){
+var G__70053 = cljs.core.first.call(null,seq70052);
+var seq70052__$1 = cljs.core.next.call(null,seq70052);
+return om.dom.path.cljs$core$IFn$_invoke$arity$variadic(G__70053,seq70052__$1);
 });
 
 om.dom.polyline = (function om$dom$polyline(){
@@ -1918,10 +1918,10 @@ return React.DOM.polyline.apply(null,cljs.core.into_array.call(null,cljs.core.co
 
 om.dom.polyline.cljs$lang$maxFixedArity = (1);
 
-om.dom.polyline.cljs$lang$applyTo = (function (seq43315){
-var G__43316 = cljs.core.first.call(null,seq43315);
-var seq43315__$1 = cljs.core.next.call(null,seq43315);
-return om.dom.polyline.cljs$core$IFn$_invoke$arity$variadic(G__43316,seq43315__$1);
+om.dom.polyline.cljs$lang$applyTo = (function (seq70054){
+var G__70055 = cljs.core.first.call(null,seq70054);
+var seq70054__$1 = cljs.core.next.call(null,seq70054);
+return om.dom.polyline.cljs$core$IFn$_invoke$arity$variadic(G__70055,seq70054__$1);
 });
 
 om.dom.rect = (function om$dom$rect(){
@@ -1935,10 +1935,10 @@ return React.DOM.rect.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.rect.cljs$lang$maxFixedArity = (1);
 
-om.dom.rect.cljs$lang$applyTo = (function (seq43317){
-var G__43318 = cljs.core.first.call(null,seq43317);
-var seq43317__$1 = cljs.core.next.call(null,seq43317);
-return om.dom.rect.cljs$core$IFn$_invoke$arity$variadic(G__43318,seq43317__$1);
+om.dom.rect.cljs$lang$applyTo = (function (seq70056){
+var G__70057 = cljs.core.first.call(null,seq70056);
+var seq70056__$1 = cljs.core.next.call(null,seq70056);
+return om.dom.rect.cljs$core$IFn$_invoke$arity$variadic(G__70057,seq70056__$1);
 });
 
 om.dom.svg = (function om$dom$svg(){
@@ -1952,10 +1952,10 @@ return React.DOM.svg.apply(null,cljs.core.into_array.call(null,cljs.core.cons.ca
 
 om.dom.svg.cljs$lang$maxFixedArity = (1);
 
-om.dom.svg.cljs$lang$applyTo = (function (seq43319){
-var G__43320 = cljs.core.first.call(null,seq43319);
-var seq43319__$1 = cljs.core.next.call(null,seq43319);
-return om.dom.svg.cljs$core$IFn$_invoke$arity$variadic(G__43320,seq43319__$1);
+om.dom.svg.cljs$lang$applyTo = (function (seq70058){
+var G__70059 = cljs.core.first.call(null,seq70058);
+var seq70058__$1 = cljs.core.next.call(null,seq70058);
+return om.dom.svg.cljs$core$IFn$_invoke$arity$variadic(G__70059,seq70058__$1);
 });
 
 om.dom.text = (function om$dom$text(){
@@ -1969,10 +1969,10 @@ return React.DOM.text.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.text.cljs$lang$maxFixedArity = (1);
 
-om.dom.text.cljs$lang$applyTo = (function (seq43321){
-var G__43322 = cljs.core.first.call(null,seq43321);
-var seq43321__$1 = cljs.core.next.call(null,seq43321);
-return om.dom.text.cljs$core$IFn$_invoke$arity$variadic(G__43322,seq43321__$1);
+om.dom.text.cljs$lang$applyTo = (function (seq70060){
+var G__70061 = cljs.core.first.call(null,seq70060);
+var seq70060__$1 = cljs.core.next.call(null,seq70060);
+return om.dom.text.cljs$core$IFn$_invoke$arity$variadic(G__70061,seq70060__$1);
 });
 
 om.dom.defs = (function om$dom$defs(){
@@ -1986,10 +1986,10 @@ return React.DOM.defs.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.defs.cljs$lang$maxFixedArity = (1);
 
-om.dom.defs.cljs$lang$applyTo = (function (seq43323){
-var G__43324 = cljs.core.first.call(null,seq43323);
-var seq43323__$1 = cljs.core.next.call(null,seq43323);
-return om.dom.defs.cljs$core$IFn$_invoke$arity$variadic(G__43324,seq43323__$1);
+om.dom.defs.cljs$lang$applyTo = (function (seq70062){
+var G__70063 = cljs.core.first.call(null,seq70062);
+var seq70062__$1 = cljs.core.next.call(null,seq70062);
+return om.dom.defs.cljs$core$IFn$_invoke$arity$variadic(G__70063,seq70062__$1);
 });
 
 om.dom.linearGradient = (function om$dom$linearGradient(){
@@ -2003,10 +2003,10 @@ return React.DOM.linearGradient.apply(null,cljs.core.into_array.call(null,cljs.c
 
 om.dom.linearGradient.cljs$lang$maxFixedArity = (1);
 
-om.dom.linearGradient.cljs$lang$applyTo = (function (seq43325){
-var G__43326 = cljs.core.first.call(null,seq43325);
-var seq43325__$1 = cljs.core.next.call(null,seq43325);
-return om.dom.linearGradient.cljs$core$IFn$_invoke$arity$variadic(G__43326,seq43325__$1);
+om.dom.linearGradient.cljs$lang$applyTo = (function (seq70064){
+var G__70065 = cljs.core.first.call(null,seq70064);
+var seq70064__$1 = cljs.core.next.call(null,seq70064);
+return om.dom.linearGradient.cljs$core$IFn$_invoke$arity$variadic(G__70065,seq70064__$1);
 });
 
 om.dom.polygon = (function om$dom$polygon(){
@@ -2020,10 +2020,10 @@ return React.DOM.polygon.apply(null,cljs.core.into_array.call(null,cljs.core.con
 
 om.dom.polygon.cljs$lang$maxFixedArity = (1);
 
-om.dom.polygon.cljs$lang$applyTo = (function (seq43327){
-var G__43328 = cljs.core.first.call(null,seq43327);
-var seq43327__$1 = cljs.core.next.call(null,seq43327);
-return om.dom.polygon.cljs$core$IFn$_invoke$arity$variadic(G__43328,seq43327__$1);
+om.dom.polygon.cljs$lang$applyTo = (function (seq70066){
+var G__70067 = cljs.core.first.call(null,seq70066);
+var seq70066__$1 = cljs.core.next.call(null,seq70066);
+return om.dom.polygon.cljs$core$IFn$_invoke$arity$variadic(G__70067,seq70066__$1);
 });
 
 om.dom.radialGradient = (function om$dom$radialGradient(){
@@ -2037,10 +2037,10 @@ return React.DOM.radialGradient.apply(null,cljs.core.into_array.call(null,cljs.c
 
 om.dom.radialGradient.cljs$lang$maxFixedArity = (1);
 
-om.dom.radialGradient.cljs$lang$applyTo = (function (seq43329){
-var G__43330 = cljs.core.first.call(null,seq43329);
-var seq43329__$1 = cljs.core.next.call(null,seq43329);
-return om.dom.radialGradient.cljs$core$IFn$_invoke$arity$variadic(G__43330,seq43329__$1);
+om.dom.radialGradient.cljs$lang$applyTo = (function (seq70068){
+var G__70069 = cljs.core.first.call(null,seq70068);
+var seq70068__$1 = cljs.core.next.call(null,seq70068);
+return om.dom.radialGradient.cljs$core$IFn$_invoke$arity$variadic(G__70069,seq70068__$1);
 });
 
 om.dom.stop = (function om$dom$stop(){
@@ -2054,10 +2054,10 @@ return React.DOM.stop.apply(null,cljs.core.into_array.call(null,cljs.core.cons.c
 
 om.dom.stop.cljs$lang$maxFixedArity = (1);
 
-om.dom.stop.cljs$lang$applyTo = (function (seq43331){
-var G__43332 = cljs.core.first.call(null,seq43331);
-var seq43331__$1 = cljs.core.next.call(null,seq43331);
-return om.dom.stop.cljs$core$IFn$_invoke$arity$variadic(G__43332,seq43331__$1);
+om.dom.stop.cljs$lang$applyTo = (function (seq70070){
+var G__70071 = cljs.core.first.call(null,seq70070);
+var seq70070__$1 = cljs.core.next.call(null,seq70070);
+return om.dom.stop.cljs$core$IFn$_invoke$arity$variadic(G__70071,seq70070__$1);
 });
 
 om.dom.tspan = (function om$dom$tspan(){
@@ -2071,10 +2071,10 @@ return React.DOM.tspan.apply(null,cljs.core.into_array.call(null,cljs.core.cons.
 
 om.dom.tspan.cljs$lang$maxFixedArity = (1);
 
-om.dom.tspan.cljs$lang$applyTo = (function (seq43153){
-var G__43154 = cljs.core.first.call(null,seq43153);
-var seq43153__$1 = cljs.core.next.call(null,seq43153);
-return om.dom.tspan.cljs$core$IFn$_invoke$arity$variadic(G__43154,seq43153__$1);
+om.dom.tspan.cljs$lang$applyTo = (function (seq69892){
+var G__69893 = cljs.core.first.call(null,seq69892);
+var seq69892__$1 = cljs.core.next.call(null,seq69892);
+return om.dom.tspan.cljs$core$IFn$_invoke$arity$variadic(G__69893,seq69892__$1);
 });
 om.dom.wrap_form_element = (function om$dom$wrap_form_element(ctor,display_name){
 return React.createFactory(React.createClass({"getDisplayName": (function (){

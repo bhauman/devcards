@@ -6,8 +6,8 @@ goog.require('sablono.util');
 goog.require('goog.object');
 goog.require('cljsjs.react');
 
-sablono.interpreter.IInterpreter = (function (){var obj47073 = {};
-return obj47073;
+sablono.interpreter.IInterpreter = (function (){var obj73812 = {};
+return obj73812;
 })();
 
 /**
@@ -80,12 +80,12 @@ return (cljs.core.truth_(sablono.util.wrapped_type_QMARK_.call(null,type))?cljs.
 
 sablono.interpreter.create_element.cljs$lang$maxFixedArity = (2);
 
-sablono.interpreter.create_element.cljs$lang$applyTo = (function (seq47074){
-var G__47075 = cljs.core.first.call(null,seq47074);
-var seq47074__$1 = cljs.core.next.call(null,seq47074);
-var G__47076 = cljs.core.first.call(null,seq47074__$1);
-var seq47074__$2 = cljs.core.next.call(null,seq47074__$1);
-return sablono.interpreter.create_element.cljs$core$IFn$_invoke$arity$variadic(G__47075,G__47076,seq47074__$2);
+sablono.interpreter.create_element.cljs$lang$applyTo = (function (seq73813){
+var G__73814 = cljs.core.first.call(null,seq73813);
+var seq73813__$1 = cljs.core.next.call(null,seq73813);
+var G__73815 = cljs.core.first.call(null,seq73813__$1);
+var seq73813__$2 = cljs.core.next.call(null,seq73813__$1);
+return sablono.interpreter.create_element.cljs$core$IFn$_invoke$arity$variadic(G__73814,G__73815,seq73813__$2);
 });
 sablono.interpreter.attributes = (function sablono$interpreter$attributes(attrs){
 var attrs__$1 = cljs.core.clj__GT_js.call(null,sablono.util.html_to_dom_attrs.call(null,attrs));
@@ -103,10 +103,10 @@ return attrs__$1;
  * Render an element vector as a HTML element.
  */
 sablono.interpreter.element = (function sablono$interpreter$element(element__$1){
-var vec__47078 = sablono.util.normalize_element.call(null,element__$1);
-var type = cljs.core.nth.call(null,vec__47078,(0),null);
-var attrs = cljs.core.nth.call(null,vec__47078,(1),null);
-var content = cljs.core.nth.call(null,vec__47078,(2),null);
+var vec__73817 = sablono.util.normalize_element.call(null,element__$1);
+var type = cljs.core.nth.call(null,vec__73817,(0),null);
+var attrs = cljs.core.nth.call(null,vec__73817,(1),null);
+var content = cljs.core.nth.call(null,vec__73817,(2),null);
 var js_attrs = sablono.interpreter.attributes.call(null,attrs);
 if((cljs.core.sequential_QMARK_.call(null,content)) && (cljs.core._EQ_.call(null,(1),cljs.core.count.call(null,content)))){
 return sablono.interpreter.create_element.call(null,type,js_attrs,sablono.interpreter.interpret.call(null,cljs.core.first.call(null,content)));
