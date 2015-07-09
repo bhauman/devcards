@@ -8,7 +8,8 @@
                  [org.clojure/clojurescript "0.0-3269"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [sablono "0.3.4"]
-                 [cljsjs/react "0.13.1-0"]                 
+                 [cljsjs/react "0.13.1-0"]
+                 [cljs-react-reload "0.1.0"]
                  [cljsjs/showdown "0.4.0-1"]]
 
   :source-paths ["src"]
@@ -29,7 +30,8 @@
       :cljsbuild {
         :builds [{:id "devcards-demos"
                   :source-paths ["example_src" "src"]
-                  :figwheel { :devcards true }
+                  :figwheel { :devcards true
+                              :websocket-host :js-client-host }
                   :compiler {
                              :main "devdemos.core"
                              :asset-path "js/compiled/out"
