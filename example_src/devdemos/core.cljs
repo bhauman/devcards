@@ -119,7 +119,7 @@
    Please interact with **the BMI calculator above**. As you change
    the sliders you will notice that a "
    (str "<span class='com-rigsomelight-devcards-history-control-left'></span>")
-   "shows up in the upper right hand corner.
+   "shows up.
 
    This is the integrated history control widget which be enabled by
    adding `{:history true}` to the devcard options.
