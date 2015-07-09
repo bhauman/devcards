@@ -188,25 +188,24 @@
                (frame children card) ;; make component and forward options
                (sab/html [:div.com-rigsomelight-devcards-frameless {} children])))))})
 
+(defn render-into-dom [this]
+   (when-let [node-fn (get-props this :node_fn)]
+     (when-let [comp (aget (.. this -refs) (get-state this :unique_id))]
+       (when-let [node (js/React.findDOMNode comp)]
+         (node-fn (get-props this :data_atom) node)))))
+
 (defonce-react-class DomComponent
   #js {:getInitialState
         (fn [] #js {:unique_id (str (gensym 'devcards-dom-component-))})
-        :renderIntoDOM
-        (fn []
-          (this-as this
-                   (when-let [node-fn (get-props this :node_fn)]
-                     (when-let [comp (aget (.. this -refs) (get-state this :unique_id))]
-                       (when-let [node (js/React.findDOMNode comp)]
-                         (node-fn (get-props this :data_atom) node))))))
         :componentDidUpdate
         (fn [prevP, prevS]
           (this-as this
                    (when (and (get-props this :node_fn) 
                               (not= (get-props this :node_fn)
                                     (aget prevP "node_fn")))
-                     (.renderIntoDOM this))))
+                     (render-into-dom this))))
         :componentDidMount
-        (fn [] (this-as this (.renderIntoDOM this)))
+        (fn [] (this-as this (render-into-dom this)))
         :render
          (fn []
            (this-as this
@@ -427,6 +426,47 @@
 (comment
   would be nice to have a drop down of history diffs)
 
+(defn can-go-back [this]
+  (let [{:keys [history pointer]} @(get-state this :history_atom)]
+    (< (inc pointer) (count history))))
+
+(defn can-go-forward [this]
+  (> (:pointer @(get-state this :history_atom)) 0))
+
+(defn in-time-machine? [this]
+  (not (zero? (:pointer @(get-state this :history_atom)))))
+
+(defn back-in-history! [this]
+  (let [history-atom   (get-state this :history_atom)
+        {:keys [history pointer]} @history-atom]
+    (when (can-go-back this)
+      (swap! history-atom assoc
+             :pointer (inc pointer)
+             :ignore-click true)
+      (reset! (get-props this :data_atom)
+              (nth history (inc pointer)))
+      (.forceUpdate this))))
+
+(defn forward-in-history! [this]
+  (let [history-atom (get-state this :history_atom)
+        {:keys [history pointer]} @history-atom]
+    (when (can-go-forward this)
+      (swap! history-atom assoc
+             :pointer (dec pointer)
+             :ignore-click true)
+      (reset! (get-props this :data_atom)
+              (nth history (dec pointer)))
+      (.forceUpdate this))))
+
+(defn continue-on! [this]
+  (let [history-atom (get-state this :history_atom)
+        {:keys [history]} @history-atom]
+    (when (can-go-forward this)
+      (swap! history-atom assoc :pointer 0 :ignore-click true)
+      (reset! (get-props this :data_atom)
+              (first history))
+      (.forceUpdate this))))
+
 ;; keep
 (def-react-class HistoryComponent
   #js {:getInitialState
@@ -447,7 +487,7 @@
             (when (and data_atom id)
               (add-watch data_atom id
                          (fn [_ _ _ n]
-                           (if (.inTimeMachine this)
+                           (if (in-time-machine? this)
                              (do
                                (swap! history-atom
                                       (fn [{:keys [pointer history ignore-click] :as ha}]
@@ -466,76 +506,24 @@
                                                  (cons n hist)
                                                  hist))
                                     :ignore-click false))))))))
-       :canGoBack
-       (fn []
-         (this-as this
-                  (let [{:keys [history pointer]} @(get-state this :history_atom)]
-                    (< (inc pointer)
-                       (count history)))))
        
-       :canGoForward
-       (fn []
-         (this-as this
-                  (> (:pointer @(get-state this :history_atom)) 0)))
-       
-       :inTimeMachine
-       (fn []
-         (this-as this
-                  (not (zero? (:pointer @(get-state this :history_atom))))))
-       
-       :backInHistory
-       (fn []
-         (this-as this
-                  (let [history-atom   (get-state this :history_atom)
-                        {:keys [history pointer]} @history-atom]
-                    (when (.. this canGoBack)
-                      (swap! history-atom assoc
-                             :pointer (inc pointer)
-                             :ignore-click true)
-                      (reset! (get-props this :data_atom)
-                              (nth history (inc pointer)))
-                      (.forceUpdate this)))))
-       
-       :forwardInHistory
-       (fn []
-         (this-as this
-                  (let [history-atom (get-state this :history_atom)
-                        {:keys [history pointer]} @history-atom]
-                    (when (.. this canGoForward)
-                      (swap! history-atom assoc
-                             :pointer (dec pointer)
-                             :ignore-click true)
-                      (reset! (get-props this :data_atom)
-                              (nth history (dec pointer)))
-                      (.forceUpdate this)))))
-       :continueOn
-       (fn []
-         (this-as
-          this
-          (let [history-atom (get-state this :history_atom)
-                {:keys [history]} @history-atom]
-            (when (.. this canGoForward)
-              (swap! history-atom assoc :pointer 0 :ignore-click true)
-              (reset! (get-props this :data_atom)
-                      (first history))
-              (.forceUpdate this)))))
        :render
        (fn []
          (this-as
           this
-          (when (or (.canGoBack this)
-                    (.canGoForward this))
+          (when (or (can-go-back this)
+                    (can-go-forward this))
             (sab/html
                [:div.com-rigsomelight-devcards-history-control-bar
-                {:style { :display (if (or (.canGoBack this)
-                                           (.canGoForward this))
+                {:style { :display (if (or (can-go-back this)
+                                           (can-go-forward this))
                                      "block" "none")}}
                 (let [action (fn [e]
                                (.preventDefault e)
-                               (.. this backInHistory))]
+                               (back-in-history! this))]
                   (sab/html
                    [:button
-                    {:style { :visibility (if (.canGoBack this) "visible" "hidden")}
+                    {:style { :visibility (if (can-go-back this) "visible" "hidden")}
                      :href "#"
                      :onClick action
                      :onTouchEnd action}
@@ -548,16 +536,16 @@
                                )]
                   (sab/html
                    [:button
-                    {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
+                    {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
                      :onClick action
                      :onTouchEnd action}
                  [:span.com-rigsomelight-devcards-history-stop ""]]))
                 (let [action (fn [e]
                                 (.preventDefault e)
-                                (.. this forwardInHistory))]
+                                (forward-in-history! this))]
                   (sab/html
                    [:button
-                    {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
+                    {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
                      :onClick action
                      :onTouchEnd action}
                     [:span.com-rigsomelight-devcards-history-control-right ""]]))
@@ -566,7 +554,7 @@
                                 (.. this continueOn))]
                   (sab/html
                    [:button
-                    {:style { :visibility (if (.canGoForward this) "visible" "hidden")}
+                    {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
                      :onClick listener
                      :onTouchEnd listener}
                     [:span.com-rigsomelight-devcards-history-control-small-arrow]
