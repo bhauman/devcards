@@ -29,25 +29,28 @@
 (defcard-doc
   "# [Devcards](https://github.com/bhauman/devcards): the hard sell
     
-   Devcards is intended to make ClojureScript development a pure joy.
+   The Devcards library is intended to make ClojureScript development
+   a pure joy.
  
    Devcards are intended to facilitate **interactive live
    development**. Devcards can be used in conjunction with figwheel but
-   will also work with any form of live file reloading (repl, boot-reload, ...)
+   will also work with any form of live code reloading (repl, boot-reload, ...)
 
    Devcards revolves around a multi-purpose macro called `defcard`.
    You can think of `defcard` a powerful form of pprint that helps you
-   display code examples as an organized set of cards in the Devcards
-   interface (you are currently looking at the Devcards interface).
+   interactively lift code examples out of your source files into the
+   Devcards interface (you are currently looking at the Devcards
+   interface).
 
    The Devcards you create are intended to have no impact on the size
    of your production code. You can use devcards just as you would use
    exectuable comments. You can also keep them seperate like a test
    suite.
 
-   With figwheel, Devcards configuration couldn't be simpler. Just add
-   `[devcards \"0.2.0-SNAPSHOT\"]` as a dependency and `:figwheel
-   {:devcards true}` to your build config.
+   With [figwheel](https://github.com/bhauman/lein-figwheel), Devcards
+   configuration couldn't be simpler. Just add `[devcards
+   \"0.2.0-SNAPSHOT\"]` and create a new build config with `:figwheel
+   {:devcards true}`
 
    Let's look at an advanced Devcard:
    
@@ -60,7 +63,7 @@
       
    ```
 
-   The [defcard api](http://localhost:3449/devcards/index.html#!/devdemos.defcard_api)
+   The [defcard api](/devcards/index.html#!/devdemos.defcard_api)
    is intended to be small and intuitive.
 
    And you can see this devcard rendered below:")
@@ -117,16 +120,21 @@
    (str "<span class='com-rigsomelight-devcards-history-control-left'></span>")
    "shows up in the upper right hand corner.
 
-   That is a history control widget. This is part of the devcard and
-   can be enabled by adding `{:history true}` to the devcard options.
+   This is the integrated history control widget which be enabled by
+   adding `{:history true}` to the devcard options.
    
-   Go ahead and move the sliders and play with the history control
-   widget. You can move forward with the <span class='com-rigsomelight-devcards-history-control-right'></span> control. You can continue from where you left off with the fast forward control 
+   Go ahead and move the sliders and play with the history control. 
+   
+   You can move forward with the <span class='com-rigsomelight-devcards-history-control-right'></span> control. 
+
+   You can continue from where you left off with the fast forward control 
    <span class='com-rigsomelight-devcards-history-control-fast-forward'>
 <span  style='margin-right: -14px' class='com-rigsomelight-devcards-history-control-small-arrow'></span>
 <span style='margin-right: -14px' class='com-rigsomelight-devcards-history-control-small-arrow'></span>
 <span class='com-rigsomelight-devcards-history-control-block'></span>
-   </span>  And you can reify the current point in history and start working with your app from there with the 
+   </span>  
+
+   You can reify the current point in history and start working with your app from this point with the 
    <span class='com-rigsomelight-devcards-history-stop'></span> control or by simply interacting with the app.
 
    ## Data display
@@ -142,15 +150,15 @@
 
    ## Markdown docs
    
-   The phrase \"*Code taken from the Reagent readme.*\" is optional in
-   the example above. But allows for the easy display of contextual
-   documentation.
+   The documentation string \"*Code taken from the Reagent readme*\"
+   in the example above is optional and allows for the easy display of
+   contextual information.
 
-   ## Auto-detection
+   ## Auto-detection and dispatch
    
-   The `defcard` macro does its best to display the data given to it.
+   The `defcard` macro does its best to display the given object.
    You can pass `defcard` a **string** (will be interpreted as
-   markdown), a **function** that takes a data-atom and an owner, a
+   markdown), a **function** that takes a data-atom and an React owner, a
    **ReactElement**, a **Map**, a **Vector**, a **List**, an **Atom**,
    an **RAtom**, an **IDeref**, anything that implements
    **IDevcardOptions** or **IDevcard**, and I'm hoping to get various
