@@ -5,7 +5,8 @@
    [sablono.core :as sab]
    [devcards.util.edn-renderer :as edn-rend]
    [goog.events :as events]
-   [goog.history.EventType :as EventType])
+   [goog.history.EventType :as EventType]
+   [devcards.util.utils :as utils])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]
    [devcards.system :refer [inline-resouce-file]])
@@ -70,12 +71,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Hashbang routing
 
-(declare set-current-path)
+(declare set-current-path history)
 
 (defonce history
-  (let [h (History.)]
-    (.setEnabled h true)
-    h))
+  (when (goog/inHtmlDocument_)
+    (let [h (History.)]
+      (.setEnabled h true)
+    h)))
 
 (defn path->token [path]
   (str "!/" (string/join "/" (map name path))))
@@ -372,7 +374,6 @@
         
         ;; escape core async context for better errors
         (js/setTimeout #(renderer app-state) 0)
-        
 
         (js/setTimeout #(add-watch app-state :devcards-render
                                    (fn [_ _ _ _] (renderer app-state))) 0)
