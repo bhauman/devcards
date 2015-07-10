@@ -740,3 +740,41 @@
   ;; its helpful to be in this namespace to pick up the extended report function.
   (let [tests (run-test-block (fn [] (doseq [f test-thunks] (f))))]
     (render-test-frame tests)))
+
+;; render namespace to string
+
+(defn get-cards-for-ns [ns-symbol]
+  (when-let [cards (:cards @dev/app-state)]
+    (when-let [card (get-in cards [(keyword ns-symbol)])]
+      card)))
+
+(defn render-namespace-to-string [ns-symbol]
+  (when-let [card (get-cards-for-ns ns-symbol)]
+    (js/React.renderToString
+     (sab/html
+      [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
+       (dev/render-cards (dev/display-cards card) dev/app-state)]))))
+
+(devcards.core/defcard render-namespace-to-string
+  "# Support rendering a namespace to a string 
+
+   This is to support writting blog posts and publishing static pages.
+
+   If you are doing this outside of the context of a running Devcards
+   interface you will need to import the cards into the
+   `devcards.system/app-state` by calling 
+
+   ```
+   (devcards.system/load-data-from-channel! devcards.core/devcard-event-chan)
+   ```
+
+   Then you should be able to make the following call with the
+   namespace of your choice.
+
+   ```
+   (render-namespace-to-string 'devdemos.core)
+   ```
+   This is pretty darn cool.
+   "
+  (render-namespace-to-string 'devdemos.core))
+
