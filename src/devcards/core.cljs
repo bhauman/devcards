@@ -772,9 +772,7 @@
       (sab/html
        [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
         (dev/render-cards (dev/display-cards card) dev/app-state)]))
-     "</div>"
-     "<script type=\"text/javascript\" src=\"" build-path "\"></script>"
-     "<script type=\"text/javascript\">devcards.core.mount_namespace('" (name ns-symbol) "')</script>")))
+     "</div>")))
 
 (defn ^:export mount-namespace [ns-symbol]
   (go (<! (load-data-from-channel!))
