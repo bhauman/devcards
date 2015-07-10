@@ -187,10 +187,9 @@
   (let [cur (current-page state)]
     (filter (complement (comp devcard? second)) cur)))
 
-(defn display-cards [state]
-  (let [cur (current-page state)]
-    (filter (comp #(and (not (:delete-card %))
-                        (devcard? %)) second) cur)))
+(defn display-cards [cur]
+  (filter (comp #(and (not (:delete-card %))
+                      (devcard? %)) second) cur))
 
 (def ^:dynamic *devcard-data* nil)
 
@@ -208,7 +207,7 @@
   (let [data @state-atom]
     (if (display-single-card? data)
       (card-template state-atom (current-page data))
-      (render-cards (display-cards data) state-atom))))
+      (render-cards (display-cards (current-page data)) state-atom))))
 
 (defn breadcrumbs [{:keys [current-path] :as state}]
   (let [cpath (map name (cons :home current-path))
@@ -351,6 +350,10 @@
             (do
               (recur (dev-trans [msg-name payload] data)))))))))
 
+(defn load-data-from-channel! [channel]
+  (go (let [new-state (<! (off-the-books channel @app-state []))]
+        (reset! app-state new-state))))
+
 (defn start-ui [channel]
   (defonce devcards-ui-setup
     (do
@@ -362,7 +365,9 @@
         ;; consume all register card messages
         ;; and then load the accumulated state into the
         ;; app-state
-        (let [new-state (<! (off-the-books channel @app-state []))]
+        (<! (load-data-from-channel! channel))
+        
+        #_(let [new-state (<! (off-the-books channel @app-state []))]
           (reset! app-state new-state))
         
         ;; escape core async context for better errors
