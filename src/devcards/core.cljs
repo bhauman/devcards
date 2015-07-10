@@ -128,16 +128,18 @@
 (defn get-state [this k]
   (aget (.-state this) (name k)))
 
-(defonce-react-class ConditionalUpdate
+(defonce-react-class DontUpdate
   #js {:shouldComponentUpdate
-       (fn [a b] (this-as this (get-props this :should_update)))
+       (fn [a b] false)
        :render
-       (fn [] (this-as this ((get-props this :children_thunk))))})
+       (fn []
+         (this-as
+          this
+          (sab/html [:div (get-props this :children_thunk)])))})
 
-(defn conditional-update [should-update children-thunk]
-  (js/React.createElement ConditionalUpdate
-                          #js {:should_update  should-update
-                               :children_thunk children-thunk}))
+(defn dont-update [children-thunk]
+  (js/React.createElement DontUpdate
+                          #js { :children_thunk children-thunk}))
 
 (defonce-react-class DevcardBase
      #js {:getInitialState
@@ -180,13 +182,14 @@
            this
            (let [card      (get-props this :card)
                  options   (:options card)
-                 main      (let [m (:main-obj card)]
-                             (conditional-update
-                              (true? (:watch-atom options))
-                              (fn []
-                                (if (fn? m)
-                                  (m (get-state this :data_atom) this)
-                                  m))))
+                           ;; some components have their own internal render loop 
+                 main      (let [m (:main-obj card)
+                                 res (if (fn? m)
+                                       (m (get-state this :data_atom) this)
+                                       m)]
+                             (if (false? (:watch-atom options))
+                               (dont-update res)
+                               res))
                  hist-ctl  (when (:history options)
                              (hist-recorder* (get-state this :data_atom)))
                  document  (when-let [docu (:documentation card)]
