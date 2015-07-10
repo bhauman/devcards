@@ -291,17 +291,17 @@
 
 (comment
 
+  a debug option :debug-card true
+  
   fix loading race
   
-  move conditional update to NoUpdate
-
   generate blog posts from a namespace with devcards
   - can implement code modules 
   - look at dev mode and prod mode for this
   - front matter in ns meta data
 
   fix style of history so that there is no margin under it
-  when there is no data being inspected
+    when there is no data being inspected
   
   move documentation cards into more descriptive namespaces
   fill out details better
