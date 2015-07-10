@@ -21,11 +21,13 @@
 
 (defn lc [x] (.log js/console x) x)
 
-(def is-mobile? (or (device/isMobile)
-                    ;; we could hook into a callback to set this on resize
-                    (< (.-offsetWidth
-                        (aget (.getElementsByTagName js/document "body") 0))
-                       490)))
+(def is-mobile?
+  (when (goog/inHtmlDocument_)
+    (or (device/isMobile)
+        ;; we could hook into a callback to set this on resize
+        (< (.-offsetWidth
+            (aget (.getElementsByTagName js/document "body") 0))
+           490))))
 
 (defcard
  "# 2048
