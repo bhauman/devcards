@@ -680,7 +680,7 @@
       {}
       (reverse tests)))]))
 
-;; RE-VISIT
+;; This should be IDevcard at this point
 
 (defn render-test-frame [test-summary]
   (let [path (:path devcards.system/*devcard-data*)

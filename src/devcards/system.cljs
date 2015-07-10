@@ -83,8 +83,13 @@
 (defn token->path [token]
   (vec (map keyword
             (-> token
-                (string/replace #"!/" "")
-                (string/split #"/")))))
+              (string/replace-first #"#" "")
+              (string/replace-first #"!/" "")
+              (string/split #"/")))))
+
+#_(prn (token->path (.getToken history)))
+
+#_(prn (token->path (aget js/location "hash")))
 
 (defn hash-navigate [path]
   (.setToken history (path->token path)))
@@ -92,7 +97,9 @@
 (defn hash-routing-init [state-atom]
   (events/listen history EventType/NAVIGATE
                  #(swap! state-atom set-current-path (token->path (.-token %))))
-  (when-let [token (.getToken history)]
+  ;; we should probably just get the location and parse this out to
+  ;; avoid the initial race condition where .getToken isn't populated
+  (when-let [token (aget js/location "hash")]
     (swap! state-atom set-current-path (token->path token))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -284,35 +291,28 @@
 
 (comment
 
-  smarter about responding to different types (cursors) for change
+  fix loading race
   
-  the composition structure of the main api
-    needs to copy normal react composition
-    particularly the relationship of
-    hist and dom-node and the passing
-    of the data atom
+  move conditional update to NoUpdate
+
+  generate blog posts from a namespace with devcards
+  - can implement code modules 
+  - look at dev mode and prod mode for this
+  - front matter in ns meta data
+
+  fix style of history so that there is no margin under it
+  when there is no data being inspected
   
-  make sure that this works with reagent
+  move documentation cards into more descriptive namespaces
+  fill out details better
+  
+  look at being able to render cursors
 
-  verify small compile size
-
+  BACKBURNER
   make slider component
-
-  move om out of dependencies
-  - need to get om root card examples out of devdemos.core
-  
-  consider configuring  global card options
-  consider frame false option
-  consider frame false binding overide
-
   consider web-components for hiding css styling!!!
-
   turn system into react component?
 
-  fix edn rendering (use flex? harder that one might think)
-  
-  dog food devcards code
-  
   )
 
 (defn merge-in-new-data [state new-state]
@@ -372,7 +372,7 @@
         (js/setTimeout #(add-watch app-state :devcards-render
                                    (fn [_ _ _ _] (renderer app-state))) 0)
 
-                (js/setTimeout #(hash-routing-init app-state) 0) ;; needs a delay        
+        (js/setTimeout #(hash-routing-init app-state) 0)
 
         (loop  []
           (when-let [v (<! channel)]
