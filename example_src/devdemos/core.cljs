@@ -317,12 +317,11 @@
   (defcard reagent-support
     (dc/reagent re-bmi-component)
     re-bmi-data ;; reagent atom
-    #_{:inspect-data true :history true })
+    {:inspect-data true :history true })
   ```"
   (dc/reagent re-bmi-component)
   re-bmi-data
-  ;; right now watching data in reagent caused a strange rendering
-  #_{:inspect-data true :history true })
+  {:inspect-data true :history true })
 
 (defcard
   "# Not cool enough?
