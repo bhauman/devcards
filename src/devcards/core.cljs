@@ -11,9 +11,10 @@
    [clojure.string :as string]
 
    [cljs.test]   
-   [cljs.core.async :refer [put! chan] :as async])
+   [cljs.core.async :refer [put! chan timeout] :as async])
   (:require-macros
-   [cljs-react-reload.core :refer [defonce-react-class def-react-class]]))
+   [cljs-react-reload.core :refer [defonce-react-class def-react-class]]
+   [cljs.core.async.macros :refer [go]]))
 
 (enable-console-print!)
 
@@ -126,7 +127,8 @@
   (aget (.-props this) (name k)))
 
 (defn get-state [this k]
-  (aget (.-state this) (name k)))
+  (when (.-state this)
+    (aget (.-state this) (name k))))
 
 (defonce-react-class DontUpdate
   #js {:shouldComponentUpdate
@@ -141,22 +143,31 @@
   (js/React.createElement DontUpdate
                           #js { :children_thunk children-thunk}))
 
+(defn wrangle-inital-data [this]
+  (let [data (or (:initial-data (get-props this :card)) {})]
+    (if (satisfies? IAtom data)
+      data
+      (atom data))))
+
+(defn get-data-atom [this]
+  (or (get-state this :data_atom)
+      (and (not (goog/inHtmlDocument_))
+           (wrangle-inital-data this))))
+
 (defonce-react-class DevcardBase
      #js {:getInitialState
        (fn []
          #js {:unique_id (gensym 'devcards-base-)})
         :componentWillMount
-        (fn []
-          (this-as
-           this
-           (.setState this
-                      (or (and (get-state this :data_atom)
-                               (.. this -state))
-                          #js {:data_atom
-                               (let [data (or (:initial-data (get-props this :card)) {})]
-                                 (if (satisfies? IAtom data)
-                                   data
-                                   (atom data)))}))))
+          (fn []
+            (when (goog/inHtmlDocument_)
+              (this-as
+               this
+               (.setState this
+                          (or (and (get-state this :data_atom)
+                                   (.. this -state))
+                              #js {:data_atom
+                                   (wrangle-inital-data this)})))))
         :componentWillUnmount
         (fn []
           (this-as
@@ -172,7 +183,7 @@
            (let [options (:options (get-props this :card))]
              (let [data_atom (get-state this :data_atom)
                    id        (get-state this :unique_id)]
-               (when (and data_atom id)
+               (when (and (goog/inHtmlDocument_) data_atom id)
                  (add-watch
                   data_atom id
                   (fn [_ _ _ _] (.forceUpdate this))))))))
@@ -185,29 +196,31 @@
                            ;; some components have their own internal render loop 
                  main      (let [m (:main-obj card)
                                  res (if (fn? m)
-                                       (m (get-state this :data_atom) this)
+                                       (m (get-data-atom this)
+                                          this)
                                        m)]
                              (if (false? (:watch-atom options))
                                (dont-update res)
                                res))
                  hist-ctl  (when (:history options)
-                             (hist-recorder* (get-state this :data_atom)))
+                             (hist-recorder* (get-data-atom this)))
                  document  (when-let [docu (:documentation card)]
                              (markdown->react docu))
                  edn       (when (:inspect-data options)
                              (sab/html
                               [:div.com-rigsomelight-devcards-padding-top-border
-                               (edn-rend/html-edn @(get-state this :data_atom))]))
+                               (edn-rend/html-edn @(get-data-atom this))]))
                  children  (sab/html [:div (list document main hist-ctl edn)])]
              (if (:frame options)
                (frame children card) ;; make component and forward options
                (sab/html [:div.com-rigsomelight-devcards-frameless {} children])))))})
 
 (defn render-into-dom [this]
-   (when-let [node-fn (get-props this :node_fn)]
-     (when-let [comp (aget (.. this -refs) (get-state this :unique_id))]
+  (when (goog/inHtmlDocument_)
+    (when-let [node-fn (get-props this :node_fn)]
+      (when-let [comp (aget (.. this -refs) (get-state this :unique_id))]
        (when-let [node (js/React.findDOMNode comp)]
-         (node-fn (get-props this :data_atom) node)))))
+         (node-fn (get-props this :data_atom) node))))))
 
 (defonce-react-class DomComponent
   #js {:getInitialState
@@ -748,28 +761,37 @@
     (when-let [card (get-in cards [(keyword ns-symbol)])]
       card)))
 
-(defn render-namespace-to-string [ns-symbol]
+(defn ^:export load-data-from-channel! []
+  (devcards.system/load-data-from-channel! devcards.core/devcard-event-chan))
+
+(defn ^:export render-namespace-to-string [ns-symbol build-path]
   (when-let [card (get-cards-for-ns ns-symbol)]
-    (js/React.renderToString
-     (sab/html
-      [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
-       (dev/render-cards (dev/display-cards card) dev/app-state)]))))
+    (str
+     "<div id=\"com-rigsomelight-devcards-main\">"
+     (js/React.renderToString
+      (sab/html
+       [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
+        (dev/render-cards (dev/display-cards card) dev/app-state)]))
+     "</div>"
+     "<script type=\"text/javascript\" src=\"" build-path "\"></script>"
+     "<script type=\"text/javascript\">devcards.core.mount_namespace('" (name ns-symbol) "')</script>")))
+
+(defn ^:export mount-namespace [ns-symbol]
+  (go (<! (load-data-from-channel!))
+      (<! (timeout 400))
+      (js/setTimeout
+       #(when-let [card (get-cards-for-ns ns-symbol)]
+          (js/React.render
+           (sab/html
+            [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
+             (dev/render-cards (dev/display-cards card) dev/app-state)])
+           (dev/devcards-app-node))
+          ) 0)))
 
 (devcards.core/defcard render-namespace-to-string
   "# Support rendering a namespace to a string 
 
    This is to support writting blog posts and publishing static pages.
-
-   If you are doing this outside of the context of a running Devcards
-   interface you will need to import the cards into the
-   `devcards.system/app-state` by calling 
-
-   ```
-   (devcards.system/load-data-from-channel! devcards.core/devcard-event-chan)
-   ```
-
-   Then you should be able to make the following call with the
-   namespace of your choice.
 
    ```
    (render-namespace-to-string 'devdemos.core)
