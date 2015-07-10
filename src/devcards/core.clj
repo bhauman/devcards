@@ -3,6 +3,7 @@
    [devcards.util.utils :as utils]
    [cljs.compiler :refer (munge)]
    [cljs.analyzer :as ana]
+   [cljs.analyzer.api :as ana-api]   
    [cljs.test]
    [cljs.env]
    [clojure.pprint :refer [with-pprint-dispatch code-dispatch pprint]]
@@ -187,3 +188,13 @@
   (when (utils/devcards-active?)
     `(mkdn-code
        (devcards.util.utils/pprint-str ~obj))))
+
+(defmacro all-front-matter-meta []
+  (vec
+   (filter
+    :front-matter
+    (map
+     (fn [x] (assoc (meta x)
+                   :namespace `(quote ~x)
+                   :munged-namespace `(quote ~(munge x))))
+     (ana-api/all-ns)))))
