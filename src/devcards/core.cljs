@@ -128,21 +128,33 @@
 (defn get-state [this k]
   (aget (.-state this) (name k)))
 
+(defonce-react-class ConditionalUpdate
+  #js {:shouldComponentUpdate
+       (fn [a b] (this-as this (get-props this :should_update)))
+       :render
+       (fn [] (this-as this ((get-props this :children_thunk))))})
+
+(defn conditional-update [should-update children-thunk]
+  (js/React.createElement ConditionalUpdate
+                          #js {:should_update  should-update
+                               :children_thunk children-thunk}))
+
 (defonce-react-class DevcardBase
      #js {:getInitialState
        (fn []
          #js {:unique_id (gensym 'devcards-base-)})
         :componentWillMount
         (fn []
-          (this-as this
-                   (.setState this
-                              (or (and (get-state this :data_atom)
-                                       (.. this -state))
-                                  #js {:data_atom
-                                       (let [data (or (:initial-data (get-props this :card)) {})]
-                                         (if (satisfies? IAtom data)
-                                           data
-                                           (atom data)))}))))
+          (this-as
+           this
+           (.setState this
+                      (or (and (get-state this :data_atom)
+                               (.. this -state))
+                          #js {:data_atom
+                               (let [data (or (:initial-data (get-props this :card)) {})]
+                                 (if (satisfies? IAtom data)
+                                   data
+                                   (atom data)))}))))
         :componentWillUnmount
         (fn []
           (this-as
@@ -161,10 +173,7 @@
                (when (and data_atom id)
                  (add-watch
                   data_atom id
-                  (fn [_ _ _ _]
-                    (let [{:keys [watch-atom inspect-data history]} (:options (get-props this :card))]
-                      (when (if (false? watch-atom) (or inspect-data history) true) 
-                        (.forceUpdate this))))))))))
+                  (fn [_ _ _ _] (.forceUpdate this))))))))
         :render
         (fn []
           (this-as
@@ -172,9 +181,12 @@
            (let [card      (get-props this :card)
                  options   (:options card)
                  main      (let [m (:main-obj card)]
-                             (if (fn? m)
-                               (m (get-state this :data_atom) this)
-                               m))
+                             (conditional-update
+                              (true? (:watch-atom options))
+                              (fn []
+                                (if (fn? m)
+                                  (m (get-state this :data_atom) this)
+                                  m))))
                  hist-ctl  (when (:history options)
                              (hist-recorder* (get-state this :data_atom)))
                  document  (when-let [docu (:documentation card)]
@@ -551,7 +563,7 @@
                     [:span.com-rigsomelight-devcards-history-control-right ""]]))
                 (let [listener (fn [e]
                                 (.preventDefault e)
-                                (.. this continueOn))]
+                                (continue-on! this))]
                   (sab/html
                    [:button
                     {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
@@ -563,6 +575,7 @@
                     ]))
                 #_(edn->html @(.. this -state -history_atom))]
                ))))})
+
 
 ;; keep
 (defn- hist-recorder* [data-atom]
