@@ -3,7 +3,7 @@
    [devcards.system :as dev]
 
    [devcards.util.markdown :as mark]
-   [devcards.util.utils :as utils]
+   [devcards.util.utils :as utils :refer [html-env?]]
    
    [sablono.core :as sab :include-macros true]
    [devcards.util.edn-renderer :as edn-rend]
@@ -72,8 +72,55 @@
                    { :__html
                      raw-html-str }})))
 
+(declare get-props)
+
+(defn get-hljs []
+  (aget goog.global "hljs"))
+
+(defn highlight-node [this]
+  (when-let [comp (aget (.. this -refs) "code-ref")]
+    (when-let [node (js/React.findDOMNode comp)]
+      (when-let [hljs (aget goog.global "hljs")]
+        (when-let [highlight-block (aget hljs "highlightBlock")]
+          (highlight-block node))))))
+
+(defonce-react-class CodeHighlight
+  #js {:componentDidMount
+       (fn []
+         (this-as this
+                  (highlight-node this)))
+       :componentDidUpdate
+       (fn []
+         (this-as this
+          (highlight-node this)))
+       :render
+       (fn []
+         (this-as
+          this
+          (sab/html
+           [:pre {:className (if (get-hljs) "com-rigsomelight-devcards-code-highlighting"  "")}
+            [:code {:className (or (get-props this :lang) "")
+                    :ref "code-ref"}
+             (get-props this :code)]])))})
+
+(defn code-highlight [block]
+  (js/React.createElement CodeHighlight #js {:code (:content block) :lang (:lang block)}))
+
+(defmulti markdown-block->react :type)
+
+(defmethod markdown-block->react :default [{:keys [content]}]
+  (-> content mark/markdown-to-html react-raw))
+
+(defmethod markdown-block->react :code-block [{:keys [content] :as block}]
+  (code-highlight block)
+  #_(-> (str "\n```\n" content "\n```\n")
+    mark/markdown-to-html react-raw))
+
 (defn markdown->react [& strs]
-  (react-raw (mark/less-sensitive-markdown strs)) )
+  (let [blocks (mapcat mark/parse-out-code-blocks strs)]
+    (sab/html
+     [:div.com-rigsomelight-devcards-markdown.working
+      (map markdown-block->react blocks)])))
 
 ;; returns a react component of rendered edn
 
@@ -659,7 +706,7 @@
   (display-message m (sab/html  [:div [:strong "Error: "] [:code (:actual m)]])))
 
 (defmethod test-render :test-doc [m]
-  (sab/html [:div (react-raw (:documentation m))]))
+  (sab/html [:div (markdown->react (:documentation m))]))
 
 (defmethod test-render :context [{:keys [testing-contexts]}]
   (sab/html [:div
@@ -669,7 +716,7 @@
                                 (list [:span (first testing-contexts)])))]))
 
 (defn- test-doc [s]
-  (cljs.test/report {:type :test-doc :documentation (mark/less-sensitive-markdown [s])}))
+  (cljs.test/report {:type :test-doc :documentation s}))
 
 (defn- test-renderer [t]
   [:div
