@@ -20,7 +20,7 @@
 
   :scm { :name "git"
          :url "https://github.com/bhauman/devcards" }
-  
+
   :profiles {
    :dev {
       :dependencies [[org.omcljs/om "0.8.8"]
@@ -51,8 +51,11 @@
                              ;:recompile-dependents true                             
                              ;; :optimizations :simple
                              :optimizations :advanced
-                             }}]}
-                   
+                             }}
+                 ]}
+         
          :figwheel { :css-dirs ["resources/public/devcards/css"]
-                     :open-file-command "emacsclient" }
+                     :open-file-command "emacsclient"
+                     :nrepl-port 7888}
      }})
+
