@@ -189,12 +189,13 @@
     `(mkdn-code
        (devcards.util.utils/pprint-str ~obj))))
 
-(defmacro all-front-matter-meta []
-  (vec
-   (filter
-    :front-matter
-    (map
-     (fn [x] (assoc (meta x)
-                   :namespace `(quote ~x)
-                   :munged-namespace `(quote ~(munge x))))
-     (ana-api/all-ns)))))
+(defmacro all-front-matter-meta [filter-keyword]
+   (vec
+    (filter
+     (or filter-keyword :front-matter)
+     (map
+      (fn [x] (assoc (meta x)
+                    :namespace `(quote ~x)
+                    :munged-namespace `(quote ~(munge x))))
+      (ana-api/all-ns)))))
+
