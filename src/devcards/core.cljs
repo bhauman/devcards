@@ -224,22 +224,24 @@
 
 (defonce-react-class DomComponent
   #js {:getInitialState
-        (fn [] #js {:unique_id (str (gensym 'devcards-dom-component-))})
-        :componentDidUpdate
-        (fn [prevP, prevS]
-          (this-as this
-                   (when (and (get-props this :node_fn) 
-                              (not= (get-props this :node_fn)
-                                    (aget prevP "node_fn")))
-                     (render-into-dom this))))
-        :componentDidMount
-        (fn [] (this-as this (render-into-dom this)))
-        :render
+       (fn [] #js {:unique_id (str (gensym 'devcards-dom-component-))})
+       :componentDidUpdate
+       (fn [prevP, prevS]
+         (this-as this
+                  (when (and (get-props this :node_fn) 
+                             (not= (get-props this :node_fn)
+                                   (aget prevP "node_fn")))
+                    (render-into-dom this))))
+       :componentDidMount
+       (fn [] (this-as this (render-into-dom this)))
+       :render
+       (if (goog/inHtmlDocument_)
          (fn []
            (this-as this
                     (js/React.DOM.div
                      #js { :ref (get-state this :unique_id)}
-                     "Card has not mounted DOM node.")))})
+                     "Card has not mounted DOM node.")))
+         (fn [] (js/React.DOM.div "Card has not mounted DOM node.")))})
 
 (defn booler? [key opts]
   (let [x (get opts key)]
