@@ -356,6 +356,27 @@
   (go (let [new-state (<! (off-the-books channel @app-state []))]
         (reset! app-state new-state))))
 
+(defn start-ui-with-renderer [channel renderer]
+  (defonce devcards-ui-setup
+    (do
+      (js/React.initializeTouchEvents true)
+      (go
+        (<! (load-data-from-channel! channel))
+
+        (js/setTimeout #(renderer app-state) 0)
+
+        (js/setTimeout #(add-watch app-state :devcards-render
+                                   (fn [_ _ _ _] (renderer app-state))) 0)
+
+        (loop  []
+          (when-let [v (<! channel)]
+            #_(prn "hey" (first v))
+            (let [new-state (<! (off-the-books channel @app-state v))]
+              #_(prn "in the books")
+              (js/setTimeout #(reset! app-state new-state) 0))
+            (recur))))
+      true)))
+
 (defn start-ui [channel]
   (defonce devcards-ui-setup
     (do

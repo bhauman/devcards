@@ -756,6 +756,10 @@
 
 ;; render namespace to string
 
+(defn get-front-matter [munged-namespace]
+  (reduce aget js/goog.global
+          (concat (string/split (name munged-namespace) ".") ["front_matter"])))
+
 (defn get-cards-for-ns [ns-symbol]
   (when-let [cards (:cards @dev/app-state)]
     (when-let [card (get-in cards [(keyword ns-symbol)])]
@@ -764,8 +768,14 @@
 (defn ^:export load-data-from-channel! []
   (devcards.system/load-data-from-channel! devcards.core/devcard-event-chan))
 
-(defn ^:export render-namespace-to-string [ns-symbol build-path]
+(defn ^:export merge-front-matter-options! [ns-symbol]
+  (when-let [base-card-options (:base-card-options (get-front-matter (name ns-symbol)))]
+    (println "Adding base card options!" (prn-str  base-card-options))
+    (swap! dev/app-state update-in [:base-card-options] (fn [opts] (merge opts base-card-options)))))
+
+(defn ^:export render-namespace-to-string [ns-symbol]
   (when-let [card (get-cards-for-ns ns-symbol)]
+    (merge-front-matter-options! ns-symbol)
     (str
      "<div id=\"com-rigsomelight-devcards-main\">"
      (js/React.renderToString
@@ -774,19 +784,25 @@
         (dev/render-cards (dev/display-cards card) dev/app-state)]))
      "</div>")))
 
-(defn ^:export mount-namespace [ns-symbol]
-  (go (<! (load-data-from-channel!))
-      (<! (timeout 400))
-      (js/setTimeout
-       #(when-let [card (get-cards-for-ns ns-symbol)]
-          (js/React.render
-           (sab/html
-            [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
-             (dev/render-cards (dev/display-cards card) dev/app-state)])
-           (dev/devcards-app-node))
-          ) 0)))
+(defn render-ns [ns-symbol app-state]
+  (when-let [card (get-cards-for-ns ns-symbol)]
+    (js/React.render
+     (sab/html
+      [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
+       (dev/render-cards (dev/display-cards card) app-state)])
+     (dev/devcards-app-node))))
 
-(devcards.core/defcard render-namespace-to-string
+(defn ^:export mount-namespace [ns-symbol]
+  (merge-front-matter-options! ns-symbol)
+  (go (<! (load-data-from-channel!))
+      (<! (timeout 100))
+      (js/setTimeout #(render-ns ns-symbol dev/app-state) 0)))
+
+(defn ^:export mount-namespace-live [ns-symbol]
+  (merge-front-matter-options! ns-symbol)
+  (dev/start-ui-with-renderer devcards.core/devcard-event-chan (partial render-ns ns-symbol)))
+
+#_(devcards.core/defcard render-namespace-to-string
   "# Support rendering a namespace to a string 
 
    This is to support writting blog posts and publishing static pages.
