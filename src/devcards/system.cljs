@@ -38,11 +38,15 @@
            (string/split #"\].\[")
            rest)))
 
-(defn create-style-element [id style-text]
-  (let [el (js/document.createElement "style")]
+(defn create-element* [tag id style-text]
+  (let [el (js/document.createElement tag)]
     (set! (.-id el) id)
     (.appendChild el (js/document.createTextNode style-text))
     el))
+
+(def create-style-element (partial create-element* "style"))
+
+(def create-script-element (partial create-element* "script"))
 
 (defn prepend-child [node node2]
   (if-let [first-child (.-firstChild node)]
@@ -58,7 +62,15 @@
       (when-not (get-element-by-id "com-rigsomelight-edn-css")
         (.appendChild head
                       (create-style-element "com-rigsomelight-edn-css"
-                                            (inline-resouce-file "public/devcards/css/com_rigsomelight_edn_flex.css")))))))
+                                            (inline-resouce-file "public/devcards/css/com_rigsomelight_edn_flex.css"))))
+      (when-not (get-element-by-id "com-rigsomelight-code-highlight-css")
+        (.appendChild head
+                      (create-style-element "com-rigsomelight-code-highlight-css"
+                                            (inline-resouce-file "public/devcards/css/zenburn.css"))))      
+      (when-not (get-element-by-id "com-rigsomelight-code-highlighting")
+        (.appendChild head
+                      (create-script-element "com-rigsomelight-code-highlighting"
+                                            (inline-resouce-file "public/devcards/js/highlight.pack.js")))))))
 
 (defn render-base-if-necessary! []
   (add-css-if-necessary!)
