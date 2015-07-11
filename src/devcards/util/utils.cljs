@@ -7,7 +7,6 @@
 
 (defn node-env? [] (not (nil? goog/nodeGlobalRequire)))
 
-
 (defn pprint-str [obj]
    (let [sb (StringBuffer.)]
      (pprint/pprint obj (StringBufferWriter. sb))
