@@ -74,24 +74,22 @@
 
 (declare get-props ref->node)
 
+;; syntax highlighting
+
 (defn get-hljs []
   (aget goog.global "hljs"))
 
 (defn highlight-node [this]
   (when-let [node (ref->node this "code-ref")]
-    (when-let [hljs (aget goog.global "hljs")]
+    (when-let [hljs (get-hljs)]
       (when-let [highlight-block (aget hljs "highlightBlock")]
         (highlight-block node)))))
 
 (defonce-react-class CodeHighlight
   #js {:componentDidMount
-       (fn []
-         (this-as this
-                  (highlight-node this)))
+       (fn [] (this-as this (highlight-node this)))
        :componentDidUpdate
-       (fn []
-         (this-as this
-          (highlight-node this)))
+       (fn [] (this-as this (highlight-node this)))
        :render
        (fn []
          (this-as
@@ -102,18 +100,13 @@
                     :ref "code-ref"}
              (get-props this :code)]])))})
 
-(defn code-highlight [block]
-  (js/React.createElement CodeHighlight #js {:code (:content block) :lang (:lang block)}))
-
 (defmulti markdown-block->react :type)
 
 (defmethod markdown-block->react :default [{:keys [content]}]
   (-> content mark/markdown-to-html react-raw))
 
 (defmethod markdown-block->react :code-block [{:keys [content] :as block}]
-  (code-highlight block)
-  #_(-> (str "\n```\n" content "\n```\n")
-    mark/markdown-to-html react-raw))
+  (js/React.createElement CodeHighlight #js {:code (:content block) :lang (:lang block)}))
 
 (defn markdown->react [& strs]
   (let [blocks (mapcat mark/parse-out-code-blocks strs)]
