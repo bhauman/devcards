@@ -71,7 +71,6 @@
       (set! (.-id el) devcards-app-element-id)
       (prepend-child (.-body js/document) el))))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Hashbang routing
 
