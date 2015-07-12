@@ -1,9 +1,12 @@
 (ns devcards.util.utils
   (:require
    [cljs.pprint :as pprint])
-  (:import [goog.string StringBuffer]))
+  (:import
+   [goog.string StringBuffer]))
 
-(defn html-env? [] (goog/inHtmlDocument_))
+(defn html-env? []
+  (if-let [doc js/goog.global.document]
+    (aget doc "write")))
 
 (defn node-env? [] (not (nil? goog/nodeGlobalRequire)))
 
@@ -14,3 +17,4 @@
  
  (defn pprint-code [code]
    (pprint/with-pprint-dispatch pprint/code-dispatch (pprint-str code)))
+
