@@ -72,17 +72,16 @@
                    { :__html
                      raw-html-str }})))
 
-(declare get-props)
+(declare get-props ref->node)
 
 (defn get-hljs []
   (aget goog.global "hljs"))
 
 (defn highlight-node [this]
-  (when-let [comp (aget (.. this -refs) "code-ref")]
-    (when-let [node (js/React.findDOMNode comp)]
-      (when-let [hljs (aget goog.global "hljs")]
-        (when-let [highlight-block (aget hljs "highlightBlock")]
-          (highlight-block node))))))
+  (when-let [node (ref->node this "code-ref")]
+    (when-let [hljs (aget goog.global "hljs")]
+      (when-let [highlight-block (aget hljs "highlightBlock")]
+        (highlight-block node)))))
 
 (defonce-react-class CodeHighlight
   #js {:componentDidMount
@@ -170,6 +169,10 @@
 ;; react helpers
 ;; these are needed for advanced compilation
 
+(defn ref->node [this ref]
+  (when-let [comp (aget (.. this -refs) ref)]
+    (js/React.findDOMNode comp)))
+
 (defn get-props [this k]
   (aget (.-props this) (name k)))
 
@@ -196,26 +199,28 @@
       data
       (atom data))))
 
-(defn get-data-atom [this]
-  (or (get-state this :data_atom)
-      (and (not (goog/inHtmlDocument_))
-           (wrangle-inital-data this))))
+(def get-data-atom
+  (if (html-env?)
+    (fn [this] (get-state this :data_atom))
+    (fn [this] (wrangle-inital-data this))))
 
 (defonce-react-class DevcardBase
-     #js {:getInitialState
+  #js {:getInitialState
        (fn []
          #js {:unique_id (gensym 'devcards-base-)})
-        :componentWillMount
-          (fn []
-            (when (goog/inHtmlDocument_)
-              (this-as
-               this
-               (.setState this
-                          (or (and (get-state this :data_atom)
-                                   (.. this -state))
-                              #js {:data_atom
-                                   (wrangle-inital-data this)})))))
-        :componentWillUnmount
+       :componentWillMount
+       (if (html-env?)
+         (fn []
+           (this-as
+            this
+            (.setState
+             this
+             (or (and (get-state this :data_atom)
+                      (.. this -state))
+                 #js {:data_atom
+                      (wrangle-inital-data this)}))))
+         (fn []))
+       :componentWillUnmount
         (fn []
           (this-as
            this
@@ -223,71 +228,70 @@
                  id        (get-state this :unique_id)]
              (when (and data_atom id)
                (remove-watch data_atom id)))))
-        :componentDidMount
-        (fn []
-          (this-as
-           this
-           (let [options (:options (get-props this :card))]
-             (let [data_atom (get-state this :data_atom)
-                   id        (get-state this :unique_id)]
-               (when (and (goog/inHtmlDocument_) data_atom id)
-                 (add-watch
-                  data_atom id
-                  (fn [_ _ _ _] (.forceUpdate this))))))))
+       :componentDidMount
+       (if (html-env?)
+         (fn []
+           (this-as
+            this
+            (when-let [data_atom (get-state this :data_atom)]
+              (when-let [id (get-state this :unique_id)]
+                (add-watch data_atom id (fn [_ _ _ _] (.forceUpdate this)))))))
+         (fn []))
         :render
         (fn []
           (this-as
            this
-           (let [card      (get-props this :card)
+           (let [data-atom (get-data-atom this)
+                 card      (get-props this :card)
                  options   (:options card)
                            ;; some components have their own internal render loop 
                  main      (let [m (:main-obj card)
-                                 res (if (fn? m)
-                                       (m (get-data-atom this)
-                                          this)
-                                       m)]
+                                 res (if (fn? m) (m data-atom this) m)]
                              (if (false? (:watch-atom options))
                                (dont-update res)
                                res))
                  hist-ctl  (when (:history options)
-                             (hist-recorder* (get-data-atom this)))
+                             (hist-recorder* data-atom))
                  document  (when-let [docu (:documentation card)]
                              (markdown->react docu))
                  edn       (when (:inspect-data options)
                              (sab/html
                               [:div.com-rigsomelight-devcards-padding-top-border
-                               (edn-rend/html-edn @(get-data-atom this))]))
+                               (edn-rend/html-edn @data-atom)]))
                  children  (sab/html [:div (list document main hist-ctl edn)])]
              (if (:frame options)
                (frame children card) ;; make component and forward options
                (sab/html [:div.com-rigsomelight-devcards-frameless {} children])))))})
 
-(defn render-into-dom [this]
-  (when (goog/inHtmlDocument_)
-    (when-let [node-fn (get-props this :node_fn)]
-      (when-let [comp (aget (.. this -refs) (get-state this :unique_id))]
-       (when-let [node (js/React.findDOMNode comp)]
-         (node-fn (get-props this :data_atom) node))))))
+(def render-into-dom
+  (if (html-env?)
+    (fn [this]
+      (when-let [node-fn (get-props this :node_fn)]
+        (when-let [node (ref->node this (get-state this :unique_id))]
+          (node-fn (get-props this :data_atom) node))))
+    identity))
 
 (defonce-react-class DomComponent
   #js {:getInitialState
        (fn [] #js {:unique_id (str (gensym 'devcards-dom-component-))})
        :componentDidUpdate
        (fn [prevP, prevS]
-         (this-as this
-                  (when (and (get-props this :node_fn) 
-                             (not= (get-props this :node_fn)
-                                   (aget prevP "node_fn")))
-                    (render-into-dom this))))
+         (this-as
+          this
+          (when (and (get-props this :node_fn) 
+                     (not= (get-props this :node_fn)
+                           (aget prevP "node_fn")))
+            (render-into-dom this))))
        :componentDidMount
        (fn [] (this-as this (render-into-dom this)))
        :render
-       (if (goog/inHtmlDocument_)
+       (if (html-env?)
          (fn []
-           (this-as this
-                    (js/React.DOM.div
-                     #js { :ref (get-state this :unique_id)}
-                     "Card has not mounted DOM node.")))
+           (this-as
+            this
+            (js/React.DOM.div
+             #js { :ref (get-state this :unique_id)}
+             "Card has not mounted DOM node.")))
          (fn [] (js/React.DOM.div "Card has not mounted DOM node.")))})
 
 (defn booler? [key opts]
