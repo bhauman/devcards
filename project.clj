@@ -48,7 +48,8 @@
                              :asset-path "site/out"
                              :output-to "site/devdemos.js"
                              :output-dir "site/out"
-                             ;:recompile-dependents true                             
+                             ;; :pseudo-names true                             
+                             :recompile-dependents true                             
                              ;; :optimizations :simple
                              :optimizations :advanced
                              }}
