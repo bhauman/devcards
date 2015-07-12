@@ -31,7 +31,7 @@
   (string/join "." (map (fn [x] (str "[" x "]"))
                         (map name (cons :cardpath path)))))
 
-(defn unique-card-id->path [card-id]
+#_(defn unique-card-id->path [card-id]
   (mapv keyword
        (-> (subs card-id 1
                  (dec (count card-id)))
@@ -66,7 +66,8 @@
       (when-not (get-element-by-id "com-rigsomelight-code-highlight-css")
         (.appendChild head
                       (create-style-element "com-rigsomelight-code-highlight-css"
-                                            (inline-resouce-file "public/devcards/css/zenburn.css"))))      
+                                            (inline-resouce-file "public/devcards/css/zenburn.css"))))
+      ;; this should be a js-dep
       (when-not (get-element-by-id "com-rigsomelight-code-highlighting")
         (.appendChild head
                       (create-script-element "com-rigsomelight-code-highlighting"
@@ -86,10 +87,10 @@
 (declare set-current-path history)
 
 (defonce history
-  (when (goog/inHtmlDocument_)
+  (when (utils/html-env?)
     (let [h (History.)]
       (.setEnabled h true)
-    h)))
+      h)))
 
 (defn path->token [path]
   (str "!/" (string/join "/" (map name path))))

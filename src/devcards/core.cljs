@@ -10,7 +10,7 @@
    
    [clojure.string :as string]
 
-   [cljs.test]   
+   [cljs.test]
    [cljs.core.async :refer [put! chan timeout] :as async])
   (:require-macros
    [cljs-react-reload.core :refer [defonce-react-class def-react-class]]
@@ -77,7 +77,7 @@
 ;; syntax highlighting
 
 (defn get-hljs []
-  (aget goog.global "hljs"))
+  (aget js/goog.global "hljs"))
 
 (defn highlight-node [this]
   (when-let [node (ref->node this "code-ref")]
@@ -107,7 +107,6 @@
 
 (defmethod markdown-block->react :code-block [{:keys [content] :as block}]
   (js/React.createElement CodeHighlight #js {:code (:content block) :lang (:lang block)}))
-
 
 (defn markdown->react [& strs]
   (let [blocks (mapcat mark/parse-out-blocks strs)]
@@ -806,6 +805,12 @@
 
 ;; render namespace to string
 
+(comment
+  make a helper macro that returns all rendered posts plus front-matter
+
+  )
+
+
 (defn get-front-matter [munged-namespace]
   (reduce aget js/goog.global
           (concat (string/split (name munged-namespace) ".") ["front_matter"])))
@@ -855,7 +860,7 @@
 #_(devcards.core/defcard render-namespace-to-string
   "# Support rendering a namespace to a string 
 
-   This is to support writting blog posts and publishing static pages.
+   This is to support writing blog posts and publishing static pages.
 
    ```
    (render-namespace-to-string 'devdemos.core)
