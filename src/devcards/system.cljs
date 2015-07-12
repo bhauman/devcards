@@ -38,15 +38,11 @@
            (string/split #"\].\[")
            rest)))
 
-(defn create-element* [tag id style-text]
-  (let [el (js/document.createElement tag)]
+(defn create-style-element [id style-text]
+  (let [el (js/document.createElement "style")]
     (set! (.-id el) id)
     (.appendChild el (js/document.createTextNode style-text))
     el))
-
-(def create-style-element (partial create-element* "style"))
-
-(def create-script-element (partial create-element* "script"))
 
 (defn prepend-child [node node2]
   (if-let [first-child (.-firstChild node)]
@@ -66,12 +62,7 @@
       (when-not (get-element-by-id "com-rigsomelight-code-highlight-css")
         (.appendChild head
                       (create-style-element "com-rigsomelight-code-highlight-css"
-                                            (inline-resouce-file "public/devcards/css/zenburn.css"))))
-      ;; this should be a js-dep
-      (when-not (get-element-by-id "com-rigsomelight-code-highlighting")
-        (.appendChild head
-                      (create-script-element "com-rigsomelight-code-highlighting"
-                                            (inline-resouce-file "public/devcards/js/highlight.pack.js")))))))
+                                            (inline-resouce-file "public/devcards/css/github.css")))))))
 
 (defn render-base-if-necessary! []
   (add-css-if-necessary!)
@@ -244,9 +235,8 @@
              [:span {:style {:display "inline-block" }}
               [:a.com-rigsomelight-devcards_set-current-path
                {:href "#"
-                :onClick      (prevent-> #(set-current-path! state-atom path))
-                #_:onTouchStart #_(prevent-> #(set-current-path! state-atom path))}
-               n]]))
+                :onClick      (prevent-> #(set-current-path! state-atom path))}
+               (str n)]]))
           crumbs))]))
 
 (defn navigate-to-path [key state-atom]
