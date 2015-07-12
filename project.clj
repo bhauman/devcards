@@ -9,6 +9,8 @@
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [sablono "0.3.4"]
                  [cljsjs/react "0.13.1-0"]
+                 [cljsjs/react "0.13.1-0"]
+                 [cljsjs/highlight "8.4-0"]
                  [cljs-react-reload "0.1.0"]
                  [cljsjs/showdown "0.4.0-1"]]
 
@@ -31,7 +33,7 @@
         :builds [{:id "devcards-demos"
                   :source-paths ["example_src" "src"]
                   :figwheel { :devcards true
-                              :websocket-host :js-client-host }
+                              #_:websocket-host #_:js-client-host }
                   :compiler {
                              :main "devdemos.core"
                              :asset-path "js/compiled/out"
@@ -42,12 +44,13 @@
                              :source-map-timestamp true}}
                  {:id "website"
                   :source-paths ["example_src" "src"]
-                  :figwheel { :devcards true }
+                  ;; :figwheel { :devcards true }
                   :compiler {
-                             :main "devdemos.core"
+                             :main "devdemos.start-ui"
                              :asset-path "site/out"
                              :output-to "site/devdemos.js"
                              :output-dir "site/out"
+                             :devcards true
                              ;; :pseudo-names true                             
                              :recompile-dependents true                             
                              ;; :optimizations :simple
@@ -57,6 +60,7 @@
          
          :figwheel { :css-dirs ["resources/public/devcards/css"]
                      :open-file-command "emacsclient"
-                     :nrepl-port 7888}
+                    ;;:nrepl-port 7888
+                    }
      }})
 

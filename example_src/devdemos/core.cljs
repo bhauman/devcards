@@ -36,7 +36,8 @@
 
 (enable-console-print!)
 
-#_(devcards.core/start-devcard-ui!)
+;; this wont work for rendering blog post
+#_(devcards.core/start-devcard-ui!) ; need a wrapper
 
 (defcard
   "# [Devcards](https://github.com/bhauman/devcards): the hard sell
