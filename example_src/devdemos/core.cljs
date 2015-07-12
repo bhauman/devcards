@@ -127,11 +127,12 @@
    :history true})
 
 (defcard-doc
-  "## Time travel
+   "## Time travel
 
    Please interact with **the BMI calculator above**. As you change
-   the sliders you will notice that a <span class='com-rigsomelight-devcards-history-control-left'></span> shows up."
-   "
+   the sliders you will notice that a  
+   &nbsp;<span class='com-rigsomelight-devcards-history-control-left'></span>&nbsp; shows up.
+
    This is the integrated history control widget which be enabled by
    adding `{:history true}` to the devcard options.
    
