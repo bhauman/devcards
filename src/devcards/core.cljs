@@ -108,8 +108,9 @@
 (defmethod markdown-block->react :code-block [{:keys [content] :as block}]
   (js/React.createElement CodeHighlight #js {:code (:content block) :lang (:lang block)}))
 
+
 (defn markdown->react [& strs]
-  (let [blocks (mapcat mark/parse-out-code-blocks strs)]
+  (let [blocks (mapcat mark/parse-out-blocks strs)]
     (sab/html
      [:div.com-rigsomelight-devcards-markdown.working
       (map markdown-block->react blocks)])))
@@ -237,7 +238,10 @@
            (let [data-atom (get-data-atom this)
                  card      (get-props this :card)
                  options   (:options card)
-                           ;; some components have their own internal render loop 
+                 ;; some components have their own internal render
+                 ;; loop
+                 ;; maybe we should have a :render-to-string false
+                 ;; option?
                  main      (let [m (:main-obj card)
                                  res (if (fn? m) (m data-atom this) m)]
                              (if (false? (:watch-atom options))
@@ -251,7 +255,7 @@
                              (sab/html
                               [:div.com-rigsomelight-devcards-padding-top-border
                                (edn-rend/html-edn @data-atom)]))
-                 children  (sab/html [:div (list document main hist-ctl edn)])]
+                 children  (keep identity (list document main hist-ctl edn))]
              (if (:frame options)
                (frame children card) ;; make component and forward options
                (sab/html [:div.com-rigsomelight-devcards-frameless {} children])))))})
