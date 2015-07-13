@@ -62,7 +62,8 @@
     [:span {:style {:color "red"}} " and red "] "text."]])
 
 (defcard reagent
-    (dc/reagent simple-component))
+  (rg/as-element simple-component))
+
 
 (defonce click-count (rg/atom 0))
 

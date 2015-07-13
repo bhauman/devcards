@@ -5,7 +5,8 @@
    [sablono.core :as sab]
    [devcards.util.edn-renderer :as edn-rend]
    [goog.events :as events]
-   [goog.history.EventType :as EventType])
+   [goog.history.EventType :as EventType]
+   [devcards.util.utils :as utils])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]
    [devcards.system :refer [inline-resouce-file]])
@@ -30,7 +31,7 @@
   (string/join "." (map (fn [x] (str "[" x "]"))
                         (map name (cons :cardpath path)))))
 
-(defn unique-card-id->path [card-id]
+#_(defn unique-card-id->path [card-id]
   (mapv keyword
        (-> (subs card-id 1
                  (dec (count card-id)))
@@ -57,7 +58,11 @@
       (when-not (get-element-by-id "com-rigsomelight-edn-css")
         (.appendChild head
                       (create-style-element "com-rigsomelight-edn-css"
-                                            (inline-resouce-file "public/devcards/css/com_rigsomelight_edn_flex.css")))))))
+                                            (inline-resouce-file "public/devcards/css/com_rigsomelight_edn_flex.css"))))
+      (when-not (get-element-by-id "com-rigsomelight-code-highlight-css")
+        (.appendChild head
+                      (create-style-element "com-rigsomelight-code-highlight-css"
+                                            (inline-resouce-file "public/devcards/css/github.css")))))))
 
 (defn render-base-if-necessary! []
   (add-css-if-necessary!)
@@ -66,16 +71,16 @@
       (set! (.-id el) devcards-app-element-id)
       (prepend-child (.-body js/document) el))))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Hashbang routing
 
-(declare set-current-path)
+(declare set-current-path history)
 
 (defonce history
-  (let [h (History.)]
-    (.setEnabled h true)
-    h))
+  (when (utils/html-env?)
+    (let [h (History.)]
+      (.setEnabled h true)
+      h)))
 
 (defn path->token [path]
   (str "!/" (string/join "/" (map name path))))
@@ -187,10 +192,9 @@
   (let [cur (current-page state)]
     (filter (complement (comp devcard? second)) cur)))
 
-(defn display-cards [state]
-  (let [cur (current-page state)]
-    (filter (comp #(and (not (:delete-card %))
-                        (devcard? %)) second) cur)))
+(defn display-cards [cur]
+  (filter (comp #(and (not (:delete-card %))
+                      (devcard? %)) second) cur))
 
 (def ^:dynamic *devcard-data* nil)
 
@@ -208,7 +212,7 @@
   (let [data @state-atom]
     (if (display-single-card? data)
       (card-template state-atom (current-page data))
-      (render-cards (display-cards data) state-atom))))
+      (render-cards (display-cards (current-page data)) state-atom))))
 
 (defn breadcrumbs [{:keys [current-path] :as state}]
   (let [cpath (map name (cons :home current-path))
@@ -230,9 +234,8 @@
              [:span {:style {:display "inline-block" }}
               [:a.com-rigsomelight-devcards_set-current-path
                {:href "#"
-                :onClick      (prevent-> #(set-current-path! state-atom path))
-                #_:onTouchStart #_(prevent-> #(set-current-path! state-atom path))}
-               n]]))
+                :onClick      (prevent-> #(set-current-path! state-atom path))}
+               (str n)]]))
           crumbs))]))
 
 (defn navigate-to-path [key state-atom]
@@ -291,17 +294,17 @@
 
 (comment
 
+  a debug option :debug-card true
+  
   fix loading race
   
-  move conditional update to NoUpdate
-
   generate blog posts from a namespace with devcards
   - can implement code modules 
   - look at dev mode and prod mode for this
   - front matter in ns meta data
 
   fix style of history so that there is no margin under it
-  when there is no data being inspected
+    when there is no data being inspected
   
   move documentation cards into more descriptive namespaces
   fill out details better
@@ -351,6 +354,31 @@
             (do
               (recur (dev-trans [msg-name payload] data)))))))))
 
+(defn load-data-from-channel! [channel]
+  (go (let [new-state (<! (off-the-books channel @app-state []))]
+        (reset! app-state new-state))))
+
+(defn start-ui-with-renderer [channel renderer]
+  (defonce devcards-ui-setup
+    (do
+      (js/React.initializeTouchEvents true)
+      (go
+        (<! (load-data-from-channel! channel))
+
+        (js/setTimeout #(renderer app-state) 0)
+
+        (js/setTimeout #(add-watch app-state :devcards-render
+                                   (fn [_ _ _ _] (renderer app-state))) 0)
+
+        (loop  []
+          (when-let [v (<! channel)]
+            #_(prn "hey" (first v))
+            (let [new-state (<! (off-the-books channel @app-state v))]
+              #_(prn "in the books")
+              (js/setTimeout #(reset! app-state new-state) 0))
+            (recur))))
+      true)))
+
 (defn start-ui [channel]
   (defonce devcards-ui-setup
     (do
@@ -362,12 +390,13 @@
         ;; consume all register card messages
         ;; and then load the accumulated state into the
         ;; app-state
-        (let [new-state (<! (off-the-books channel @app-state []))]
+        (<! (load-data-from-channel! channel))
+        
+        #_(let [new-state (<! (off-the-books channel @app-state []))]
           (reset! app-state new-state))
         
         ;; escape core async context for better errors
         (js/setTimeout #(renderer app-state) 0)
-        
 
         (js/setTimeout #(add-watch app-state :devcards-render
                                    (fn [_ _ _ _] (renderer app-state))) 0)

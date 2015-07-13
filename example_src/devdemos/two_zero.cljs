@@ -1,8 +1,7 @@
-(ns
-    ^{:description "An implementation of 2048"}
-  devdemos.two-zero
+(ns devdemos.two-zero
   (:require
    [devcards.core]
+   [devcards.util.utils :refer [html-env?]]
    [clojure.string :as string]
    [clojure.set :refer [difference union]]
    [sablono.core :as sab :include-macros true]
@@ -16,16 +15,17 @@
    [cljs.core.async.macros :refer [go]]
    [devcards.core :as dc :refer [defcard defcard-doc deftest]]))
 
-
 (defn lh [x] (prn-str x) x)
 
 (defn lc [x] (.log js/console x) x)
 
-(def is-mobile? (or (device/isMobile)
-                    ;; we could hook into a callback to set this on resize
-                    (< (.-offsetWidth
-                        (aget (.getElementsByTagName js/document "body") 0))
-                       490)))
+(def is-mobile?
+  (when (html-env?)
+    (or (device/isMobile)
+        ;; we could hook into a callback to set this on resize
+        (< (.-offsetWidth
+            (aget (.getElementsByTagName js/document "body") 0))
+           490))))
 
 (defcard
  "# 2048

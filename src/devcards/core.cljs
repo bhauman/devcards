@@ -3,17 +3,25 @@
    [devcards.system :as dev]
 
    [devcards.util.markdown :as mark]
-   [devcards.util.utils :as utils]
+   [devcards.util.utils :as utils :refer [html-env?]]
    
    [sablono.core :as sab :include-macros true]
    [devcards.util.edn-renderer :as edn-rend]
    
    [clojure.string :as string]
 
-   [cljs.test]   
-   [cljs.core.async :refer [put! chan] :as async])
+   [cljs.test]
+   [cljs.core.async :refer [put! chan timeout] :as async]
+   [cljsjs.highlight]
+   [cljsjs.highlight.langs.clojure]
+   [cljsjs.highlight.langs.javascript]
+   [cljsjs.highlight.langs.bash]
+   [cljsjs.highlight.langs.css]
+   [cljsjs.highlight.langs.xml]
+   [cljsjs.highlight.langs.markdown])
   (:require-macros
-   [cljs-react-reload.core :refer [defonce-react-class def-react-class]]))
+   [cljs-react-reload.core :refer [defonce-react-class def-react-class]]
+   [cljs.core.async.macros :refer [go]]))
 
 (enable-console-print!)
 
@@ -71,8 +79,47 @@
                    { :__html
                      raw-html-str }})))
 
+(declare get-props ref->node)
+
+;; syntax highlighting
+
+(defn get-hljs []
+  (aget js/goog.global "hljs"))
+
+(defn highlight-node [this]
+  (when-let [node (ref->node this "code-ref")]
+    (when-let [hljs (get-hljs)]
+      (when-let [highlight-block (aget hljs "highlightBlock")]
+        (highlight-block node)))))
+
+(defonce-react-class CodeHighlight
+  #js {:componentDidMount
+       (fn [] (this-as this (highlight-node this)))
+       :componentDidUpdate
+       (fn [] (this-as this (highlight-node this)))
+       :render
+       (fn []
+         (this-as
+          this
+          (sab/html
+           [:pre {:className (if (get-hljs) "com-rigsomelight-devcards-code-highlighting"  "")}
+            [:code {:className (or (get-props this :lang) "")
+                    :ref "code-ref"}
+             (get-props this :code)]])))})
+
+(defmulti markdown-block->react :type)
+
+(defmethod markdown-block->react :default [{:keys [content]}]
+  (-> content mark/markdown-to-html react-raw))
+
+(defmethod markdown-block->react :code-block [{:keys [content] :as block}]
+  (js/React.createElement CodeHighlight #js {:code (:content block) :lang (:lang block)}))
+
 (defn markdown->react [& strs]
-  (react-raw (mark/less-sensitive-markdown strs)) )
+  (let [blocks (mapcat mark/parse-out-blocks strs)]
+    (sab/html
+     [:div.com-rigsomelight-devcards-markdown.working
+      (map markdown-block->react blocks)])))
 
 ;; returns a react component of rendered edn
 
@@ -122,40 +169,58 @@
 ;; react helpers
 ;; these are needed for advanced compilation
 
+(defn ref->node [this ref]
+  (when-let [comp (aget (.. this -refs) ref)]
+    (js/React.findDOMNode comp)))
+
 (defn get-props [this k]
   (aget (.-props this) (name k)))
 
 (defn get-state [this k]
-  (aget (.-state this) (name k)))
+  (when (.-state this)
+    (aget (.-state this) (name k))))
 
-(defonce-react-class ConditionalUpdate
+(defonce-react-class DontUpdate
   #js {:shouldComponentUpdate
-       (fn [a b] (this-as this (get-props this :should_update)))
+       (fn [a b] false)
        :render
-       (fn [] (this-as this ((get-props this :children_thunk))))})
+       (fn []
+         (this-as
+          this
+          (sab/html [:div (get-props this :children_thunk)])))})
 
-(defn conditional-update [should-update children-thunk]
-  (js/React.createElement ConditionalUpdate
-                          #js {:should_update  should-update
-                               :children_thunk children-thunk}))
+(defn dont-update [children-thunk]
+  (js/React.createElement DontUpdate
+                          #js { :children_thunk children-thunk}))
+
+(defn wrangle-inital-data [this]
+  (let [data (or (:initial-data (get-props this :card)) {})]
+    (if (satisfies? IAtom data)
+      data
+      (atom data))))
+
+(def get-data-atom
+  (if (html-env?)
+    (fn [this] (get-state this :data_atom))
+    (fn [this] (wrangle-inital-data this))))
 
 (defonce-react-class DevcardBase
-     #js {:getInitialState
+  #js {:getInitialState
        (fn []
          #js {:unique_id (gensym 'devcards-base-)})
-        :componentWillMount
-        (fn []
-          (this-as
-           this
-           (.setState this
-                      (or (and (get-state this :data_atom)
-                               (.. this -state))
-                          #js {:data_atom
-                               (let [data (or (:initial-data (get-props this :card)) {})]
-                                 (if (satisfies? IAtom data)
-                                   data
-                                   (atom data)))}))))
-        :componentWillUnmount
+       :componentWillMount
+       (if (html-env?)
+         (fn []
+           (this-as
+            this
+            (.setState
+             this
+             (or (and (get-state this :data_atom)
+                      (.. this -state))
+                 #js {:data_atom
+                      (wrangle-inital-data this)}))))
+         (fn []))
+       :componentWillUnmount
         (fn []
           (this-as
            this
@@ -163,67 +228,74 @@
                  id        (get-state this :unique_id)]
              (when (and data_atom id)
                (remove-watch data_atom id)))))
-        :componentDidMount
-        (fn []
-          (this-as
-           this
-           (let [options (:options (get-props this :card))]
-             (let [data_atom (get-state this :data_atom)
-                   id        (get-state this :unique_id)]
-               (when (and data_atom id)
-                 (add-watch
-                  data_atom id
-                  (fn [_ _ _ _] (.forceUpdate this))))))))
+       :componentDidMount
+       (if (html-env?)
+         (fn []
+           (this-as
+            this
+            (when-let [data_atom (get-state this :data_atom)]
+              (when-let [id (get-state this :unique_id)]
+                (add-watch data_atom id (fn [_ _ _ _] (.forceUpdate this)))))))
+         (fn []))
         :render
         (fn []
           (this-as
            this
-           (let [card      (get-props this :card)
+           (let [data-atom (get-data-atom this)
+                 card      (get-props this :card)
                  options   (:options card)
-                 main      (let [m (:main-obj card)]
-                             (conditional-update
-                              (true? (:watch-atom options))
-                              (fn []
-                                (if (fn? m)
-                                  (m (get-state this :data_atom) this)
-                                  m))))
+                 ;; some components have their own internal render
+                 ;; loop
+                 ;; maybe we should have a :render-to-string false
+                 ;; option?
+                 main      (let [m (:main-obj card)
+                                 res (if (fn? m) (m data-atom this) m)]
+                             (if (false? (:watch-atom options))
+                               (dont-update res)
+                               res))
                  hist-ctl  (when (:history options)
-                             (hist-recorder* (get-state this :data_atom)))
+                             (hist-recorder* data-atom))
                  document  (when-let [docu (:documentation card)]
                              (markdown->react docu))
                  edn       (when (:inspect-data options)
                              (sab/html
                               [:div.com-rigsomelight-devcards-padding-top-border
-                               (edn-rend/html-edn @(get-state this :data_atom))]))
-                 children  (sab/html [:div (list document main hist-ctl edn)])]
+                               (edn-rend/html-edn @data-atom)]))
+                 children  (keep identity (list document main hist-ctl edn))]
              (if (:frame options)
                (frame children card) ;; make component and forward options
                (sab/html [:div.com-rigsomelight-devcards-frameless {} children])))))})
 
-(defn render-into-dom [this]
-   (when-let [node-fn (get-props this :node_fn)]
-     (when-let [comp (aget (.. this -refs) (get-state this :unique_id))]
-       (when-let [node (js/React.findDOMNode comp)]
-         (node-fn (get-props this :data_atom) node)))))
+(def render-into-dom
+  (if (html-env?)
+    (fn [this]
+      (when-let [node-fn (get-props this :node_fn)]
+        (when-let [node (ref->node this (get-state this :unique_id))]
+          (node-fn (get-props this :data_atom) node))))
+    identity))
 
 (defonce-react-class DomComponent
   #js {:getInitialState
-        (fn [] #js {:unique_id (str (gensym 'devcards-dom-component-))})
-        :componentDidUpdate
-        (fn [prevP, prevS]
-          (this-as this
-                   (when (and (get-props this :node_fn) 
-                              (not= (get-props this :node_fn)
-                                    (aget prevP "node_fn")))
-                     (render-into-dom this))))
-        :componentDidMount
-        (fn [] (this-as this (render-into-dom this)))
-        :render
+       (fn [] #js {:unique_id (str (gensym 'devcards-dom-component-))})
+       :componentDidUpdate
+       (fn [prevP, prevS]
+         (this-as
+          this
+          (when (and (get-props this :node_fn) 
+                     (not= (get-props this :node_fn)
+                           (aget prevP "node_fn")))
+            (render-into-dom this))))
+       :componentDidMount
+       (fn [] (this-as this (render-into-dom this)))
+       :render
+       (if (html-env?)
          (fn []
-           (this-as this
-                    (js/React.DOM.div
-                     #js { :ref (get-state this :unique_id)}
-                     "Card has not mounted DOM node.")))})
+           (this-as
+            this
+            (js/React.DOM.div
+             #js { :ref (get-state this :unique_id)}
+             "Card has not mounted DOM node.")))
+         (fn [] (js/React.DOM.div "Card has not mounted DOM node.")))})
 
 (defn booler? [key opts]
   (let [x (get opts key)]
@@ -641,7 +713,7 @@
   (display-message m (sab/html  [:div [:strong "Error: "] [:code (:actual m)]])))
 
 (defmethod test-render :test-doc [m]
-  (sab/html [:div (react-raw (:documentation m))]))
+  (sab/html [:div (markdown->react (:documentation m))]))
 
 (defmethod test-render :context [{:keys [testing-contexts]}]
   (sab/html [:div
@@ -651,7 +723,7 @@
                                 (list [:span (first testing-contexts)])))]))
 
 (defn- test-doc [s]
-  (cljs.test/report {:type :test-doc :documentation (mark/less-sensitive-markdown [s])}))
+  (cljs.test/report {:type :test-doc :documentation s}))
 
 (defn- test-renderer [t]
   [:div
@@ -737,3 +809,70 @@
   ;; its helpful to be in this namespace to pick up the extended report function.
   (let [tests (run-test-block (fn [] (doseq [f test-thunks] (f))))]
     (render-test-frame tests)))
+
+;; render namespace to string
+
+(comment
+  make a helper macro that returns all rendered posts plus front-matter
+
+  )
+
+
+(defn get-front-matter [munged-namespace]
+  (reduce aget js/goog.global
+          (concat (string/split (name munged-namespace) ".") ["front_matter"])))
+
+(defn get-cards-for-ns [ns-symbol]
+  (when-let [cards (:cards @dev/app-state)]
+    (when-let [card (get-in cards [(keyword ns-symbol)])]
+      card)))
+
+(defn ^:export load-data-from-channel! []
+  (devcards.system/load-data-from-channel! devcards.core/devcard-event-chan))
+
+(defn ^:export merge-front-matter-options! [ns-symbol]
+  (when-let [base-card-options (:base-card-options (get-front-matter (name ns-symbol)))]
+    (println "Adding base card options!" (prn-str  base-card-options))
+    (swap! dev/app-state update-in [:base-card-options] (fn [opts] (merge opts base-card-options)))))
+
+(defn ^:export render-namespace-to-string [ns-symbol]
+  (when-let [card (get-cards-for-ns ns-symbol)]
+    (merge-front-matter-options! ns-symbol)
+    (str
+     "<div id=\"com-rigsomelight-devcards-main\">"
+     (js/React.renderToString
+      (sab/html
+       [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
+        (dev/render-cards (dev/display-cards card) dev/app-state)]))
+     "</div>")))
+
+(defn render-ns [ns-symbol app-state]
+  (when-let [card (get-cards-for-ns ns-symbol)]
+    (js/React.render
+     (sab/html
+      [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
+       (dev/render-cards (dev/display-cards card) app-state)])
+     (dev/devcards-app-node))))
+
+(defn ^:export mount-namespace [ns-symbol]
+  (merge-front-matter-options! ns-symbol)
+  (go (<! (load-data-from-channel!))
+      (<! (timeout 100))
+      (js/setTimeout #(render-ns ns-symbol dev/app-state) 0)))
+
+(defn ^:export mount-namespace-live [ns-symbol]
+  (merge-front-matter-options! ns-symbol)
+  (dev/start-ui-with-renderer devcards.core/devcard-event-chan (partial render-ns ns-symbol)))
+
+#_(devcards.core/defcard render-namespace-to-string
+  "# Support rendering a namespace to a string 
+
+   This is to support writing blog posts and publishing static pages.
+
+   ```
+   (render-namespace-to-string 'devdemos.core)
+   ```
+   This is pretty darn cool.
+   "
+  (render-namespace-to-string 'devdemos.core))
+

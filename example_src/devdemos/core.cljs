@@ -1,6 +1,7 @@
 (ns 
   ^{:description "Devcards: A high level introduction."
-    :figwheel-always true }
+    :figwheel-always true
+    :rigsomelight-post true}
   devdemos.core
     (:require
      [om.core :as om :include-macros true]
@@ -22,11 +23,23 @@
      ;; be created when the :devcards is set to true in the build config.
      [devcards.core :as dc :refer [defcard defcard-doc noframe-doc deftest dom-node]]))
 
+(def ^:export front-matter
+  {:layout "devcards_post"
+   :title "The Hard Sell"
+   :slug "devcards-the-hard-sell"
+   :date "2015-06-06"
+   :draft true
+   :published false
+   :category nil
+   :tags nil
+   :base-card-options {:frame false}})
+
 (enable-console-print!)
 
-(devcards.core/start-devcard-ui!)
+;; this wont work for rendering blog post
+#_(devcards.core/start-devcard-ui!) ; need a wrapper
 
-(defcard-doc
+(defcard
   "# [Devcards](https://github.com/bhauman/devcards): the hard sell
     
    The Devcards library is intended to make ClojureScript development
@@ -61,7 +74,6 @@
      (fn [data-atom _] (bmi-component data-atom)) ;; object of focus
      {:height 180 :weight 80}                     ;; optional initial data
      {:inspect-data true :history true})          ;; optional devcard config options
-      
    ```
 
    The [defcard api](#!/devdemos.defcard_api)
@@ -111,15 +123,16 @@
   "*Code taken from the Reagent readme.*"
   (fn [data-atom _] (bmi-component data-atom))
   {:height 180 :weight 80}
-  {:inspect-data true :history true})
+  {:inspect-data true
+   :frame true
+   :history true})
 
 (defcard-doc
-  "## Time travel
+   "## Time travel
 
    Please interact with **the BMI calculator above**. As you change
-   the sliders you will notice that a "
-   (str "<span class='com-rigsomelight-devcards-history-control-left'></span>")
-   "shows up.
+   the sliders you will notice that a  
+   &nbsp;<span class='com-rigsomelight-devcards-history-control-left'></span>&nbsp; shows up.
 
    This is the integrated history control widget which be enabled by
    adding `{:history true}` to the devcard options.
@@ -262,7 +275,7 @@
         [:span {:style {:color color}} diagnose]
         (om-slider bmi-data :bmi bmi 10 50)]]))))
 
-(defcard om-support
+(defcard
   "# Om support
 
    Here is the same calculator being rendered as an Om application.
@@ -273,10 +286,13 @@
      {:height 180 :weight 80} ;; initial data
      {:inspect-data true :history true })
    ``` 
-   "
+   ")
+
+(defcard om-support
   (dc/om-root om-bmi-component)
   {:height 180 :weight 80} ;; initial data
   {:inspect-data true
+   :frame true
    :history true })
 
 (defonce re-bmi-data (reagent/atom {:height 180 :weight 80}))
@@ -309,7 +325,7 @@
       [:span {:style {:color color}} diagnose]
       [re-slider :bmi bmi 10 50]]]))
 
-(defcard reagent-support
+(defcard
   "# There is also built-in support for Reagent 
 
   Below is the same BMI calculator in Reagent:
@@ -318,10 +334,15 @@
     (dc/reagent re-bmi-component)
     re-bmi-data ;; reagent atom
     {:inspect-data true :history true })
-  ```"
+  ```")
+
+(defcard reagent-support
+
   (dc/reagent re-bmi-component)
   re-bmi-data
-  {:inspect-data true :history true })
+  {:inspect-data true
+   :frame true
+   :history true })
 
 (defcard
   "# Not cool enough?
@@ -337,8 +358,8 @@
    
    You can generate a new devcards project with:
    
-   ```
-   lein new devcards hello-world
+   ```bash
+   $ lein new devcards hello-world
    ```
 
    ## Existing project
@@ -350,6 +371,7 @@
    Add `[devcards \"0.2.0-SNAPSHOT\"]` as a dependency.
 
    Require the devcards macros: 
+
    ```
    (ns example.core
     (:require-macros
@@ -363,7 +385,7 @@
    figwheel dev build and add `:devcards true` (figwheel >= 0.3.7) to
    your `:figwheel` build config like so:
 
-   ```
+   ```clojure
    :cljsbuild {
      :builds [{:id :devcards
                :source-paths [\"src\"]
@@ -411,6 +433,5 @@
   For now refer to the
   [devcards-template](https://github.com/bhauman/devcards-template)
   for a more complete picture of setting up decards.
-  
   
   ")
