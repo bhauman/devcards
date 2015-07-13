@@ -10,7 +10,7 @@
                  [sablono "0.3.4"]
                  [cljsjs/react "0.13.1-0"]
                  [cljsjs/react "0.13.1-0"]
-                 [cljsjs/highlight "8.4-0"]
+                 #_[cljsjs/highlight "8.4-0"]
                  [cljs-react-reload "0.1.0"]
                  [cljsjs/showdown "0.4.0-1"]]
 

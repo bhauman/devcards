@@ -6,6 +6,7 @@
    [devcards.util.edn-renderer :as edn-rend]
    [goog.events :as events]
    [goog.history.EventType :as EventType]
+   [goog.labs.userAgent.device :as device]
    [devcards.util.utils :as utils])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]
@@ -38,11 +39,14 @@
            (string/split #"\].\[")
            rest)))
 
-(defn create-style-element [id style-text]
-  (let [el (js/document.createElement "style")]
+(defn create-element* [tag id style-text]
+  (let [el (js/document.createElement tag)]
     (set! (.-id el) id)
     (.appendChild el (js/document.createTextNode style-text))
     el))
+
+(def create-style-element (partial create-element* "style"))
+(def create-script-element (partial create-element* "script"))
 
 (defn prepend-child [node node2]
   (if-let [first-child (.-firstChild node)]
@@ -62,7 +66,15 @@
       (when-not (get-element-by-id "com-rigsomelight-code-highlight-css")
         (.appendChild head
                       (create-style-element "com-rigsomelight-code-highlight-css"
-                                            (inline-resouce-file "public/devcards/css/github.css")))))))
+                                            (inline-resouce-file "public/devcards/css/github.css"))))
+      ;; we are injecting conditionally so that we can skip mobile
+      ;; and skip node
+      ;; really not diggin this but ...
+      (when-not (or (get-element-by-id "com-rigsomelight-code-highlighting")
+                    (device/isMobile))
+        (.appendChild head
+                      (create-script-element "com-rigsomelight-code-highlighting"
+                                             (inline-resouce-file "public/devcards/js/highlight.pack.js")))))))
 
 (defn render-base-if-necessary! []
   (add-css-if-necessary!)
