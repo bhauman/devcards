@@ -10,12 +10,6 @@
      [clojure.string :as string]
      [sablono.core :as sab :include-macros true]
      [devcards.core]
-     [devdemos.defcard-api]
-     [devdemos.two-zero]
-     [devdemos.testing]
-     [devdemos.errors]
-     [devdemos.extentions]
-     [devdemos.edn-render]
      [cljs.test :as t :include-macros true :refer-macros [testing is]])
     (:require-macros
      ;; Notice that I am not including the 'devcards.core namespace
@@ -24,20 +18,15 @@
      [devcards.core :as dc :refer [defcard defcard-doc noframe-doc deftest dom-node]]))
 
 (def ^:export front-matter
-  {:layout "devcards_post"
+  {:layout false
    :title "The Hard Sell"
    :slug "devcards-the-hard-sell"
    :date "2015-06-06"
    :draft true
    :published false
-   :category nil
-   :tags nil
    :base-card-options {:frame false}})
 
 (enable-console-print!)
-
-;; this wont work for rendering blog post
-#_(devcards.core/start-devcard-ui!) ; need a wrapper
 
 (defcard
   "# [Devcards](https://github.com/bhauman/devcards): the hard sell
@@ -184,7 +173,7 @@
    and **IDevcard** protocols.
    " )
 
-(deftest cljs-test-integration
+(defcard
   "# clsj.test integration
 
    Devcards provides a `deftest` macro that behaves very similarly to
@@ -225,7 +214,10 @@
 
    The `testing` and is macros are the ones from `cljs.test`
 
-   These tests are rendered below:"
+   These tests are rendered below:")
+
+(deftest cljs-test-integration
+  
   (testing "testing context 1"
     (is (= (+ 3 4 55555) 4) "This is the message arg to an 'is' test")
     (is (= (+ 1 0 0 0) 1)

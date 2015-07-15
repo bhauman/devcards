@@ -35,7 +35,7 @@
                   :figwheel { :devcards true
                               #_:websocket-host #_:js-client-host }
                   :compiler {
-                             :main "devdemos.core"
+                             :main "devdemos.start-ui"
                              :asset-path "js/compiled/out"
                              :output-to "resources/public/devcards/js/compiled/devdemos.js"
                              :output-dir "resources/public/devcards/js/compiled/out"
