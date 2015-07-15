@@ -306,6 +306,19 @@
 
 (comment
 
+  an iterator to delinate a card in many states
+  
+  when initial state changes we should reset the state
+  
+  docs should not have frames too ugly ??
+
+  documentation should interpret non-strings as edn or use pprint
+  maybe we should expect code
+  
+  fall back to highlighted pprint on devcard main object display
+
+  speed test pprint and hightlighting versus edn-react
+  
   a debug option :debug-card true
   
   fix loading race
