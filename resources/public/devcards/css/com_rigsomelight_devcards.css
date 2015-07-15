@@ -1,6 +1,6 @@
 body {
     margin: 0px;
-    background-color: rgb(233,234,237); 
+    background-color: rgb(240,241,242); 
 }
 
 #com-rigsomelight-devcards-main {
@@ -15,6 +15,7 @@ body {
     background-color: rgb(233,234,237);
 }
 
+
 .com-rigsomelight-devcards-markdown pre,
 .com-rigsomelight-devcards-test-line.com-rigsomelight-devcards-test-doc .com-rigsomelight-devcards-markdown pre
 {
@@ -27,7 +28,7 @@ body {
   word-wrap: normal;
   overflow-x: scroll;
   color: #333;
-  background-color: #f8f8f8;
+  background-color: rgb(255,252,234); /* #f8f8f8; */
   border: 1px solid #e1e1e1;  
   margin-left: -14px;
   margin-right: -14px;  
@@ -41,8 +42,25 @@ body {
   margin-right: -15px;  
 }
 
+/* frameless style for markdown */
+.com-rigsomelight-devcards-framelesss .com-rigsomelight-devcards-markdown {
+    padding-top: 14px;
+    padding-left: 14px;
+    padding-right: 14px;
+}
+
+
+.com-rigsomelight-devcards-framelesss .com-rigsomelight-devcards-markdown pre {
+    margin-right: -3000px;
+    margin-left: -3000px;
+
+    padding-right: 3000px;
+    padding-left: 3000px;        
+}
+
+/* end fremless markdown style */
+
 .com-rigsomelight-devcards-padding-top-border {
-    border-top: 1px solid #f5f5f5;
     margin-top: 14px;
     padding-top: 14px;
 }
@@ -70,7 +88,7 @@ body {
 .com-rigsomelight-devcards-base,
 .com-rigsomelight-devcards-markdown {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.42857143;
 
 }
@@ -135,11 +153,11 @@ body {
 
 .com-rigsomelight-devcards-card-base-no-pad {
     background: #fff;
-    border-top:  1px solid;
-    border-color: #e5e6e9 #dfe0e4 #d0d1d5;
-    border-color: #e5e6e9 #dfe0e4 #d0d1d5;     
+    border-top:  1px solid rgb(240,241,242); 
+    /* border-color: #e5e6e9 #dfe0e4 #d0d1d5;     */
     margin-top: 20px;
 }
+
 
 .com-rigsomelight-devcards-breadcrumbs {
     font-size: 16px;
@@ -185,13 +203,11 @@ button.com-rigsomelight-devcards-badge {
     padding: 8px 15px;
     font-size: 16px;
     line-height: 1.5em;
-    color: #333;
-    background-color: #fcfcfc;
-    background-color: #f5f5f5;
+    background-color: rgb(60,90,153);    
 }
 
 .com-rigsomelight-devcards-panel-heading a {
-    color: #333;
+    color: #f8f8f8;
 }
 
 .com-rigsomelight-devcards-devcard-padding {
@@ -291,7 +307,7 @@ button.com-rigsomelight-devcards-badge {
 }
 
 .com-rigsomelight-devcards-history-control-bar {
-    background-color: #f5f5f5;
+    background-color: rgb(255,252,234);
     padding-top: 5px;
     padding-bottom: 3px;    
     margin: 14px 0px;
@@ -341,8 +357,9 @@ button.com-rigsomelight-devcards-badge {
  .com-rigsomelight-devcards-card-base,
  .com-rigsomelight-devcards-card-base-no-pad {
      border-radius: 3px;
-     border:  1px solid;
-     border-color: #e5e6e9 #dfe0e4 #d0d1d5;      
+     border-top:  1px solid rgb(240,241,242);      
+    /* border:  1px solid;
+     border-color: #e5e6e9 #dfe0e4 #d0d1d5;      */
  } 
 }
 
