@@ -116,10 +116,17 @@
   (js/React.createElement CodeHighlight #js {:code (:content block) :lang (:lang block)}))
 
 (defn markdown->react [& strs]
-  (let [blocks (mapcat mark/parse-out-blocks strs)]
-    (sab/html
-     [:div.com-rigsomelight-devcards-markdown.working
-      (map markdown-block->react blocks)])))
+  (if (every? string? strs)
+    (let [blocks (mapcat mark/parse-out-blocks strs)]
+      (sab/html
+       [:div.com-rigsomelight-devcards-markdown.working
+        (map markdown-block->react blocks)]))
+    (do
+      (let [message "Devcards Error: Didn't pass a seq of strings to less-sensitive-markdown. 
+ You are probably trying to pass react to markdown instead of strings. (defcard-doc (doc ...)) won't work."]
+        (try (.error js/console message))
+            (sab/html [:div {:style {:color "#a94442"}}
+                       message])))))
 
 ;; returns a react component of rendered edn
 
