@@ -457,8 +457,13 @@ button.com-rigsomelight-devcards-badge {
 
 @media (min-width: 1000px) {
   .com-rigsomelight-devcards-card-hide-border .com-rigsomelight-devcards-markdown pre {
-     border: 1px solid #e1e1e1;
-     border-radius: 4px;
+      border: 1px solid #e1e1e1;
+      border-radius: 4px;
+      padding-left: 14px;
+      padding-right: 14px;
+
+      margin-left: 0px;
+      margin-right: 0px;            
   }
 }
 
