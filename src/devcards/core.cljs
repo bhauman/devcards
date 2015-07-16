@@ -701,7 +701,10 @@
       body))
 
 (defn render-pass-fail [{:keys [expected] :as m}]
-  (display-message m (sab/html [:pre [:code (utils/pprint-code expected)]])))
+  (display-message
+   m
+   (js/React.createElement CodeHighlight #js {:code (utils/pprint-code expected)
+                                              :lang "clojure"})))
 
 (defmethod test-render :pass [m]
   (render-pass-fail m))
