@@ -116,10 +116,17 @@
   (js/React.createElement CodeHighlight #js {:code (:content block) :lang (:lang block)}))
 
 (defn markdown->react [& strs]
-  (let [blocks (mapcat mark/parse-out-blocks strs)]
-    (sab/html
-     [:div.com-rigsomelight-devcards-markdown.working
-      (map markdown-block->react blocks)])))
+  (if (every? string? strs)
+    (let [blocks (mapcat mark/parse-out-blocks strs)]
+      (sab/html
+       [:div.com-rigsomelight-devcards-markdown.working
+        (map markdown-block->react blocks)]))
+    (do
+      (let [message "Devcards Error: Didn't pass a seq of strings to less-sensitive-markdown. 
+ You are probably trying to pass react to markdown instead of strings. (defcard-doc (doc ...)) won't work."]
+        (try (.error js/console message))
+            (sab/html [:div {:style {:color "#a94442"}}
+                       message])))))
 
 ;; returns a react component of rendered edn
 
@@ -139,7 +146,11 @@
     (if-not (:hidden options)
       (if (false? (:heading options))
         (sab/html
-         [:div.com-rigsomelight-devcards-card-base-no-pad {:key (prn-str path)}
+         [:div
+          {:key (prn-str path)
+           :class (str "com-rigsomelight-devcards-card-base-no-pad "
+                       (when (:hide-border options)
+                         " com-rigsomelight-devcards-card-hide-border"))}
           (naked-card children card)])
         (sab/html
          [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad {:key (prn-str path)}
@@ -248,11 +259,11 @@
                  ;; loop
                  ;; maybe we should have a :render-to-string false
                  ;; option?
-                 main      (let [m (:main-obj card)
-                                 res (if (fn? m) (m data-atom this) m)]
-                             (if (false? (:watch-atom options))
-                               (dont-update res)
-                               res))
+                 main-obj  (let [m (:main-obj card)]
+                             (if (fn? m) (m data-atom this) m))
+                 main      (if (false? (:watch-atom options))
+                             (dont-update main-obj)
+                             main-obj)
                  hist-ctl  (when (:history options)
                              (hist-recorder* data-atom))
                  document  (when-let [docu (:documentation card)]
@@ -261,6 +272,11 @@
                              (sab/html
                               [:div.com-rigsomelight-devcards-padding-top-border
                                (edn-rend/html-edn @data-atom)]))
+                            ;; only documentation?
+                 card      (if (or (string? main-obj)
+                                       (nil? main-obj))
+                             (assoc-in card [:options :hide-border] true)
+                             card)
                  children  (keep identity (list document main hist-ctl edn))]
              (if (:frame options)
                (frame children card) ;; make component and forward options
@@ -696,12 +712,17 @@
 
 (defn- display-message [{:keys [message]} body]
   (if message
-      (sab/html [:div [:span.com-rigsomelight-devcards-test-message message]
-                 body])
+    (sab/html [:div 
+               [:span.com-rigsomelight-devcards-test-message 
+                message]
+               body])
       body))
 
 (defn render-pass-fail [{:keys [expected] :as m}]
-  (display-message m (sab/html [:pre [:code (utils/pprint-code expected)]])))
+  (display-message
+   m
+   (js/React.createElement CodeHighlight #js {:code (utils/pprint-code expected)
+                                              :lang "clojure"})))
 
 (defmethod test-render :pass [m]
   (render-pass-fail m))
@@ -783,7 +804,7 @@
            (sab/html
             [:button.com-rigsomelight-devcards-badge
              {:style {:float "right"
-                      :backgroundColor "#d9534f"
+                      :backgroundColor "#F7918E"
                       :color "#fff"
                       :margin "3px 3px"}
               :onClick (dev/prevent->
@@ -794,7 +815,7 @@
            (sab/html
             [:button.com-rigsomelight-devcards-badge
              {:style {:float "right"
-                      :backgroundColor "#5cb85c"
+                      :backgroundColor "#92C648"
                       :color "#fff"
                       :margin "3px 3px"}
               :onClick (dev/prevent->

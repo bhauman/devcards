@@ -98,8 +98,9 @@
 ;; is this really needed now?
 (defmacro defcard-doc [& exprs]
   (when (utils/devcards-active?)
-    `(devcards.core/defcard (doc ~@exprs))))
+    `(devcards.core/defcard (doc ~@exprs) {} {:hide-border true})))
 
+;; this really needs to go now
 (defmacro noframe-doc [& exprs]
   (when (utils/devcards-active?)
     `(devcards.core/defcard (doc ~@exprs) {} {:frame false})))

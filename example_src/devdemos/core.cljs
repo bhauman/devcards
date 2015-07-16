@@ -174,7 +174,7 @@
    " )
 
 (defcard
-  "# clsj.test integration
+  "# cljs.test integration
 
    Devcards provides a `deftest` macro that behaves very similarly to
    the `cljs.test/deftest` macro. This makes it easy to define tests
@@ -217,7 +217,7 @@
    These tests are rendered below:")
 
 (deftest cljs-test-integration
-  
+  "## Here are some example tests"
   (testing "testing context 1"
     (is (= (+ 3 4 55555) 4) "This is the message arg to an 'is' test")
     (is (= (+ 1 0 0 0) 1)
