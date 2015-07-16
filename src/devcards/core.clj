@@ -98,7 +98,7 @@
 ;; is this really needed now?
 (defmacro defcard-doc [& exprs]
   (when (utils/devcards-active?)
-    `(devcards.core/defcard (doc ~@exprs))))
+    `(devcards.core/defcard (doc ~@exprs) {} {:hide-border true})))
 
 (defmacro noframe-doc [& exprs]
   (when (utils/devcards-active?)
