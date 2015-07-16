@@ -213,11 +213,12 @@ button.com-rigsomelight-devcards-badge {
     padding: 8px 15px;
     font-size: 16px;
     line-height: 1.5em;
-    background-color: rgb(142,162,206);        
+    background-color: rgb(142,162,206);
+    background-color: rgb(239, 237, 237);
 }
 
 .com-rigsomelight-devcards-panel-heading a {
-    color: #f8f8f8;
+    color: #666;
 }
 
 .com-rigsomelight-devcards-devcard-padding {
@@ -422,7 +423,7 @@ button.com-rigsomelight-devcards-badge {
  }
 
  button.com-rigsomelight-devcards-badge {
-    border: 1px solid #78d;
+    border: 1px solid #999;
     padding: 3px 9px;
     background-color: #ccc;
  }
