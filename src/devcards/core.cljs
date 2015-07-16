@@ -786,7 +786,7 @@
            (sab/html
             [:button.com-rigsomelight-devcards-badge
              {:style {:float "right"
-                      :backgroundColor "#d9534f"
+                      :backgroundColor "#F7918E"
                       :color "#fff"
                       :margin "3px 3px"}
               :onClick (dev/prevent->
@@ -797,7 +797,7 @@
            (sab/html
             [:button.com-rigsomelight-devcards-badge
              {:style {:float "right"
-                      :backgroundColor "#5cb85c"
+                      :backgroundColor "#92C648"
                       :color "#fff"
                       :margin "3px 3px"}
               :onClick (dev/prevent->

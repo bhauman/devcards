@@ -1,6 +1,6 @@
 body {
     margin: 0px;
-    background-color: rgb(240,241,242); 
+    overflow-x: hidden;
 }
 
 #com-rigsomelight-devcards-main {
@@ -15,12 +15,11 @@ body {
     background-color: rgb(233,234,237);
 }
 
-
-.com-rigsomelight-devcards-markdown pre,
+.com-rigsomelight-devcards-markdown pre,lo
 .com-rigsomelight-devcards-test-line.com-rigsomelight-devcards-test-doc .com-rigsomelight-devcards-markdown pre
 {
   display: block;
-  padding: 9.5px;
+  padding: 9.5px 14px;
   margin: 0px 0px 10px;
   font-size: 13px;
   line-height: 1.42857143;
@@ -28,13 +27,12 @@ body {
   word-wrap: normal;
   overflow-x: scroll;
   color: #333;
-  background-color: rgb(255,252,234); /* #f8f8f8; */
+  background-color: rgb(250,250,250);
   border: 1px solid #e1e1e1;  
   margin-left: -14px;
   margin-right: -14px;  
   border-left: 0px;
   border-right: 0px; 
- /*  border-radius: 4px;  */
 }
 
 .com-rigsomelight-devcards-test-line.com-rigsomelight-devcards-test-doc .com-rigsomelight-devcards-markdown pre {
@@ -50,13 +48,15 @@ body {
 }
 
 
-.com-rigsomelight-devcards-framelesss .com-rigsomelight-devcards-markdown pre {
+
+.com-rigsomelight-devcards-card-hide-border .com-rigsomelight-devcards-markdown pre {
     margin-right: -3000px;
     margin-left: -3000px;
-
     padding-right: 3000px;
     padding-left: 3000px;        
 }
+
+
 
 /* end fremless markdown style */
 
@@ -68,8 +68,8 @@ body {
 .com-rigsomelight-devcards-markdown code {
   padding: 2px 4px;
   font-size: 90%;
-  color: #c7254e;
-  background-color: #f9f2f4;
+  color: #990073;
+  background-color: #fafafa;
   white-space: nowrap;
   border-radius: 4px;
 }
@@ -82,8 +82,6 @@ body {
   background-color: transparent;
   border-radius: 0;
 }
-
-
 
 .com-rigsomelight-devcards-base,
 .com-rigsomelight-devcards-markdown {
@@ -136,7 +134,9 @@ body {
 .com-rigsomelight-devcards-brand {
     color: #ccc;
     font-size: 18px;
-    line-height: 50px; 
+    line-height: 50px;
+    display: block;
+    margin-left: 14px;
 }
 
 .com-rigsomelight-devcards-container {
@@ -146,22 +146,27 @@ body {
 
 .com-rigsomelight-devcards-card-base {
     background: #fff;
-
-    padding: 8px 15px;     
+    padding: 8px 14px;     
     margin-top: 20px;
 }
 
 .com-rigsomelight-devcards-card-base-no-pad {
     background: #fff;
-    border-top:  1px solid rgb(240,241,242); 
-    /* border-color: #e5e6e9 #dfe0e4 #d0d1d5;     */
+    border:  1px solid rgb(231,234,242);
     margin-top: 20px;
+    border-left: 0px;
+    border-right: 0px;    
+}
+
+.com-rigsomelight-devcards-card-base-no-pad.com-rigsomelight-devcards-card-hide-border {
+   border: 1px solid transparent;
 }
 
 
 .com-rigsomelight-devcards-breadcrumbs {
     font-size: 16px;
     line-height: 1.5em;
+    border: none !important;
 }
 
 .com-rigsomelight-devcards-breadcrumb-sep {
@@ -170,13 +175,17 @@ body {
     color: #ccc;
 }
 
+.com-rigsomelight-devcards-list-group {
+    margin-top: 30px;
+}
+
 .com-rigsomelight-devcards-list-group-item {
     color: #555;
     position: relative;
     display: block;
-    padding: 10px 15px;
+    padding: 10px 14px;
     margin-bottom: -1px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #eee;
 }
 
 .com-rigsomelight-devcards-badge {
@@ -199,11 +208,12 @@ button.com-rigsomelight-devcards-badge {
     padding: 3px 19px;
 }
 
+
 .com-rigsomelight-devcards-panel-heading {
     padding: 8px 15px;
     font-size: 16px;
     line-height: 1.5em;
-    background-color: rgb(60,90,153);    
+    background-color: rgb(142,162,206);        
 }
 
 .com-rigsomelight-devcards-panel-heading a {
@@ -220,37 +230,62 @@ button.com-rigsomelight-devcards-badge {
 .com-rigsomelight-devcards-test-line {
   position: relative;
   display: block;
-  padding: 10px 15px;
+  padding: 10px 14px;
   border: none;
-  border-top: solid 1px #fafafa;  
+  border-top: 1px solid #fafafa;
+}
+
+
+
+
+.com-rigsomelight-devcards-test-line.com-rigsomelight-devcards-context {
+    background-color: #fcfcfc;
+    border-left: 1px solid #f1f1f1;
+    border-right: 1px solid #f1f1f1;      
 }
 
 .com-rigsomelight-devcards-test-line pre {
   margin: 0px;
+    
   word-break: normal;
   word-wrap: normal;
   overflow-x: scroll;    
 }
 
+
+.com-rigsomelight-devcards-test-line pre code {
+    font-size: 80%;
+    padding: 0px;
+    background-color:transparent;
+}
+    
 .com-rigsomelight-devcards-pass {
-  color: #3c763d;
-  background-color: #dff0d8;
+    color: #3c763d;
+    border: 1px solid rgb(199, 225, 160);
+    border-left: 10px solid rgb(199, 225, 160);    
+}
+
+.com-rigsomelight-devcards-fail, .com-rigsomelight-devcards-error {
+  color: #a94442;
+  border: 1px solid rgb(236, 196, 196);    
+  border-left: 10px solid rgb(236, 196, 196);  
 }
 
 .com-rigsomelight-devcards-fail {
-  color: #a94442;
-  background-color: #f2dede;
+    background-color: rgb(254, 254, 244);
 }
 
+
 .com-rigsomelight-devcards-error {
-  color: #a94442;
-  border-left: 2px solid #a94442;    
-  background-color: #f2dede;
+    background-color: rgb(254, 245, 245);
 }
+
+
 
 .com-rigsomelight-devcards-test-message {
     display: block;
-    margin-top: -5px;    
+    margin-top: 2px;
+    margin-bottom: 8px;
 }
 
 .com-rigsomelight-devcards-pass .com-rigsomelight-devcards-test-message {
@@ -334,20 +369,62 @@ button.com-rigsomelight-devcards-badge {
 
 .com-rigsomelight-devcards-devcard-padding .com-rigsomelight-devcards-history-control-bar {
     /* margin-top: -14px; */
-    margin: 14px -14px;
+    margin: 14px -30px;
 }
+
+
 
 
 @media (min-width: 768px) {
 
+    
+.com-rigsomelight-devcards-markdown pre,
+.com-rigsomelight-devcards-test-line.com-rigsomelight-devcards-test-doc .com-rigsomelight-devcards-markdown pre {
+  padding: 9.5px 30px;
+  margin-left: -30px;
+  margin-right: -30px;      
+}
+
+.com-rigsomelight-devcards-panel-heading {
+    padding: 8px 30px;
+}    
+
+.com-rigsomelight-devcards-brand {
+    margin-left: 0px;
+}
+
+.com-rigsomelight-devcards-devcard-padding {
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.com-rigsomelight-devcards-card-hide-border .com-rigsomelight-devcards-devcard-padding {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.com-rigsomelight-devcards-breadcrumbs {
+    padding: 0px 0px;
+}
+
+.com-rigsomelight-devcards-list-group {
+    margin-top: 30px;
+}
+
+.com-rigsomelight-devcards-list-group-item {
+    padding-left: 0px;
+    padding-right: 0px;    
+}
+    
  .com-rigsomelight-devcards-container {
     margin: auto;
     width: 750px;
  }
 
  button.com-rigsomelight-devcards-badge {
-    border: none;
+    border: 1px solid #78d;
     padding: 3px 9px;
+    background-color: #ccc;
  }
 
  .com-rigsomelight-devcards-history-control-bar button {
@@ -357,14 +434,51 @@ button.com-rigsomelight-devcards-badge {
  .com-rigsomelight-devcards-card-base,
  .com-rigsomelight-devcards-card-base-no-pad {
      border-radius: 3px;
-     border-top:  1px solid rgb(240,241,242);      
-    /* border:  1px solid;
-     border-color: #e5e6e9 #dfe0e4 #d0d1d5;      */
- } 
+     border:  1px solid rgb(231,234,242);
+ }
+
+ .com-rigsomelight-devcards-test-line {
+    padding: 10px 30px;
+ }
+
+.com-rigsomelight-devcards-pass {
+  border-left: 25px solid rgb(199, 225, 160);        
 }
 
+.com-rigsomelight-devcards-fail {
+  border-left: 25px solid rgb(236, 196, 196);  
+}
+
+.com-rigsomelight-devcards-error {
+  border-left: 25px solid rgb(236, 196, 196);      
+}
+ 
+}
+
+@media (min-width: 1000px) {
+  .com-rigsomelight-devcards-card-hide-border .com-rigsomelight-devcards-markdown pre {
+     border: 1px solid #e1e1e1;
+     border-radius: 4px;
+  }
+}
 
 @media (min-width: 1200px) {
+  .com-rigsomelight-devcards-card-hide-border .com-rigsomelight-devcards-devcard-padding {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+  .com-rigsomelight-devcards-brand {
+    margin-left: 30px;
+  }
+  .com-rigsomelight-devcards-list-group-item {
+      margin-left: 30px;
+      margin-right: 30px;
+  }
+  
+  .com-rigsomelight-devcards-breadcrumbs {
+    padding: 0px 30px;
+  }
+  
   .com-rigsomelight-devcards-container {    
     margin: auto;
     width: 970px;
