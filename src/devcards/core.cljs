@@ -696,8 +696,10 @@
 
 (defn- display-message [{:keys [message]} body]
   (if message
-      (sab/html [:div [:span.com-rigsomelight-devcards-test-message message]
-                 body])
+    (sab/html [:div 
+               [:span.com-rigsomelight-devcards-test-message 
+                message]
+               body])
       body))
 
 (defn render-pass-fail [{:keys [expected] :as m}]
