@@ -56,6 +56,11 @@
 (defn add-css-if-necessary! []
   (if-let [heads (.getElementsByTagName js/document "head")]
     (let [head (aget heads 0)]
+      (when-not (get-element-by-id "com-rigsomelight-code-highlight-css")
+        (.appendChild head
+                      (create-style-element "com-rigsomelight-code-highlight-css"
+                                            (inline-resouce-file "public/devcards/css/github.css"))))
+      
       (when-not (get-element-by-id "com-rigsomelight-devcards-css")
         (.appendChild head (create-style-element "com-rigsomelight-devcards-css"
                                                  (inline-resouce-file "public/devcards/css/com_rigsomelight_devcards.css"))))
@@ -63,10 +68,7 @@
         (.appendChild head
                       (create-style-element "com-rigsomelight-edn-css"
                                             (inline-resouce-file "public/devcards/css/com_rigsomelight_edn_flex.css"))))
-      (when-not (get-element-by-id "com-rigsomelight-code-highlight-css")
-        (.appendChild head
-                      (create-style-element "com-rigsomelight-code-highlight-css"
-                                            (inline-resouce-file "public/devcards/css/github.css"))))
+
       ;; we are injecting conditionally so that we can skip mobile
       ;; and skip node
       ;; really not diggin this but ...
@@ -309,20 +311,16 @@
 
 (comment
 
-  move highlighting out and force folks to require hljs if they want it?
   
-  move nav into header
+  fall back to highlighted pprint on devcard main object display
+  
+  move highlighting out and force folks to require hljs if they want it?
   
   an iterator to delinate a card in many states
   
   when initial state changes we should reset the state
-  
-  docs should not have frames too ugly ??
 
-  documentation should interpret non-strings as edn or use pprint
-  maybe we should expect code
-  
-  fall back to highlighted pprint on devcard main object display
+
 
   speed test pprint and hightlighting versus edn-react
   
