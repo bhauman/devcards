@@ -259,8 +259,12 @@
                  ;; loop
                  ;; maybe we should have a :render-to-string false
                  ;; option?
-                 main-obj  (let [m (:main-obj card)]
+                 main-obj'  (let [m (:main-obj card)]
                              (if (fn? m) (m data-atom this) m))
+                 main-obj (if (and (not (nil? main-obj'))
+                                   (not (react-element? main-obj')))
+                             (code-highlight (utils/pprint-code main-obj') "clojure")
+                             main-obj') 
                  main      (if (false? (:watch-atom options))
                              (dont-update main-obj)
                              main-obj)
@@ -346,10 +350,10 @@
                        :value options})
                   (stringer? :name opts)                
                   (stringer? :documentation opts)
-                  (or (nil? main-obj) (fn? main-obj) (react-element? main-obj)
-                      {:label   :main-obj
-                       :message "should be a function or a ReactElement or nil."
-                       :value main-obj})
+                  #_(or (nil? main-obj) (fn? main-obj) (react-element? main-obj)
+                        {:label   :main-obj
+                         :message "should be a function or a ReactElement or nil."
+                         :value main-obj})
                   (or (nil? initial-data) (map? initial-data) (satisfies? IAtom initial-data)
                       {:label :initial-data
                        :message "should be an Atom or a Map or nil."
