@@ -107,6 +107,10 @@
                     :ref "code-ref"}
              (get-props this :code)]])))})
 
+(defn code-highlight [code-str lang]
+  (js/React.createElement CodeHighlight #js {:code code-str
+                                             :lang lang}))
+
 (defmulti markdown-block->react :type)
 
 (defmethod markdown-block->react :default [{:keys [content]}]
@@ -115,18 +119,24 @@
 (defmethod markdown-block->react :code-block [{:keys [content] :as block}]
   (js/React.createElement CodeHighlight #js {:code (:content block) :lang (:lang block)}))
 
+(declare react-element?)
+
 (defn markdown->react [& strs]
-  (if (every? string? strs)
-    (let [blocks (mapcat mark/parse-out-blocks strs)]
-      (sab/html
-       [:div.com-rigsomelight-devcards-markdown.working
-        (map markdown-block->react blocks)]))
-    (do
-      (let [message "Devcards Error: Didn't pass a seq of strings to less-sensitive-markdown. 
+  (let [strs (map (fn [x] (if (string? x)
+                           x
+                           (when-not (react-element? x)
+                             (str "```clojure\n" (utils/pprint-code x) "```\n")))) strs)]
+    (if (every? string? strs)
+      (let [blocks (mapcat mark/parse-out-blocks strs)]
+        (sab/html
+         [:div.com-rigsomelight-devcards-markdown.working
+          (map markdown-block->react blocks)]))
+      (do
+        (let [message "Devcards Error: Didn't pass a seq of strings to less-sensitive-markdown. 
  You are probably trying to pass react to markdown instead of strings. (defcard-doc (doc ...)) won't work."]
-        (try (.error js/console message))
-            (sab/html [:div {:style {:color "#a94442"}}
-                       message])))))
+          (try (.error js/console message))
+          (sab/html [:div {:style {:color "#a94442"}}
+                     message]))))))
 
 ;; returns a react component of rendered edn
 
