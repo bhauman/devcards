@@ -11,14 +11,7 @@
    [clojure.string :as string]
 
    [cljs.test]
-   [cljs.core.async :refer [put! chan timeout] :as async]
-   #_[cljsjs.highlight]
-   #_[cljsjs.highlight.langs.clojure]
-   #_[cljsjs.highlight.langs.javascript]
-   #_[cljsjs.highlight.langs.bash]
-   #_[cljsjs.highlight.langs.css]
-   #_[cljsjs.highlight.langs.xml]
-   #_[cljsjs.highlight.langs.markdown])
+   [cljs.core.async :refer [put! chan timeout] :as async])
   (:require-macros
    [cljs-react-reload.core :refer [defonce-react-class def-react-class]]
    [cljs.core.async.macros :refer [go]]))

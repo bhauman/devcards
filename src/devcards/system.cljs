@@ -311,22 +311,20 @@
 
 (comment
 
-  
-  fall back to highlighted pprint on devcard main object display
-  
-  move highlighting out and force folks to require hljs if they want it?
-  
-  an iterator to delinate a card in many states
-  
-  when initial state changes we should reset the state
-
-
-
-  speed test pprint and hightlighting versus edn-react
-  
   a debug option :debug-card true
   
+  when initial state changes we should reset the state
+  
+  an iterator to delinate a card in many states
+
+  speed test pprint and hightlighting versus edn-renderer
+
+  use a pure component for the edn renderer to memoize rerenders
+
+  
   fix loading race
+
+  move highlighting out and force folks to require hljs if they want it?
   
   generate blog posts from a namespace with devcards
   - can implement code modules 
