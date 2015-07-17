@@ -3,6 +3,12 @@ body {
     overflow-x: hidden;
 }
 
+body .hljs {
+  padding: 0px;
+  color: #333;
+  background: transparent;
+}
+  
 #com-rigsomelight-devcards-main {
     padding-bottom: 10em;
 }
@@ -73,6 +79,10 @@ body {
   white-space: nowrap;
   border-radius: 4px;
 }
+
+.com-rigsomelight-devcards_rendered-card code {
+  font-size: 90%;
+} 
 
 .com-rigsomelight-devcards-markdown pre code {
   padding: 0;
