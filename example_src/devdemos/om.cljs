@@ -11,7 +11,7 @@
      ;; Notice that I am not including the 'devcards.core namespace
      ;; but only the macros. This helps ensure that devcards will only
      ;; be created when the :devcards is set to true in the build config.
-     [devcards.core :as dc :refer [defcard defcard-doc noframe-doc deftest dom-node]]))
+     [devcards.core :as dc :refer [defcard defcard-doc defcard-om noframe-doc deftest dom-node]]))
 
 (defcard-doc
    "## Rendering Om components with `om-root` and `defcard-om`
@@ -62,15 +62,21 @@
   "### You can share an Atom with an `edn-card` too:"
   om-test-atom)
 
-(deftest test-card-ex
-  "## Test card
-    Test cards provide interactive testing inline with your code.
-    Test cards allow arbitrary markdown in them, this can allow for a
-    literate coding style"
-   (t/is (= 23 (+ 21 2)))
-   (t/is (= (+ 3 4 5) 12))
-   "`(+ 3 4 5)` is definitely equal to `12`"
-   (t/is (= (+ 3 4 5) 12)))
+(defn unmount-sample [_ _]
+  (reify
+    om/IDidMount
+    (did-mount [_]
+      (println "mounting"))
+    om/IWillUnmount
+    (will-unmount [_]
+      (println "unmounting this"))
+    om/IRender
+    (render [_]
+      (dom/div nil "unmount"))))
+
+(defcard-om sample-cardd
+  unmount-sample
+  {})
 
 (defn rand-strs [c]
   (repeatedly c #(apply str (map (fn [x] (char (rand-int 255)))
