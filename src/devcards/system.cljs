@@ -280,7 +280,7 @@
                 {:style {:float "right"}}
                 (count child-tree)]
                [:span " " (name key)]]))
-           (sort-by (fn [[_ child-tree]] (-> child-tree first second :position -))  dirs))])))
+           (sort-by (fn [[key _]] (name key))  dirs))])))
 
 (defn main-template [state-atom]
   (let [data @state-atom]
@@ -323,8 +323,8 @@
   use a pure component for the edn renderer to memoize rerenders
 
   look at upndown.js and marked.js
-  
-  order by namespace name
+
+  probably switch to marked for markdown parsing
   
   fix loading race
 
