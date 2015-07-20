@@ -158,7 +158,7 @@
           (om.core/root ~om-comp-fn data-atom#
                         (merge ~om-options
                                {:target node#}))))
-       {:watch-atom false})))
+       {:watch-atom true})))
   ([om-comp-fn]
    (when (utils/devcards-active?)
      `(om-root ~om-comp-fn {}))))
