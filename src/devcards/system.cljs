@@ -311,6 +311,7 @@
 
 (comment
 
+  
   a debug option :debug-card true
   
   when initial state changes we should reset the state
@@ -321,6 +322,9 @@
 
   use a pure component for the edn renderer to memoize rerenders
 
+  look at upndown.js and marked.js
+  
+  order by namespace name
   
   fix loading race
 

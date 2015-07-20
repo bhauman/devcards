@@ -308,6 +308,12 @@
                      (not= (get-props this :node_fn)
                            (aget prevP "node_fn")))
             (render-into-dom this))))
+       :componentWillUnmount
+       (fn []
+         (this-as
+          this
+          (when-let [node (ref->node this (get-state this :unique_id))]
+            (js/React.unmountComponentAtNode node))))
        :componentDidMount
        (fn [] (this-as this (render-into-dom this)))
        :render
@@ -316,7 +322,7 @@
            (this-as
             this
             (js/React.DOM.div
-             #js { :ref (get-state this :unique_id)}
+             #js { :className "com-rigsomelight-devcards-dom-node" :ref (get-state this :unique_id)}
              "Card has not mounted DOM node.")))
          (fn [] (js/React.DOM.div "Card has not mounted DOM node.")))})
 
