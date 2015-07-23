@@ -222,6 +222,16 @@
   #js {:getInitialState
        (fn []
          #js {:unique_id (gensym 'devcards-base-)})
+       :componentDidUpdate
+       (fn [_ _]
+         (this-as
+          this
+          (let [atom    (get-state this :data_atom)
+                card    (get-props this :card)
+                options (:options card)
+                data    @(:initial-data card)]
+            (if (and (:static-state options) (not= @atom data))
+              (reset! atom data)))))
        :componentWillMount
        (if (html-env?)
          (fn []
@@ -367,7 +377,7 @@
                       {:label :initial-data
                        :message "should be an Atom or a Map or nil."
                        :value initial-data})]
-                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history])))))
+                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history :static-state])))))
     [{:message "Card should be a Map."
       :value   opts}]))
 
@@ -380,6 +390,7 @@
                              :heading false
                              :padding false
                              :inspect-data true
+                             :static-state false
                              :watch-atom nil
                              :history nil})))
 
