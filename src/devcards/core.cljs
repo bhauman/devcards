@@ -225,13 +225,15 @@
        :componentDidUpdate
        (fn [_ _]
          (this-as
-          this
-          (let [atom    (get-state this :data_atom)
-                card    (get-props this :card)
-                options (:options card)
-                data    @(:initial-data card)]
-            (if (and (:static-state options) (not= @atom data))
-              (reset! atom data)))))
+           this
+           (let [atom    (get-state this :data_atom)
+                 card    (get-props this :card)
+                 options (:options card)]
+             (when (:static-state options)
+               (let [initial-data (:initial-data card)
+                     data         (if (atom-like? initial-data) @initial-data initial-data)]
+                 (if (not= @atom data)
+                   (reset! atom data)))))))
        :componentWillMount
        (if (html-env?)
          (fn []
