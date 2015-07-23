@@ -218,6 +218,8 @@
     (fn [this] (get-state this :data_atom))
     (fn [this] (wrangle-inital-data this))))
 
+(declare atom-like?)
+
 (defonce-react-class DevcardBase
   #js {:getInitialState
        (fn []
