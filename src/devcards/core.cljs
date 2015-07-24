@@ -218,10 +218,24 @@
     (fn [this] (get-state this :data_atom))
     (fn [this] (wrangle-inital-data this))))
 
+(declare atom-like?)
+
 (defonce-react-class DevcardBase
   #js {:getInitialState
        (fn []
          #js {:unique_id (gensym 'devcards-base-)})
+       :componentDidUpdate
+       (fn [_ _]
+         (this-as
+           this
+           (let [atom    (get-state this :data_atom)
+                 card    (get-props this :card)
+                 options (:options card)]
+             (when (:static-state options)
+               (let [initial-data (:initial-data card)
+                     data         (if (atom-like? initial-data) @initial-data initial-data)]
+                 (if (not= @atom data)
+                   (reset! atom data)))))))
        :componentWillMount
        (if (html-env?)
          (fn []
@@ -367,7 +381,7 @@
                       {:label :initial-data
                        :message "should be an Atom or a Map or nil."
                        :value initial-data})]
-                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history])))))
+                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history :static-state])))))
     [{:message "Card should be a Map."
       :value   opts}]))
 
@@ -380,6 +394,7 @@
                              :heading false
                              :padding false
                              :inspect-data true
+                             :static-state false
                              :watch-atom nil
                              :history nil})))
 
