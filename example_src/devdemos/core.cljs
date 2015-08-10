@@ -1,6 +1,5 @@
 (ns 
   ^{:description "Devcards: A high level introduction."
-    :figwheel-always true
     :rigsomelight-post true}
   devdemos.core
     (:require
@@ -17,6 +16,7 @@
      ;; be created when the :devcards is set to true in the build config.
      [devcards.core :as dc :refer [defcard defcard-doc deftest dom-node]]))
 
+
 (def ^:export front-matter
   {:layout false
    :title "The Hard Sell"
@@ -27,6 +27,7 @@
    :base-card-options {:frame false}})
 
 (enable-console-print!)
+
 
 (defcard
   "# [Devcards](https://github.com/bhauman/devcards): the hard sell

@@ -9,7 +9,6 @@
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [sablono "0.3.4"]
                  [cljsjs/react "0.13.1-0"]
-                 [cljsjs/react "0.13.1-0"]
                  [cljs-react-reload "0.1.0"]
                  [cljsjs/showdown "0.4.0-1"]]
 

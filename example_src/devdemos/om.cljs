@@ -1,4 +1,4 @@
-(ns ^:figwheel-always devdemos.om
+(ns devdemos.om
     (:require
      [devcards.core]
      [om.core :as om :include-macros true]

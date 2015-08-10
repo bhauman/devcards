@@ -10,7 +10,8 @@
    [devcards.util.utils :as utils])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]
-   [devcards.system :refer [inline-resouce-file]])
+   [devcards.system :refer [inline-resouce-file]]
+   [cljs-react-reload.core :refer [defonce-react-class]])
   (:import
    [goog History]))
 
@@ -299,12 +300,22 @@
        [:div
         (main-cards-template state-atom)]]])))
 
-;; enables the deletion of cards
+(defonce-react-class DevcardsRoot
+  #js {:componentDidMount
+       (fn []
+         (this-as this
+                  (add-watch app-state
+                             :renderer-watch
+                             (fn [_ _ _ _]
+                               (.forceUpdate this)))))
+       :render (fn [] (main-template app-state)) } )
+
 
 (defn renderer [state-atom]
   #_(prn "Rendering")
   (js/React.render
-   (sab/html [:div
+   (js/React.createElement DevcardsRoot)
+   #_(sab/html [:div
               (main-template state-atom)
               #_(edn-rend/html-edn @state-atom)])
    (devcards-app-node)))
@@ -411,6 +422,7 @@
             (recur))))
       true)))
 
+
 (defn start-ui [channel]
   (defonce devcards-ui-setup
     (do
@@ -430,7 +442,7 @@
         ;; escape core async context for better errors
         (js/setTimeout #(renderer app-state) 0)
 
-        (js/setTimeout #(add-watch app-state :devcards-render
+        #_(js/setTimeout #(add-watch app-state :devcards-render
                                    (fn [_ _ _ _] (renderer app-state))) 0)
 
         (js/setTimeout #(hash-routing-init app-state) 0)

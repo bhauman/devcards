@@ -1,4 +1,4 @@
-(ns ^:figwheel-always devdemos.start-ui
+(ns devdemos.start-ui
   (:require
    [devcards.core]
    [devdemos.defcard-api]
