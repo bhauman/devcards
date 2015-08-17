@@ -3,7 +3,8 @@
    [devcards.util.utils :as utils]
    [cljs.compiler :refer (munge)]
    [cljs.analyzer :as ana]
-   [cljs.analyzer.api :as ana-api]   
+   [cljs.analyzer.api :as ana-api]
+   [cljs.repl]
    [cljs.test]
    [cljs.env]
    [clojure.pprint :refer [with-pprint-dispatch code-dispatch pprint]]
@@ -178,12 +179,17 @@
   (when (utils/devcards-active?)
     `(devcards.util.utils/pprint-code ~obj)))
 
-(defmacro mkdn-code [body] `(str "\n```\n" ~body "```\n"))
+(defmacro mkdn-code [body] `(str "\n```clojure\n" ~body "\n```\n"))
 
 (defmacro mkdn-pprint-code [obj]
   (when (utils/devcards-active?)
     `(mkdn-code
       (devcards.util.utils/pprint-code ~obj))))
+
+(defmacro mkdn-pprint-source [obj]
+  (when (utils/devcards-active?)
+    `(mkdn-code
+       ~(or (cljs.repl/source-fn &env obj) (str "Source not found")))))
 
 (defmacro mkdn-pprint-str [obj]
   (when (utils/devcards-active?)
