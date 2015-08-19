@@ -6,14 +6,14 @@
 
 (defcard some-typical-nested-edn
   {:first (range 50)
-   :sets  (set   (range 1000 1100))
-   :vector  (vec (range 1000 1100))   
-   :second (take 6 (repeat {:name "Bruce"
+   :sets (set (range 1000 1100))
+   :vector (vec (range 1000 1100))
+   :second (take 6 (repeat {:first-name "Bruce"
                             :last-name "Hauman"
                             :date (js/Date.)
-                            :children (take 6 (repeat {:name "Bruce"
+                            :children (take 6 (repeat {:first-name "Bruce"
                                                        :last-name "Hauman"
                                                        :date (js/Date.)
-                                                       :children (take 6 (repeat {:name "Bruce"
-                                                       :last-name "Hauman"
-                                                       :date (js/Date.)}))}))}))})
+                                                       :children (take 6 (repeat {:first-name "Bruce"
+                                                                                  :last-name "Hauman"
+                                                                                  :date (js/Date.)}))}))}))})
