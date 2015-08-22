@@ -289,7 +289,8 @@
      [:div
       {:className
        (str "com-rigsomelight-devcards-base "
-            (when-let [n (first (:current-path data))] (name n)))}
+            (when-let [n (first (:current-path data))]
+              (string/replace (name n) "." "-")))}
       #_[:div.com-rigsomelight-devcards-navbar
        [:div.com-rigsomelight-devcards-container
         [:span.com-rigsomelight-devcards-brand
