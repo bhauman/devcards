@@ -215,7 +215,7 @@
 
 (defn card-template [state-atom {:keys [path options func] :as card}]
   (sab/html
-   [:div {:key (path->unique-card-id path)}
+   [:div.com-rigsomelight-devcard {:key (path->unique-card-id path)}
     (cljs.core/binding [*devcard-data* card]
       (func))]))
 
