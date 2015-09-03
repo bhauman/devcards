@@ -367,7 +367,8 @@
                             options]} opts]
                 (concat
                  propagated-errors
-                 [(or (map? options) (nil? options)
+                 [(or (map? options) 
+                      (nil? options)
                       {:label   :options 
                        :message "should be a Map or nil"
                        :value options})
@@ -377,7 +378,10 @@
                         {:label   :main-obj
                          :message "should be a function or a ReactElement or nil."
                          :value main-obj})
-                  (or (nil? initial-data) (map? initial-data) (satisfies? IAtom initial-data)
+                  (or (nil? initial-data)
+                      (vector? initial-data)
+                      (map? initial-data)
+                      (satisfies? IAtom initial-data)
                       {:label :initial-data
                        :message "should be an Atom or a Map or nil."
                        :value initial-data})]
