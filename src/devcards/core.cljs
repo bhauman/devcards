@@ -194,7 +194,8 @@
   (when (.-state this)
     (aget (.-state this) (name k))))
 
-(defonce-react-class DontUpdate
+;; this is not currently being used
+#_(defonce-react-class DontUpdate
   #js {:shouldComponentUpdate
        (fn [a b] false)
        :render
@@ -203,7 +204,8 @@
           this
           (sab/html [:div (get-props this :children_thunk)])))})
 
-(defn dont-update [children-thunk]
+;; this is not currently being used
+#_(defn dont-update [children-thunk]
   (js/React.createElement DontUpdate
                           #js { :children_thunk children-thunk}))
 
@@ -282,9 +284,7 @@
                                    (not (react-element? main-obj')))
                              (code-highlight (utils/pprint-code main-obj') "clojure")
                              main-obj') 
-                 main      (if (false? (:watch-atom options))
-                             (dont-update main-obj)
-                             main-obj)
+                 main      main-obj
                  hist-ctl  (when (:history options)
                              (hist-recorder* data-atom))
                  document  (when-let [docu (:documentation card)]

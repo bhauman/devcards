@@ -25,8 +25,8 @@
    :dev {
       :dependencies [[org.omcljs/om "0.8.8"]
                      [reagent "0.5.0"]]                   
-      :plugins [[lein-cljsbuild "1.0.5"]
-                [lein-figwheel "0.3.7"]]
+      :plugins [#_[lein-cljsbuild "1.0.5"]
+                [lein-figwheel "0.3.9"]]
       :cljsbuild {
         :builds [{:id "devcards-demos"
                   :source-paths ["example_src" "src"]
