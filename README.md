@@ -19,49 +19,6 @@ can be created and edited **"live"** in one's ClojureScript source
 files. Essentially lifting the code example out of the file into the
 browser for you to try out immediately.
 
-# Why???
-
-We primarily design and iterate on our front end applications *inside*
-the main application itself. In other words, our execution environment
-is constrained by the shape and demands of the application we are
-working on. This is extremely limiting.
-
-This doesn't seem like a problem, eh?
-
-Well think of it this way: the main application and its many
-subcomponents can potentially embody a tremendous number of states. But
-working against a single instance of the application only lets you
-look at one state at a time. What if you could work on the application
-or component in several states at the same time? This is a powerful
-multiplier. You are increasing the bandwidth of the feedback you are
-getting while working on your code.
-
-Another problem is that we often manually place our components into
-different **important** states to run them through their paces as we
-develope them. But ... these test states are **ephemeral**. Wouldn't
-it be better to **keep** a development "page" as a permanent asset
-where these components are displayed in these various states as a
-
-* a lab space for future development
-* a code reference for new developers, and your future self
-* a tool for QA and application testers
-
-Developing inside the main application is constraining and it isn't
-until you develop inside a larger application that you can see this
-more clearly. With a meta application, you now have a space
-to try things out that **do not have to interface or fit into the main
-application**. This is extremely important as it gives you space to try new
-things.
-
-This is experiential. Until you actually try this its going to just
-seem novel. However, the experience is compelling.
-
-Devcards is one way to approach this problem.
-
-Read: [The Hard Sell](http://rigsomelight.com/devcards/#!/devdemos.core) 
-
-[See the introduction video.](https://vimeo.com/97078905)
-
 <img src="https://s3.amazonaws.com/bhauman-blog-images/devcards-action-shot.png"/>
 
 For example, the following code will create a *card* for a Sablono
@@ -80,6 +37,50 @@ template that you might be working on:
 When used with [lein-figwheel][leinfigwheel], saving the file that
 contains this definition will cause this Sablono template to be
 rendered into the Devcards interface.
+
+Read: [The Hard Sell](http://rigsomelight.com/devcards/#!/devdemos.core) 
+
+[See the introduction video.](https://vimeo.com/97078905)
+
+# Why???
+
+We primarily design and iterate on our front end applications *inside*
+the main application itself. In other words, our execution environment
+is constrained by the shape and demands of the application we are
+working on. This is extremely limiting.
+
+This doesn't seem like a problem, eh?
+
+Well think of it this way: the main application and its many
+subcomponents can potentially embody a tremendous number of states. But
+working against a single instance of the application only lets you
+look at one state at a time. What if you could work on the application
+or component in several states at the same time? This is a powerful
+multiplier. You are **increasing the bandwidth of the feedback** you are
+getting while working on your code.
+
+Another problem is that we often manually place our components into
+different **important** states to run them through their paces as we
+develope them. But ... these test states are **ephemeral**. Wouldn't
+it be better to **keep** a development "page" as a permanent asset
+where these components are displayed in these various states as a
+
+* a lab space for future development
+* a code reference for new developers, and your future self
+* a tool for QA and application testers
+
+Developing inside the main application is constraining and it isn't
+until you develop inside a **meta application** that you can see this
+more clearly. With a meta application, you now have a space to try
+things out that **do not have to interface or fit into the main
+application**. This is extremely important as it gives you space to
+try new things without the cost that is currently associated with
+experiements (branching, new html host file, etc).
+
+This is experiential. Until you actually try this, it's going to just
+seem novel. However, the experience is another thing altogether.
+
+
 
 ## Examples
 
