@@ -61,7 +61,7 @@ getting while working on your code.
 
 Another problem is that we often manually place our components into
 different **important** states to run them through their paces as we
-develope them. But ... these test states are **ephemeral**. Wouldn't
+develop them. But ... these test states are **ephemeral**. Wouldn't
 it be better to **keep** a development "page" as a permanent asset
 where these components are displayed in these various states as a
 
@@ -75,12 +75,10 @@ more clearly. With a meta application, you now have a space to try
 things out that **do not have to interface or fit into the main
 application**. This is extremely important as it gives you space to
 try new things without the cost that is currently associated with
-experiements (branching, new html host file, etc).
+experiments (branching, new html host file, etc).
 
 This is experiential. Until you actually try this, it's going to just
-seem novel. However, the experience is another thing altogether.
-
-
+seem novel. The experience, however, is compelling.
 
 ## Examples
 
