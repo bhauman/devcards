@@ -72,8 +72,8 @@ where these components are displayed in these various states as a
 One more thing: developing your components in a different context than
 your main application **starkly reveals environmental coupling**, in
 the same way that unit tests often do. This can lead to developing
-components that are more independent than ones that are developed
-inside main app.
+components that are more independent than the ones that are developed
+inside the main app.
 
 Developing inside the main application is constraining and it isn't
 until you develop inside a **meta application** that you can see this
