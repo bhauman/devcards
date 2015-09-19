@@ -83,8 +83,7 @@ application**. This is extremely important as it gives you space to
 try new things without the cost that is currently associated with
 experiments (branching, new html host file, etc).
 
-This is experiential. Until you actually try this, it's going to just
-seem novel. The experience, however, is compelling.
+The experience is compelling.
 
 ## Examples
 
