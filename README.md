@@ -215,7 +215,7 @@ but there are three things that you will need to do.
 
 #### You need to specify `:devcards true` **in the build-options** of your ClojureScript build
 
-```
+```clojure
 { :main    "{{name}}.core"
   :devcards true
   :asset-path "js/compiled/devcards_out"
@@ -227,8 +227,7 @@ but there are three things that you will need to do.
 This is important as it is a signal to the `defcard` macro to render
 the cards.
 
-#### You will need to require `devcards.core` along with the macros in
-    the files that use devcards as such:
+#### You will need to require `devcards.core` in the files that use devcards as such:
 
 ```clojure
 (ns example.core
@@ -242,7 +241,7 @@ the cards.
   (sab/html [:h1 "Devcards is freaking awesome!"]))
 ```
 
-This isn't required with figwheel because it puts devcards into the
+This isn't required with figwheel because it puts `devcards.core` into the
 build automatically.
 
 #### You will need to start the Devcards UI.
