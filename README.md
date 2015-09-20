@@ -206,12 +206,11 @@ This will create a card in the devcards interface.
 
 Take a look at [the `defcard` api](http://rigsomelight.com/devcards/#!/devdemos.defcard_api) ([src](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/defcard_api.cljs))
 
-## Devcards without figwheel
+## Devcards without Figwheel
 
 Figwheel does some magic so that devcards can be included or excluded
 from your code easily. You can certainly use Devcards without figwheel,
 but there are three things that you will need to do.
-
 
 #### You need to specify `:devcards true` **in the build-options** of your ClojureScript build
 
@@ -232,10 +231,10 @@ the cards.
 ```clojure
 (ns example.core
   (:require
-   [devcards.core :as dc]
-   [sablono.core :as sab]) ; just for example
+   [devcards.core :as dc] ; <-- here
+   [sablono.core :as sab]) ; just for this example
   (:require-macros
-   [devcards.core :refer [defcard]]))
+   [devcards.core :refer [defcard]])) ; <-- and here
 
 (defcard my-first-card
   (sab/html [:h1 "Devcards is freaking awesome!"]))
@@ -244,7 +243,7 @@ the cards.
 This isn't required with figwheel because it puts `devcards.core` into the
 build automatically.
 
-#### You will need to start the Devcards UI.
+#### You will need to start the Devcards UI
 
 ```
 (devcards.core/start-devcard-ui!)
