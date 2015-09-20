@@ -15,8 +15,8 @@ checkouts/
 .lein-classpath
 .rbenv-version
 config.ru
-resources/public/js/compiled/*
-resources/public/devcards/js/compiled/*
+example-resources/public/js/compiled/*
+example-resources/public/devcards/js/compiled/*
 .\#*
 \#*
 

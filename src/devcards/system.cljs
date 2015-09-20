@@ -60,7 +60,8 @@
       (when-not (get-element-by-id "com-rigsomelight-code-highlight-css")
         (.appendChild head
                       (create-style-element "com-rigsomelight-code-highlight-css"
-                                            (inline-resouce-file "public/devcards/css/github.css"))))
+                                            (inline-resouce-file "public/devcards/css/com_rigsomelight_github_highlight.css"))))
+
       
       (when-not (get-element-by-id "com-rigsomelight-devcards-css")
         (.appendChild head (create-style-element "com-rigsomelight-devcards-css"
