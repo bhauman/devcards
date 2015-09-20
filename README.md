@@ -206,6 +206,56 @@ This will create a card in the devcards interface.
 
 Take a look at [the `defcard` api](http://rigsomelight.com/devcards/#!/devdemos.defcard_api) ([src](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/defcard_api.cljs))
 
+## Devcards without figwheel
+
+Figwheel does some magic so that devcards can be included or excluded
+from you code easily. You can certainly use Devcards without figwheel,
+but there are three things that you will need to do.
+
+There are three requirements for devcards to work without Figwheel.
+
+1. You need to specify `:devcards true` **in the build-options** of your ClojureScript build**
+
+```
+{ :main    "{{name}}.core"
+  :devcards true
+  :asset-path "js/compiled/devcards_out"
+  :output-to  "resources/public/js/{{sanitized}}_devcards.js"
+  :output-dir "resources/public/js/devcards_out"
+  :source-map-timestamp true }
+```
+
+This is important as it is a signal to the `defcard` macro to render
+the cards.
+
+2. You will need to require `devcards.core` along with the macros in
+the files that use devcards as such:
+
+```clojure
+(ns example.core
+  (:require
+   [devcards.core :as dc]
+   [sablono.core :as sab]) ; just for example
+  (:require-macros
+   [devcards.core :refer [defcard]]))
+
+(defcard my-first-card
+  (sab/html [:h1 "Devcards is freaking awesome!"]))
+```
+
+This isn't required with figwheel because it puts devcards into the
+build automatically.
+
+2. You will need to start the Devcards UI.
+
+```
+(devcards.core/start-devcard-ui!)
+```
+
+As mentioned above, you don't want the Devcards UI to compete with
+your application's UI so you will want to make sure it isn't getting
+launched.
+
 ## FAQ
 
 #### Does Devcards only work with React or Om?
