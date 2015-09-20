@@ -212,7 +212,8 @@ Figwheel does some magic so that devcards can be included or excluded
 from your code easily. You can certainly use Devcards without figwheel,
 but there are three things that you will need to do.
 
-1. You need to specify `:devcards true` **in the build-options** of your ClojureScript build**
+
+* You need to specify `:devcards true` **in the build-options** of your ClojureScript build
 
 ```
 { :main    "{{name}}.core"
@@ -226,8 +227,8 @@ but there are three things that you will need to do.
 This is important as it is a signal to the `defcard` macro to render
 the cards.
 
-2. You will need to require `devcards.core` along with the macros in
-the files that use devcards as such:
+* You will need to require `devcards.core` along with the macros in
+    the files that use devcards as such:
 
 ```clojure
 (ns example.core
@@ -244,7 +245,7 @@ the files that use devcards as such:
 This isn't required with figwheel because it puts devcards into the
 build automatically.
 
-2. You will need to start the Devcards UI.
+* You will need to start the Devcards UI.
 
 ```
 (devcards.core/start-devcard-ui!)
