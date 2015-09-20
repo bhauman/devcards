@@ -208,8 +208,8 @@ Take a look at [the `defcard` api](http://rigsomelight.com/devcards/#!/devdemos.
 
 ## Devcards without Figwheel
 
-Figwheel does some magic so that devcards can be included or excluded
-from your code easily. You can certainly use Devcards without figwheel,
+Figwheel does some magic so that Devcards can be included or excluded
+from your code easily. You can certainly use Devcards without Figwheel,
 but there are three things that you will need to do.
 
 #### You need to specify `:devcards true` **in the build-options** of your ClojureScript build
@@ -240,7 +240,7 @@ the cards.
   (sab/html [:h1 "Devcards is freaking awesome!"]))
 ```
 
-This isn't required with figwheel because it puts `devcards.core` into the
+This isn't required with Figwheel because it puts `devcards.core` into the
 build automatically.
 
 #### You will need to start the Devcards UI
