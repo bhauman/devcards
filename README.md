@@ -143,7 +143,7 @@ interface responds.
 First make sure you include the following `:dependencies` in your `project.clj` file.
 
 ```clojure
-[org.clojure/clojurescript "0.0-3308"]
+[org.clojure/clojurescript "1.7.122"]
 [devcards "0.2.0-SNAPSHOT"]
 ```
 
