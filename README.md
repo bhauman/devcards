@@ -161,9 +161,9 @@ Configure your devcards build:
    {:id "devcards"
     :source-paths ["src"]   
     :figwheel { :devcards true } ;; <- note this
-    :compiler { :main    "{{name}}.core"
+    :compiler { :main    "{{your lib name}}.core"
                 :asset-path "js/compiled/devcards_out"
-                :output-to  "resources/public/js/{{sanitized}}_devcards.js"
+                :output-to  "resources/public/js/{{your lib name}}_devcards.js"
                 :output-dir "resources/public/js/devcards_out"
                 :source-map-timestamp true }}]
 }                
