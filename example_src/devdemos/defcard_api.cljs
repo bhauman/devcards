@@ -74,7 +74,7 @@
   ## What's in a name?
 
   The first optional arg to `defcard` is the **name**. This is a
-  symbol and it is used to provide a distinct key for your the card
+  symbol and it is used to provide a distinct key for the card
   you are creating. 
 
   For cards that aren't stateful like documentation and such the name
