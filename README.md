@@ -90,8 +90,6 @@ application**. This is extremely important as it gives you space to
 try new things without the cost that is currently associated with
 experiments (branching, new html host file, etc).
 
-Devcards tries to provide such a lab space.
-
 ## Examples
 
 Regardless of which path you take to get started with Devcards please
