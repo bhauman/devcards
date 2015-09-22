@@ -69,11 +69,18 @@ where these components are displayed in these various states as a
 * a code reference for new developers, and your future self
 * a tool for QA and application testers
 
-One more thing: developing your components in a different context than
-your main application **starkly reveals environmental coupling**, in
-the same way that unit tests often do. This can lead to developing
-components that are more independent than the ones that are developed
-inside the main app.
+Developing your components in a different context than your main
+application **starkly reveals environmental coupling**, in the same
+way that unit tests often do. This can lead to developing components
+that are more independent than the ones that are developed inside the
+main app.
+
+One more thing: developing your components in a SPA that isn't your
+main application provides you a space to create and use visual
+components that are intended to help you understand the code you are
+working on. We are UI programmers after all, why wait for IDEs to
+create the tools we need? Most problems are unique and can benefit
+tremendously from the creation of a very thin layer of custom tooling.
 
 Developing inside the main application is constraining and it isn't
 until you develop inside a **meta application** that you can see this
@@ -82,6 +89,8 @@ things out that **do not have to interface or fit into the main
 application**. This is extremely important as it gives you space to
 try new things without the cost that is currently associated with
 experiments (branching, new html host file, etc).
+
+Devcards tries to provide such a lab space.
 
 ## Examples
 
