@@ -123,7 +123,7 @@ lein figwheel
 
 to start the figwheel interactive devserver.
 
-Then visit `http://localhost:3449/devcards.html`
+Then visit `http://localhost:3449/cards.html`
 
 ## Quick Trial
 
