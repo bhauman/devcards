@@ -42,6 +42,8 @@ Read: [The Hard Sell](http://rigsomelight.com/devcards/#!/devdemos.core)
 
 [See the introduction video.](https://vimeo.com/97078905)
 
+[See the Strange Loop talk.](https://www.youtube.com/watch?v=G7Z_g2fnEDg)
+
 # Why???
 
 We primarily design and iterate on our front end applications *inside*
