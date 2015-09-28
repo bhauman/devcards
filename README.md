@@ -1,5 +1,8 @@
 # Devcards
 
+### Current release:
+[![Clojars Project](https://clojars.org/devcards/latest-version.svg)](https://clojars.org/lein-figwheel)
+
 Devcards aims to provide ClojureScript developers with an interactive
 visual REPL. Devcards makes it simple to interactively surface code
 examples that have a visual aspect into a browser interface. 
@@ -153,7 +156,7 @@ First make sure you include the following `:dependencies` in your `project.clj` 
 
 ```clojure
 [org.clojure/clojurescript "1.7.122"]
-[devcards "0.2.0-SNAPSHOT"]
+[devcards "0.2.0]
 ```
 
 lein figwheel is not required to use Devcards but ... if you want to
