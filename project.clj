@@ -1,5 +1,5 @@
-(defproject devcards "0.2.0-SNAPSHOT"
-  :description "FIXME: write this!"
+(defproject devcards "0.2.0"
+  :description "Devcards is a ClojureScript library that provides a lab space to you develop your UI components independently and interactively."
   :url "http://github.com/bhauman/devcards"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
