@@ -123,7 +123,6 @@ indicates that your async tests threw an exception.
 All the tests after that exception will not be run.
 ")
 
-
 (set! devcards.core/test-timeout 800)
 
 (dc/deftest async-tester
@@ -140,7 +139,8 @@ All the tests after that exception will not be run.
                (<! (timeout 100))
                (is (= (+ 3 4 55555) 4) "Testing the adding")
                (is (= (+ 1 0 0 0) 1) "This shouldn't work")
-               (is (throw "heck"))
+               (is (throw "heck")) ;; all the tests from here down
+               ;; will not be rendered
                (is (= 1 3))              
                (is true)
                (done))))
