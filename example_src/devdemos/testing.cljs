@@ -36,7 +36,6 @@
                #_(is (throw "heck"))
                (is (= 1 3))              
                (is true)
-
                (done))))
   "## And here is more documentation"
   (t/testing "bad stuff"
@@ -52,11 +51,12 @@
   "## This is documentation
    It should work well"
   (testing "good stuff"
-    (is (= (+ 3 4 55555) 4) "Testing the adding")
+    (is (= (+ 3 4 55555) 5) "Testing the adding")
     (is (= (+ 1 0 0 0) 1) "This should work")
     (is (= 1 3))              
     (is false)
-    (is (throw "heck")))
+    (is (throw "heck"))
+    (is (js/asdf)))
   "## And here is more documentation"
   (t/testing "bad stuff"
     (is (= (+ 1 0 0 0) 1))        

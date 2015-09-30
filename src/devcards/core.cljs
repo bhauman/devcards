@@ -11,7 +11,7 @@
    [clojure.string :as string]
 
    [cljs.test]
-   [cljs.core.async :refer [put! chan timeout <! close!] :as async])
+   [cljs.core.async :refer [put! chan timeout <! close! alts!] :as async])
   (:require-macros
    [cljs-react-reload.core :refer [defonce-react-class def-react-class]]
    [cljs.core.async.macros :refer [go]]))
@@ -860,6 +860,8 @@
 
 ;; running tests synchronously
 
+(def test-timeout 800)
+
 (defonce test-channel (chan))
 
 (defn run-card-tests [test-thunks]
@@ -878,8 +880,12 @@
 (defonce test-loop
   (go
     (loop [{:keys [tests callback]} (<! test-channel)]
-      (callback (<! (run-card-tests tests)))
-      (recur (<! test-channel)))))
+      (when tests
+        (let [timer (timeout test-timeout)
+              [result ch] (alts! [(run-card-tests tests) timer])]
+          (when (not= ch timer)
+            (callback result))
+          (recur (<! test-channel)))))))
 
 (defn test-card-test-run [this tests]
   (put! test-channel {:tests tests
