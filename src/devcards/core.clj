@@ -114,6 +114,7 @@
        (~'-devcard-options [this# devcard-opts#]
          (assoc devcard-opts#
                 :main-obj ~main-obj-body
+                
                 :options (merge ~default-options-literal
                                 (devcards.core/assert-options-map (:options devcard-opts#))))))))
 
@@ -121,12 +122,10 @@
 
 (defmacro tests [& parts]
   (when (utils/devcards-active?)
-    `(create-idevcard
-      (devcards.core/test-card-help
+    `(devcards.core/test-card
                  ~@(map (fn [p] (if (string? p)
                                 `(fn [] (devcards.core/test-doc ~p))
-                                `(fn [] ~p))) parts))
-      {:frame false})))
+                                `(fn [] ~p))) parts))))
 
 (defmacro deftest [vname & parts]
   `(do

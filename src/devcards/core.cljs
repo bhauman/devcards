@@ -11,7 +11,7 @@
    [clojure.string :as string]
 
    [cljs.test]
-   [cljs.core.async :refer [put! chan timeout] :as async])
+   [cljs.core.async :refer [put! chan timeout <! close!] :as async])
   (:require-macros
    [cljs-react-reload.core :refer [defonce-react-class def-react-class]]
    [cljs.core.async.macros :refer [go]]))
@@ -806,16 +806,13 @@
       (reverse tests)))]))
 
 ;; This should be IDevcard at this point
-
-(defn render-test-frame [test-summary]
-  (let [path (:path devcards.system/*devcard-data*)
-        tests (:_devcards_collect_tests test-summary)
+(defn render-tests [this path test-summary]
+  (let [tests (:_devcards_collect_tests test-summary)
         some-tests (filter (fn [{:keys [type]}] (not= type :test-doc))
                       (:_devcards_collect_tests test-summary))
         total-tests (count some-tests)
         {:keys [fail pass error]} (:report-counters test-summary)]
-    (fn [data-atom owner]
-      (sab/html
+    (sab/html
        [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
         [:div.com-rigsomelight-devcards-panel-heading
          [:a
@@ -830,7 +827,7 @@
           {:style {:float "right"
                    :margin "3px 3px"}
            :onClick (dev/prevent->
-                     #(swap! data-atom assoc :filter identity))}
+                     (fn [] (.setState this #js {:filter identity})))}
           total-tests]
          (when-not (zero? (+ fail error))
            (sab/html
@@ -840,8 +837,10 @@
                       :color "#fff"
                       :margin "3px 3px"}
               :onClick (dev/prevent->
-                        #(swap! data-atom assoc :filter (fn [{:keys [type]}]
-                                                          (#{:fail :error} type))))}
+                        (fn []
+                          (.setState this
+                                     #js {:filter (fn [{:keys [type]}]
+                                                    (#{:fail :error} type))})))}
              (str (+ fail error))]))          
          (when-not (zero? pass)
            (sab/html
@@ -851,17 +850,72 @@
                       :color "#fff"
                       :margin "3px 3px"}
               :onClick (dev/prevent->
-                        #(swap! data-atom assoc :filter (fn [{:keys [type]}] (= type :pass)))) }
+                        (fn []
+                          (.setState this #js {:filter (fn [{:keys [type]}] (= type :pass))}))) }
              pass]))]
         [:div {:className devcards.system/devcards-rendered-card-class}
-         (layout-tests (filter (or (:filter @data-atom)
+         (layout-tests (filter (or (get-state this :filter)
                                    identity)
-                               tests))]]))))
+                               tests))]])))
 
-(defn- test-card-help [& test-thunks]
-  ;; its helpful to be in this namespace to pick up the extended report function.
-  (let [tests (run-test-block (fn [] (doseq [f test-thunks] (f))))]
-    (render-test-frame tests)))
+;; running tests synchronously
+
+(defonce test-channel (chan))
+
+(defn run-card-tests [test-thunks]
+  (let [out (chan)
+        test-env (assoc (cljs.test/empty-env)
+                        :reporter :_devcards_test_card_reporter)]
+    (cljs.test/set-env! test-env)
+    (let [tests (concat test-thunks
+                        [(fn []
+                           (put! out (cljs.test/get-and-clear-env!))
+                           (close! out))])]
+      (prn "Running tests!!")
+      (cljs.test/run-block tests)
+      out)))
+
+(defonce test-loop
+  (go
+    (loop [{:keys [tests callback]} (<! test-channel)]
+      (callback (<! (run-card-tests tests)))
+      (recur (<! test-channel)))))
+
+(defn test-card-test-run [this tests]
+  (put! test-channel {:tests tests
+                      :callback (fn [results] (.setState
+                                              this
+                                              #js {:test_results
+                                                   results}))}))
+
+(defonce-react-class TestDevcard
+  #js
+  {:componentWillMount
+   (fn []
+     (this-as
+      this
+      (when-let [test-thunks (get-props this :test_thunks)]
+        (test-card-test-run this test-thunks))))
+   :componentWillReceiveProps
+   (fn [next-props]
+     (this-as this
+              (when-let [test-thunks (aget next-props (name :test_thunks))]
+                (test-card-test-run this test-thunks))))
+   :render (fn []
+             (this-as
+              this
+              (let [test-summary (get-state this :test_results)
+                    path         (get-props this :path)]
+                (render-tests this path test-summary))))})
+
+(defn test-card [& test-thunks]
+  (reify
+    IDevcard
+    (-devcard [this devcard-opts]
+      (let [path (:path devcards.system/*devcard-data*)]
+        (js/React.createElement TestDevcard
+                                #js {:test_thunks test-thunks
+                                     :path path})))))
 
 ;; render namespace to string
 
