@@ -1,5 +1,8 @@
 # Devcards
 
+### Current release:
+[![Clojars Project](https://clojars.org/devcards/latest-version.svg)](https://clojars.org/lein-figwheel)
+
 Devcards aims to provide ClojureScript developers with an interactive
 visual REPL. Devcards makes it simple to interactively surface code
 examples that have a visual aspect into a browser interface. 
@@ -19,10 +22,6 @@ can be created and edited **"live"** in one's ClojureScript source
 files. Essentially lifting the code example out of the file into the
 browser for you to try out immediately.
 
-Read: [The Hard Sell](http://rigsomelight.com/devcards/#!/devdemos.core) 
-
-[See the introduction video.](https://vimeo.com/97078905)
-
 <img src="https://s3.amazonaws.com/bhauman-blog-images/devcards-action-shot.png"/>
 
 For example, the following code will create a *card* for a Sablono
@@ -41,6 +40,60 @@ template that you might be working on:
 When used with [lein-figwheel][leinfigwheel], saving the file that
 contains this definition will cause this Sablono template to be
 rendered into the Devcards interface.
+
+Read: [The Hard Sell](http://rigsomelight.com/devcards/#!/devdemos.core) 
+
+[See the introduction video.](https://vimeo.com/97078905)
+
+[See the Strange Loop talk.](https://www.youtube.com/watch?v=G7Z_g2fnEDg)
+
+# Why???
+
+We primarily design and iterate on our front end applications *inside*
+the main application itself. In other words, our execution environment
+is constrained by the shape and demands of the application we are
+working on. This is extremely limiting.
+
+This doesn't seem like a problem, eh?
+
+Well think of it this way: the main application and its many
+subcomponents can potentially embody a tremendous number of states. But
+working against a single instance of the application only lets you
+look at one state at a time. What if you could work on the application
+or component in several states at the same time? This is a powerful
+multiplier. You are **increasing the bandwidth of the feedback** you are
+getting while working on your code.
+
+Another problem is that we often manually place our components into
+different **important** states to run them through their paces as we
+develop them. But ... these test states are **ephemeral**. Wouldn't
+it be better to **keep** a development "page" as a permanent asset
+where these components are displayed in these various states as a
+
+* a lab space for future development
+* a code reference for new developers, and your future self
+* a tool for QA and application testers
+
+Developing your components in a different context than your main
+application **starkly reveals environmental coupling**, in the same
+way that unit tests often do. This can lead to developing components
+that are more independent than the ones that are developed inside the
+main app.
+
+One more thing: developing your components in a SPA that isn't your
+main application provides you a space to create and use visual
+components that are intended to help you understand the code you are
+working on. We are UI programmers after all, why wait for IDEs to
+create the tools we need? Most problems are unique and can benefit
+tremendously from the creation of a very thin layer of custom tooling.
+
+Developing inside the main application is constraining and it isn't
+until you develop inside a **meta application** that you can see this
+more clearly. With a meta application, you now have a space to try
+things out that **do not have to interface or fit into the main
+application**. This is extremely important as it gives you space to
+try new things without the cost that is currently associated with
+experiments (branching, new html host file, etc).
 
 ## Examples
 
@@ -75,7 +128,7 @@ lein figwheel
 
 to start the figwheel interactive devserver.
 
-Then visit `http://localhost:3449/devcards.html`
+Then visit `http://localhost:3449/cards.html`
 
 ## Quick Trial
 
@@ -102,8 +155,8 @@ interface responds.
 First make sure you include the following `:dependencies` in your `project.clj` file.
 
 ```clojure
-[org.clojure/clojurescript "0.0-3308"]
-[devcards "0.2.0-SNAPSHOT"]
+[org.clojure/clojurescript "1.7.122"]
+[devcards "0.2.0-1]
 ```
 
 lein figwheel is not required to use Devcards but ... if you want to
@@ -120,9 +173,9 @@ Configure your devcards build:
    {:id "devcards"
     :source-paths ["src"]   
     :figwheel { :devcards true } ;; <- note this
-    :compiler { :main    "{{name}}.core"
+    :compiler { :main    "{{your lib name}}.core"
                 :asset-path "js/compiled/devcards_out"
-                :output-to  "resources/public/js/{{sanitized}}_devcards.js"
+                :output-to  "resources/public/js/{{your lib name}}_devcards.js"
                 :output-dir "resources/public/js/devcards_out"
                 :source-map-timestamp true }}]
 }                
@@ -162,6 +215,53 @@ This will create a card in the devcards interface.
 
 
 Take a look at [the `defcard` api](http://rigsomelight.com/devcards/#!/devdemos.defcard_api) ([src](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/defcard_api.cljs))
+
+## Devcards without Figwheel
+
+Figwheel does some magic so that Devcards can be included or excluded
+from your code easily. You can certainly use Devcards without Figwheel,
+but there are three things that you will need to do.
+
+#### You need to specify `:devcards true` **in the build-options** of your ClojureScript build
+
+```clojure
+{ :main    "{{name}}.core"
+  :devcards true
+  :asset-path "js/compiled/devcards_out"
+  :output-to  "resources/public/js/{{sanitized}}_devcards.js"
+  :output-dir "resources/public/js/devcards_out"
+  :source-map-timestamp true }
+```
+
+This is important as it is a signal to the `defcard` macro to render
+the cards.
+
+#### You will need to require `devcards.core` in the files that use devcards as such:
+
+```clojure
+(ns example.core
+  (:require
+   [devcards.core :as dc] ; <-- here
+   [sablono.core :as sab]) ; just for this example
+  (:require-macros
+   [devcards.core :refer [defcard]])) ; <-- and here
+
+(defcard my-first-card
+  (sab/html [:h1 "Devcards is freaking awesome!"]))
+```
+
+This isn't required with Figwheel because it puts `devcards.core` into the
+build automatically.
+
+#### You will need to start the Devcards UI
+
+```
+(devcards.core/start-devcard-ui!)
+```
+
+As mentioned above, you don't want the Devcards UI to compete with
+your application's UI so you will want to make sure it isn't getting
+launched.
 
 ## FAQ
 

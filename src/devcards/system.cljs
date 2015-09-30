@@ -10,7 +10,8 @@
    [devcards.util.utils :as utils])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]
-   [devcards.system :refer [inline-resouce-file]])
+   [devcards.system :refer [inline-resouce-file]]
+   [cljs-react-reload.core :refer [defonce-react-class]])
   (:import
    [goog History]))
 
@@ -56,6 +57,12 @@
 (defn add-css-if-necessary! []
   (if-let [heads (.getElementsByTagName js/document "head")]
     (let [head (aget heads 0)]
+      (when-not (get-element-by-id "com-rigsomelight-code-highlight-css")
+        (.appendChild head
+                      (create-style-element "com-rigsomelight-code-highlight-css"
+                                            (inline-resouce-file "public/devcards/css/com_rigsomelight_github_highlight.css"))))
+
+      
       (when-not (get-element-by-id "com-rigsomelight-devcards-css")
         (.appendChild head (create-style-element "com-rigsomelight-devcards-css"
                                                  (inline-resouce-file "public/devcards/css/com_rigsomelight_devcards.css"))))
@@ -63,10 +70,7 @@
         (.appendChild head
                       (create-style-element "com-rigsomelight-edn-css"
                                             (inline-resouce-file "public/devcards/css/com_rigsomelight_edn_flex.css"))))
-      (when-not (get-element-by-id "com-rigsomelight-code-highlight-css")
-        (.appendChild head
-                      (create-style-element "com-rigsomelight-code-highlight-css"
-                                            (inline-resouce-file "public/devcards/css/github.css"))))
+
       ;; we are injecting conditionally so that we can skip mobile
       ;; and skip node
       ;; really not diggin this but ...
@@ -212,7 +216,7 @@
 
 (defn card-template [state-atom {:keys [path options func] :as card}]
   (sab/html
-   [:div {:key (path->unique-card-id path)}
+   [:div.com-rigsomelight-devcard {:key (path->unique-card-id path)}
     (cljs.core/binding [*devcard-data* card]
       (func))]))
 
@@ -278,12 +282,16 @@
                 {:style {:float "right"}}
                 (count child-tree)]
                [:span " " (name key)]]))
-           (sort-by (fn [[_ child-tree]] (-> child-tree first second :position -))  dirs))])))
+           (sort-by (fn [[key _]] (name key))  dirs))])))
 
 (defn main-template [state-atom]
   (let [data @state-atom]
     (sab/html
-     [:div.com-rigsomelight-devcards-base
+     [:div
+      {:className
+       (str "com-rigsomelight-devcards-base "
+            (when-let [n (first (:current-path data))]
+              (string/replace (name n) "." "-")))}
       #_[:div.com-rigsomelight-devcards-navbar
        [:div.com-rigsomelight-devcards-container
         [:span.com-rigsomelight-devcards-brand
@@ -297,38 +305,46 @@
        [:div
         (main-cards-template state-atom)]]])))
 
-;; enables the deletion of cards
+(defonce-react-class DevcardsRoot
+  #js {:componentDidMount
+       (fn []
+         (this-as this
+                  (add-watch app-state
+                             :renderer-watch
+                             (fn [_ _ _ _]
+                               (.forceUpdate this)))))
+       :render (fn [] (main-template app-state)) } )
+
 
 (defn renderer [state-atom]
   #_(prn "Rendering")
   (js/React.render
-   (sab/html [:div
+   (js/React.createElement DevcardsRoot)
+   #_(sab/html [:div
               (main-template state-atom)
               #_(edn-rend/html-edn @state-atom)])
    (devcards-app-node)))
 
 (comment
 
-  move highlighting out and force folks to require hljs if they want it?
-  
-  move nav into header
-  
-  an iterator to delinate a card in many states
-  
-  when initial state changes we should reset the state
-  
-  docs should not have frames too ugly ??
-
-  documentation should interpret non-strings as edn or use pprint
-  maybe we should expect code
-  
-  fall back to highlighted pprint on devcard main object display
-
-  speed test pprint and hightlighting versus edn-react
   
   a debug option :debug-card true
   
+  when initial state changes we should reset the state
+  
+  an iterator to delinate a card in many states
+
+  speed test pprint and hightlighting versus edn-renderer
+
+  use a pure component for the edn renderer to memoize rerenders
+
+  look at upndown.js and marked.js
+
+  probably switch to marked for markdown parsing
+  
   fix loading race
+
+  move highlighting out and force folks to require hljs if they want it?
   
   generate blog posts from a namespace with devcards
   - can implement code modules 
@@ -411,6 +427,7 @@
             (recur))))
       true)))
 
+
 (defn start-ui [channel]
   (defonce devcards-ui-setup
     (do
@@ -430,7 +447,7 @@
         ;; escape core async context for better errors
         (js/setTimeout #(renderer app-state) 0)
 
-        (js/setTimeout #(add-watch app-state :devcards-render
+        #_(js/setTimeout #(add-watch app-state :devcards-render
                                    (fn [_ _ _ _] (renderer app-state))) 0)
 
         (js/setTimeout #(hash-routing-init app-state) 0)

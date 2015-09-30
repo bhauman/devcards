@@ -3,7 +3,8 @@
    [devcards.util.utils :as utils]
    [cljs.compiler :refer (munge)]
    [cljs.analyzer :as ana]
-   [cljs.analyzer.api :as ana-api]   
+   [cljs.analyzer.api :as ana-api]
+   [cljs.repl]
    [cljs.test]
    [cljs.env]
    [clojure.pprint :refer [with-pprint-dispatch code-dispatch pprint]]
@@ -113,6 +114,7 @@
        (~'-devcard-options [this# devcard-opts#]
          (assoc devcard-opts#
                 :main-obj ~main-obj-body
+                
                 :options (merge ~default-options-literal
                                 (devcards.core/assert-options-map (:options devcard-opts#))))))))
 
@@ -120,12 +122,10 @@
 
 (defmacro tests [& parts]
   (when (utils/devcards-active?)
-    `(create-idevcard
-      (devcards.core/test-card-help
+    `(devcards.core/test-card
                  ~@(map (fn [p] (if (string? p)
                                 `(fn [] (devcards.core/test-doc ~p))
-                                `(fn [] ~p))) parts))
-      {:frame false})))
+                                `(fn [] ~p))) parts))))
 
 (defmacro deftest [vname & parts]
   `(do
@@ -158,7 +158,7 @@
           (om.core/root ~om-comp-fn data-atom#
                         (merge ~om-options
                                {:target node#}))))
-       {:watch-atom false})))
+       {:watch-atom true})))
   ([om-comp-fn]
    (when (utils/devcards-active?)
      `(om-root ~om-comp-fn {}))))
@@ -178,12 +178,17 @@
   (when (utils/devcards-active?)
     `(devcards.util.utils/pprint-code ~obj)))
 
-(defmacro mkdn-code [body] `(str "\n```\n" ~body "```\n"))
+(defmacro mkdn-code [body] `(str "\n```clojure\n" ~body "\n```\n"))
 
 (defmacro mkdn-pprint-code [obj]
   (when (utils/devcards-active?)
     `(mkdn-code
       (devcards.util.utils/pprint-code ~obj))))
+
+(defmacro mkdn-pprint-source [obj]
+  (when (utils/devcards-active?)
+    `(mkdn-code
+       ~(or (cljs.repl/source-fn &env obj) (str "Source not found")))))
 
 (defmacro mkdn-pprint-str [obj]
   (when (utils/devcards-active?)

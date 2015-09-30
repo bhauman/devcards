@@ -11,14 +11,7 @@
    [clojure.string :as string]
 
    [cljs.test]
-   [cljs.core.async :refer [put! chan timeout] :as async]
-   #_[cljsjs.highlight]
-   #_[cljsjs.highlight.langs.clojure]
-   #_[cljsjs.highlight.langs.javascript]
-   #_[cljsjs.highlight.langs.bash]
-   #_[cljsjs.highlight.langs.css]
-   #_[cljsjs.highlight.langs.xml]
-   #_[cljsjs.highlight.langs.markdown])
+   [cljs.core.async :refer [put! chan timeout <! close! alts!] :as async])
   (:require-macros
    [cljs-react-reload.core :refer [defonce-react-class def-react-class]]
    [cljs.core.async.macros :refer [go]]))
@@ -107,6 +100,10 @@
                     :ref "code-ref"}
              (get-props this :code)]])))})
 
+(defn code-highlight [code-str lang]
+  (js/React.createElement CodeHighlight #js {:code code-str
+                                             :lang lang}))
+
 (defmulti markdown-block->react :type)
 
 (defmethod markdown-block->react :default [{:keys [content]}]
@@ -115,18 +112,24 @@
 (defmethod markdown-block->react :code-block [{:keys [content] :as block}]
   (js/React.createElement CodeHighlight #js {:code (:content block) :lang (:lang block)}))
 
+(declare react-element?)
+
 (defn markdown->react [& strs]
-  (if (every? string? strs)
-    (let [blocks (mapcat mark/parse-out-blocks strs)]
-      (sab/html
-       [:div.com-rigsomelight-devcards-markdown.working
-        (map markdown-block->react blocks)]))
-    (do
-      (let [message "Devcards Error: Didn't pass a seq of strings to less-sensitive-markdown. 
+  (let [strs (map (fn [x] (if (string? x)
+                           x
+                           (when-not (react-element? x)
+                             (str "```clojure\n" (utils/pprint-code x) "```\n")))) strs)]
+    (if (every? string? strs)
+      (let [blocks (mapcat mark/parse-out-blocks strs)]
+        (sab/html
+         [:div.com-rigsomelight-devcards-markdown.working
+          (map markdown-block->react blocks)]))
+      (do
+        (let [message "Devcards Error: Didn't pass a seq of strings to less-sensitive-markdown. 
  You are probably trying to pass react to markdown instead of strings. (defcard-doc (doc ...)) won't work."]
-        (try (.error js/console message))
-            (sab/html [:div {:style {:color "#a94442"}}
-                       message])))))
+          (try (.error js/console message))
+          (sab/html [:div {:style {:color "#a94442"}}
+                     message]))))))
 
 ;; returns a react component of rendered edn
 
@@ -191,7 +194,8 @@
   (when (.-state this)
     (aget (.-state this) (name k))))
 
-(defonce-react-class DontUpdate
+;; this is not currently being used
+#_(defonce-react-class DontUpdate
   #js {:shouldComponentUpdate
        (fn [a b] false)
        :render
@@ -200,7 +204,8 @@
           this
           (sab/html [:div (get-props this :children_thunk)])))})
 
-(defn dont-update [children-thunk]
+;; this is not currently being used
+#_(defn dont-update [children-thunk]
   (js/React.createElement DontUpdate
                           #js { :children_thunk children-thunk}))
 
@@ -215,10 +220,24 @@
     (fn [this] (get-state this :data_atom))
     (fn [this] (wrangle-inital-data this))))
 
+(declare atom-like?)
+
 (defonce-react-class DevcardBase
   #js {:getInitialState
        (fn []
          #js {:unique_id (gensym 'devcards-base-)})
+       :componentDidUpdate
+       (fn [_ _]
+         (this-as
+           this
+           (let [atom    (get-state this :data_atom)
+                 card    (get-props this :card)
+                 options (:options card)]
+             (when (:static-state options)
+               (let [initial-data (:initial-data card)
+                     data         (if (atom-like? initial-data) @initial-data initial-data)]
+                 (if (not= @atom data)
+                   (reset! atom data)))))))
        :componentWillMount
        (if (html-env?)
          (fn []
@@ -259,11 +278,13 @@
                  ;; loop
                  ;; maybe we should have a :render-to-string false
                  ;; option?
-                 main-obj  (let [m (:main-obj card)]
+                 main-obj'  (let [m (:main-obj card)]
                              (if (fn? m) (m data-atom this) m))
-                 main      (if (false? (:watch-atom options))
-                             (dont-update main-obj)
-                             main-obj)
+                 main-obj (if (and (not (nil? main-obj'))
+                                   (not (react-element? main-obj')))
+                             (code-highlight (utils/pprint-code main-obj') "clojure")
+                             main-obj') 
+                 main      main-obj
                  hist-ctl  (when (:history options)
                              (hist-recorder* data-atom))
                  document  (when-let [docu (:documentation card)]
@@ -301,6 +322,12 @@
                      (not= (get-props this :node_fn)
                            (aget prevP "node_fn")))
             (render-into-dom this))))
+       :componentWillUnmount
+       (fn []
+         (this-as
+          this
+          (when-let [node (ref->node this (get-state this :unique_id))]
+            (js/React.unmountComponentAtNode node))))
        :componentDidMount
        (fn [] (this-as this (render-into-dom this)))
        :render
@@ -309,7 +336,7 @@
            (this-as
             this
             (js/React.DOM.div
-             #js { :ref (get-state this :unique_id)}
+             #js { :className "com-rigsomelight-devcards-dom-node" :ref (get-state this :unique_id)}
              "Card has not mounted DOM node.")))
          (fn [] (js/React.DOM.div "Card has not mounted DOM node.")))})
 
@@ -340,21 +367,25 @@
                             options]} opts]
                 (concat
                  propagated-errors
-                 [(or (map? options) (nil? options)
+                 [(or (map? options) 
+                      (nil? options)
                       {:label   :options 
                        :message "should be a Map or nil"
                        :value options})
                   (stringer? :name opts)                
                   (stringer? :documentation opts)
-                  (or (nil? main-obj) (fn? main-obj) (react-element? main-obj)
-                      {:label   :main-obj
-                       :message "should be a function or a ReactElement or nil."
-                       :value main-obj})
-                  (or (nil? initial-data) (map? initial-data) (satisfies? IAtom initial-data)
+                  #_(or (nil? main-obj) (fn? main-obj) (react-element? main-obj)
+                        {:label   :main-obj
+                         :message "should be a function or a ReactElement or nil."
+                         :value main-obj})
+                  (or (nil? initial-data)
+                      (vector? initial-data)
+                      (map? initial-data)
+                      (satisfies? IAtom initial-data)
                       {:label :initial-data
                        :message "should be an Atom or a Map or nil."
                        :value initial-data})]
-                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history])))))
+                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history :static-state])))))
     [{:message "Card should be a Map."
       :value   opts}]))
 
@@ -367,6 +398,7 @@
                              :heading false
                              :padding false
                              :inspect-data true
+                             :static-state false
                              :watch-atom nil
                              :history nil})))
 
@@ -731,7 +763,7 @@
   (render-pass-fail m))
 
 (defmethod test-render :error [m]
-  (display-message m (sab/html  [:div [:strong "Error: "] [:code (:actual m)]])))
+  (display-message m (sab/html  [:div [:strong "Error: "] [:code (str (:actual m))]])))
 
 (defmethod test-render :test-doc [m]
   (sab/html [:div (markdown->react (:documentation m))]))
@@ -774,16 +806,15 @@
       (reverse tests)))]))
 
 ;; This should be IDevcard at this point
-
-(defn render-test-frame [test-summary]
-  (let [path (:path devcards.system/*devcard-data*)
+(defn render-tests [this path test-summary]
+  (let [error? (:error test-summary)
         tests (:_devcards_collect_tests test-summary)
         some-tests (filter (fn [{:keys [type]}] (not= type :test-doc))
                       (:_devcards_collect_tests test-summary))
         total-tests (count some-tests)
-        {:keys [fail pass error]} (:report-counters test-summary)]
-    (fn [data-atom owner]
-      (sab/html
+        {:keys [fail pass error]} (:report-counters test-summary)
+        error (if error? (inc error) error)]
+    (sab/html
        [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
         [:div.com-rigsomelight-devcards-panel-heading
          [:a
@@ -798,7 +829,7 @@
           {:style {:float "right"
                    :margin "3px 3px"}
            :onClick (dev/prevent->
-                     #(swap! data-atom assoc :filter identity))}
+                     (fn [] (.setState this #js {:filter identity})))}
           total-tests]
          (when-not (zero? (+ fail error))
            (sab/html
@@ -808,10 +839,12 @@
                       :color "#fff"
                       :margin "3px 3px"}
               :onClick (dev/prevent->
-                        #(swap! data-atom assoc :filter (fn [{:keys [type]}]
-                                                          (#{:fail :error} type))))}
+                        (fn []
+                          (.setState this
+                                     #js {:filter (fn [{:keys [type]}]
+                                                    (#{:fail :error} type))})))}
              (str (+ fail error))]))          
-         (when-not (zero? pass)
+         (when-not (or (nil? pass) (zero? pass))
            (sab/html
             [:button.com-rigsomelight-devcards-badge
              {:style {:float "right"
@@ -819,17 +852,85 @@
                       :color "#fff"
                       :margin "3px 3px"}
               :onClick (dev/prevent->
-                        #(swap! data-atom assoc :filter (fn [{:keys [type]}] (= type :pass)))) }
+                        (fn []
+                          (.setState this #js {:filter (fn [{:keys [type]}] (= type :pass))}))) }
              pass]))]
         [:div {:className devcards.system/devcards-rendered-card-class}
-         (layout-tests (filter (or (:filter @data-atom)
-                                   identity)
-                               tests))]]))))
+         (layout-tests (filter (or (get-state this :filter)
+                                    identity)
+                                tests))]])))
 
-(defn- test-card-help [& test-thunks]
-  ;; its helpful to be in this namespace to pick up the extended report function.
-  (let [tests (run-test-block (fn [] (doseq [f test-thunks] (f))))]
-    (render-test-frame tests)))
+;; running tests synchronously
+
+;; you can adjust testing timeouts by setting this variable
+(def test-timeout 800)
+
+(defonce test-channel (chan))
+
+(defn run-card-tests [test-thunks]
+  (let [out (chan)
+        test-env (assoc (cljs.test/empty-env)
+                        :reporter :_devcards_test_card_reporter)]
+    (cljs.test/set-env! test-env)
+    (let [tests (concat test-thunks
+                        [(fn []
+                           (put! out (cljs.test/get-current-env))
+                           (close! out))])]
+      (prn "Running tests!!")
+      (cljs.test/run-block tests)
+      out)))
+
+(defonce test-loop
+  (go
+    (loop [{:keys [tests callback]} (<! test-channel)]
+      (when tests
+        (let [timer (timeout test-timeout)
+              [result ch] (alts! [(run-card-tests tests) timer])]
+          (if (not= ch timer)
+            (callback result)
+            (do
+              (collect-test {:type :error :actual "Tests timed out. Please check Dev Console for Exceptions" })
+              (callback (assoc (cljs.test/get-current-env)
+                               :error "Execution timed out!"))))
+          (cljs.test/clear-env!)
+          (recur (<! test-channel)))))))
+
+
+(defn test-card-test-run [this tests]
+  (put! test-channel {:tests tests
+                      :callback (fn [results] (.setState
+                                              this
+                                              #js {:test_results
+                                                   results}))}))
+
+(defonce-react-class TestDevcard
+  #js
+  {:componentWillMount
+   (fn []
+     (this-as
+      this
+      (when-let [test-thunks (get-props this :test_thunks)]
+        (test-card-test-run this test-thunks))))
+   :componentWillReceiveProps
+   (fn [next-props]
+     (this-as this
+              (when-let [test-thunks (aget next-props (name :test_thunks))]
+                (test-card-test-run this test-thunks))))
+   :render (fn []
+             (this-as
+              this
+              (let [test-summary (get-state this :test_results)
+                    path         (get-props this :path)]
+                (render-tests this path test-summary))))})
+
+(defn test-card [& test-thunks]
+  (reify
+    IDevcard
+    (-devcard [this devcard-opts]
+      (let [path (:path devcards.system/*devcard-data*)]
+        (js/React.createElement TestDevcard
+                                #js {:test_thunks test-thunks
+                                     :path path})))))
 
 ;; render namespace to string
 

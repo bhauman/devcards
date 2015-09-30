@@ -22,7 +22,12 @@
 
 (defcard hello)
 
-(defcard #js {})
+(defcard "This should fall back to **pprint**"
+  #js {:beetle "juice"})
+
+(defcard
+  "This should fall back to **pprint**"
+  (to-array ["asdf" "asd"]))
 
 (defcard #js {} #js {})
 

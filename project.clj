@@ -1,23 +1,20 @@
-(defproject devcards "0.2.0-SNAPSHOT"
-  :description "FIXME: write this!"
+(defproject devcards "0.2.0-2"
+  :description "Devcards is a ClojureScript library that provides a lab space to you develop your UI components independently and interactively."
   :url "http://github.com/bhauman/devcards"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "0.0-3269"]
+                 [org.clojure/clojurescript "1.7.122"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [sablono "0.3.4"]
+                 [sablono "0.3.6"]
                  [cljsjs/react "0.13.1-0"]
-                 [cljsjs/react "0.13.1-0"]
-                 #_[cljsjs/highlight "8.4-0"]
-                 [cljs-react-reload "0.1.0"]
+                 [cljs-react-reload "0.1.1"]
                  [cljsjs/showdown "0.4.0-1"]]
 
   :source-paths ["src"]
 
-  :clean-targets ^{:protect false} ["resources/public/devcards/js/compiled/devdemos.js"
-                                    "resources/public/devcards/js/compiled/out"
+  :clean-targets ^{:protect false} ["example-resources/public/devcards/js/compiled"
                                     :target-path]
 
   :scm { :name "git"
@@ -27,8 +24,9 @@
    :dev {
       :dependencies [[org.omcljs/om "0.8.8"]
                      [reagent "0.5.0"]]                   
-      :plugins [[lein-cljsbuild "1.0.5"]
-                [lein-figwheel "0.3.7"]]
+      :plugins [#_[lein-cljsbuild "1.0.5"]
+                [lein-figwheel "0.4.0"]]
+      :resource-paths ["resources" "example-resources"]   
       :cljsbuild {
         :builds [{:id "devcards-demos"
                   :source-paths ["example_src" "src"]
@@ -37,8 +35,8 @@
                   :compiler {
                              :main "devdemos.start-ui"
                              :asset-path "js/compiled/out"
-                             :output-to "resources/public/devcards/js/compiled/devdemos.js"
-                             :output-dir "resources/public/devcards/js/compiled/out"
+                             :output-to "example-resources/public/devcards/js/compiled/devdemos.js"
+                             :output-dir "example-resources/public/devcards/js/compiled/out"
                              ;:recompile-dependents true                             
                              :optimizations :none
                              :source-map-timestamp true}}

@@ -1,4 +1,4 @@
-(ns ^:figwheel-always devdemos.defcard-api
+(ns devdemos.defcard-api
     (:require
      [devcards.core]
      [om.core :as om :include-macros true]
@@ -13,8 +13,8 @@
      ;; be created when the :devcards is set to true in the build config.
      [devcards.core :as dc :refer [defcard defcard-doc noframe-doc deftest dom-node]]))
 
-(defcard
- "#It all starts with `defcard`
+(defcard-doc
+  "#It all starts with `defcard`
 
    Once you have Devcards setup and have required the devcards macros as below
    ```clojure
@@ -26,13 +26,11 @@
    live into the browser. It can handle many types of data but
    primarily takes any type of ReactElement.
 
-   So this would be the \"Hello World\" of Devcards,
+   So this would be the \"Hello World\" of Devcards,"
 
-   ```clojure
-   (defcard (sab/html [:h3 \"Hello World!\"]))
-   ```
+  '(defcard (sab/html [:h3 "Hello world"]))
 
-   You can see this devcard rendered below:")
+  "You can see this devcard rendered below:")
 
 (defcard (sab/html [:h3 "Hello World!"]))
 
@@ -76,7 +74,7 @@
   ## What's in a name?
 
   The first optional arg to `defcard` is the **name**. This is a
-  symbol and it is used to provide a distinct key for your the card
+  symbol and it is used to provide a distinct key for the card
   you are creating. 
 
   For cards that aren't stateful like documentation and such the name

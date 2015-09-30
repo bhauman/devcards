@@ -1,6 +1,5 @@
 (ns 
   ^{:description "Devcards: A high level introduction."
-    :figwheel-always true
     :rigsomelight-post true}
   devdemos.core
     (:require
@@ -15,7 +14,8 @@
      ;; Notice that I am not including the 'devcards.core namespace
      ;; but only the macros. This helps ensure that devcards will only
      ;; be created when the :devcards is set to true in the build config.
-     [devcards.core :as dc :refer [defcard defcard-doc noframe-doc deftest dom-node]]))
+     [devcards.core :as dc :refer [defcard defcard-doc deftest dom-node]]))
+
 
 (def ^:export front-matter
   {:layout false
@@ -234,7 +234,6 @@
       (is (= (+ 1 0 0 0) 1))        
       (t/is (= (+ 3 4 55555) 4))
       (t/is false))))
-
 
 (defn om-slider [bmi-data param value min max]
   (sab/html
