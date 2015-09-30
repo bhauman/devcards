@@ -763,7 +763,7 @@
   (render-pass-fail m))
 
 (defmethod test-render :error [m]
-  (display-message m (sab/html  [:div [:strong "Error: "] [:code (:actual m)]])))
+  (display-message m (sab/html  [:div [:strong "Error: "] [:code (str (:actual m))]])))
 
 (defmethod test-render :test-doc [m]
   (sab/html [:div (markdown->react (:documentation m))]))
@@ -807,11 +807,13 @@
 
 ;; This should be IDevcard at this point
 (defn render-tests [this path test-summary]
-  (let [tests (:_devcards_collect_tests test-summary)
+  (let [error? (:error test-summary)
+        tests (:_devcards_collect_tests test-summary)
         some-tests (filter (fn [{:keys [type]}] (not= type :test-doc))
                       (:_devcards_collect_tests test-summary))
         total-tests (count some-tests)
-        {:keys [fail pass error]} (:report-counters test-summary)]
+        {:keys [fail pass error]} (:report-counters test-summary)
+        error (if error? (inc error) error)]
     (sab/html
        [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
         [:div.com-rigsomelight-devcards-panel-heading
@@ -842,7 +844,7 @@
                                      #js {:filter (fn [{:keys [type]}]
                                                     (#{:fail :error} type))})))}
              (str (+ fail error))]))          
-         (when-not (zero? pass)
+         (when-not (or (nil? pass) (zero? pass))
            (sab/html
             [:button.com-rigsomelight-devcards-badge
              {:style {:float "right"
@@ -855,11 +857,12 @@
              pass]))]
         [:div {:className devcards.system/devcards-rendered-card-class}
          (layout-tests (filter (or (get-state this :filter)
-                                   identity)
-                               tests))]])))
+                                    identity)
+                                tests))]])))
 
 ;; running tests synchronously
 
+;; you can adjust testing timeouts by setting this variable
 (def test-timeout 800)
 
 (defonce test-channel (chan))
@@ -871,7 +874,7 @@
     (cljs.test/set-env! test-env)
     (let [tests (concat test-thunks
                         [(fn []
-                           (put! out (cljs.test/get-and-clear-env!))
+                           (put! out (cljs.test/get-current-env))
                            (close! out))])]
       (prn "Running tests!!")
       (cljs.test/run-block tests)
@@ -883,9 +886,15 @@
       (when tests
         (let [timer (timeout test-timeout)
               [result ch] (alts! [(run-card-tests tests) timer])]
-          (when (not= ch timer)
-            (callback result))
+          (if (not= ch timer)
+            (callback result)
+            (do
+              (collect-test {:type :error :actual "Tests timed out. Please check Dev Console for Exceptions" })
+              (callback (assoc (cljs.test/get-current-env)
+                               :error "Execution timed out!"))))
+          (cljs.test/clear-env!)
           (recur (<! test-channel)))))))
+
 
 (defn test-card-test-run [this tests]
   (put! test-channel {:tests tests
