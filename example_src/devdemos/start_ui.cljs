@@ -9,9 +9,12 @@
    [devdemos.errors]
    [devdemos.extentions]
    [devdemos.edn-render]
-   [devdemos.css-opt-in]
+   [devdemos.css-opt-out]
    [devdemos.core]))
 
+;; The main function here is actually used in a documentation
+;; generator that I'm experimenting with. This is not needed
+;; with a standard Devcards setup!!
 
 (defn ^:export main []
   (devcards.core/start-devcard-ui!))

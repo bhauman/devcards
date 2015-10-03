@@ -1,4 +1,4 @@
-(ns ^:figwheel-load devdemos.css-opt-in
+(ns devdemos.css-opt-out
   (:require
    [sablono.core :as sab :include-macros true]
    [devcards.core :as dc]
@@ -9,21 +9,21 @@
 (defcard
   "# Devcards CSS
 
-Devcards includes its own CSS into the HTML document that hosts your
-cards. This is done because it is a bit awkward to get and include CSS
-and other assets from a jar file into an HTML file.
+Devcards inlines its own CSS into the `<head>` of HTML document that
+hosts your cards. This is done because it is a bit awkward to get and
+include CSS and other assets from a jar file into an HTML file.
 
-Inlining CSS into the document allows makes it much easier to initially setup Devcards.
+Inlining CSS into the document makes it much easier to initially setup Devcards.
 
-Right now there are four CSS files that are included.
+Right now there are four CSS files that are included:
 
 * Devcards main CSS (for card headings, ui and navigation)
 * Devcards addons CSS (adding default typography styles to the card body, etc)
 * EDN highlighting CSS (for the built in EDN renderer)
 * Code highlighting CSS (for highlight.js)
 
-If you inspect HEAD tag of this document or of your Devcards ui you
-will see three STYLE tags with these ids: 
+If you inspect `<head>` tag of this document or of your Devcards UI you
+will see four `<style>`  tags with these ids: 
 
 * `com-rigsomelight-devcards-css` 
 * `com-rigsomelight-devcards-addons-css` 
@@ -32,8 +32,10 @@ will see three STYLE tags with these ids:
 
 ## CSS override
 
-It is easy to opt out of devcards default CSS styling by adding
-elements with the above ids to your document.
+The way to override styles in Devcards may seem strange at first but
+it easily allows you to kill two birds with one stone. You can add a
+`<link>` to the style you want and by adding one of the above ids to
+that link you will be excluding the default inlined CSS.
 
 For example, you can override the Devcards CSS by putting a link
 to your own stylesheet into the head of your document and giving it the id
