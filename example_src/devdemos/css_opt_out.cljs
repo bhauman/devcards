@@ -15,7 +15,7 @@ include CSS and other assets from a jar file into an HTML file.
 
 Inlining CSS into the document makes it much easier to initially setup Devcards.
 
-Right now there are four CSS files that are included:
+There are four CSS files that are included:
 
 * Devcards main CSS (for card headings, ui and navigation)
 * Devcards addons CSS (adding default typography styles to the card body, etc)
@@ -32,29 +32,29 @@ will see four `<style>`  tags with these ids:
 
 ## CSS override
 
-The way to override styles in Devcards may seem strange at first but
+The way to override styles in Devcards may seem strange at first, but
 it easily allows you to kill two birds with one stone. You can add a
-`<link>` to the style you want and by adding one of the above ids to
-that link you will be excluding the default inlined CSS.
+`<link>` tag to the style you want and by adding one of the above `id`s to
+that link you will be **excluding** the default inlined CSS.
 
-For example, you can override the Devcards CSS by putting a link
-to your own stylesheet into the head of your document and giving it the id
+For example, you can override the standard Devcards CSS by putting a link
+to your own stylesheet into the head of your document and giving it the `id`
 of the inlined CSS that you are wanting to exclude:
 
 ```html
 <link id=\"com-rigsomelight-devcards-css\" href=\"my_style.css\" rel=\"stylesheet\" type=\"text/css\">
 ```
 
-The above will cause the original inlined addons CSS to be excluded
-and your custom CSS to be included.
-
-You can also simply exclude CSS by placing an empty tag with the
-correct id into your document. The following tag will exclude the
+You can also easily exclude CSS by placing an empty tag with the
+correct `id` into the `<head>` of your document. The following tag will exclude the
 Devcards addons CSS:
 
 ```html
 <style id=\"com-rigsomelight-devcards-addons-css\"></style>
 ```
+
+_I'm trying to keep extraneous CSS in the addons_
+
 
 You can find all the orginal CSS files here:
 [https://github.com/bhauman/devcards/blob/master/resources/public/devcards/css](https://github.com/bhauman/devcards/blob/master/resources/public/devcards/css)
