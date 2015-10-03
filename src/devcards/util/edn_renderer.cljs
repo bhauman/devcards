@@ -76,4 +76,4 @@
    :else        (literal "literal" x)))
 
 (defn html-edn [e]
-  (sab/html [:div.com-rigsomelight-rendered-edn (html e)]))
+  (sab/html [:div.com-rigsomelight-rendered-edn.com-rigsomelight-devcards-typog (html e)]))
