@@ -66,6 +66,9 @@
       (when-not (get-element-by-id "com-rigsomelight-devcards-css")
         (.appendChild head (create-style-element "com-rigsomelight-devcards-css"
                                                  (inline-resouce-file "public/devcards/css/com_rigsomelight_devcards.css"))))
+      (when-not (get-element-by-id "com-rigsomelight-devcards-addons-css")
+        (.appendChild head (create-style-element "com-rigsomelight-devcards-css"
+                                                 (inline-resouce-file "public/devcards/css/com_rigsomelight_devcards_addons.css"))))      
       (when-not (get-element-by-id "com-rigsomelight-edn-css")
         (.appendChild head
                       (create-style-element "com-rigsomelight-edn-css"

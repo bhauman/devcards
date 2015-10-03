@@ -1,6 +1,5 @@
 body {
     margin: 0px;
-    overflow-x: hidden;
 }
 
 body .hljs {
@@ -21,7 +20,7 @@ body .hljs {
     background-color: rgb(233,234,237);
 }
 
-.com-rigsomelight-devcards-markdown pre,lo
+.com-rigsomelight-devcards-markdown pre,
 .com-rigsomelight-devcards-test-line.com-rigsomelight-devcards-test-doc .com-rigsomelight-devcards-markdown pre
 {
   display: block;
@@ -53,16 +52,12 @@ body .hljs {
     padding-right: 14px;
 }
 
-
-
-.com-rigsomelight-devcards-card-hide-border .com-rigsomelight-devcards-markdown pre {
+.cccom-rigsomelight-devcards-card-hide-border .com-rigsomelight-devcards-markdown pre {
     margin-right: -3000px;
     margin-left: -3000px;
     padding-right: 3000px;
     padding-left: 3000px;        
 }
-
-
 
 /* end fremless markdown style */
 
@@ -470,7 +465,7 @@ button.com-rigsomelight-devcards-badge {
  
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 800px) {
   .com-rigsomelight-devcards-card-hide-border .com-rigsomelight-devcards-markdown pre {
       border: 1px solid #e1e1e1;
       border-radius: 4px;
