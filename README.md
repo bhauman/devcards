@@ -156,7 +156,7 @@ First make sure you include the following `:dependencies` in your `project.clj` 
 
 ```clojure
 [org.clojure/clojurescript "1.7.122"]
-[devcards "0.2.0-2"]
+[devcards "0.2.0-3"]
 ```
 
 lein figwheel is not required to use Devcards but ... if you want to
