@@ -69,11 +69,11 @@
    (keyword? x) (literal "keyword" x)
    (symbol? x)  (literal "symbol" x)
    (string? x)  (html-string x)
-   (map? x)     (html-map (into (sorted-map) x))
-   (set? x)     (html-collection "set"    "#{" "}" (into (sorted-set) x))
+   (map? x)     (html-map x)
+   (set? x)     (html-collection "set"    "#{" "}" x)
    (vector? x)  (html-collection "vector" "[" "]" x)
    (seq? x)     (html-collection "seq"    "(" ")" x)
    :else        (literal "literal" x)))
 
 (defn html-edn [e]
-  (sab/html [:div.com-rigsomelight-rendered-edn (html e)]))
+  (sab/html [:div.com-rigsomelight-rendered-edn.com-rigsomelight-devcards-typog (html e)]))
