@@ -122,7 +122,7 @@
     (if (every? string? strs)
       (let [blocks (mapcat mark/parse-out-blocks strs)]
         (sab/html
-         [:div.com-rigsomelight-devcards-markdown.working
+         [:div.com-rigsomelight-devcards-markdown.com-rigsomelight-devcards-typog
           (map markdown-block->react blocks)]))
       (do
         (let [message "Devcards Error: Didn't pass a seq of strings to less-sensitive-markdown. 
@@ -157,7 +157,7 @@
           (naked-card children card)])
         (sab/html
          [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad {:key (prn-str path)}
-          [:div.com-rigsomelight-devcards-panel-heading
+          [:div.com-rigsomelight-devcards-panel-heading.com-rigsomelight-devcards-typog
            (if path
              (sab/html
               [:a
@@ -815,7 +815,7 @@
         {:keys [fail pass error]} (:report-counters test-summary)
         error (if error? (inc error) error)]
     (sab/html
-       [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad
+       [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad.com-rigsomelight-devcards-typog
         [:div.com-rigsomelight-devcards-panel-heading
          [:a
           { :href "#"

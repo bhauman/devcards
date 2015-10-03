@@ -244,7 +244,7 @@
 
 (defn breadcrumbs-templ [crumbs state-atom]
   (sab/html
-   [:div.com-rigsomelight-devcards-card-base.com-rigsomelight-devcards-breadcrumbs
+   [:div.com-rigsomelight-devcards-card-base.com-rigsomelight-devcards-breadcrumbs.com-rigsomelight-devcards-typog
     (interpose
      (sab/html [:span.com-rigsomelight-devcards-breadcrumb-sep "/"])
      (map (fn [[n path]]
@@ -267,7 +267,7 @@
 (defn dir-links [dirs state-atom]
   (when-not (empty? dirs)
     (sab/html
-     [:div.com-rigsomelight-devcards-list-group
+     [:div.com-rigsomelight-devcards-list-group.com-rigsomelight-devcards-typog
       (map (fn [[key child-tree]]
              (sab/html
               [:a.com-rigsomelight-devcards-list-group-item
