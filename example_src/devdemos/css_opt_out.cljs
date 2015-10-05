@@ -9,11 +9,11 @@
 (defcard
   "# Devcards CSS
 
-Devcards inlines its own CSS into the `<head>` of HTML document that
-hosts your cards. This is done because it is a bit awkward to get and
-include CSS and other assets from a jar file into an HTML file.
+Devcards inlines its own CSS into the `<head>` of the HTML document that
+hosts your cards. This is done because it is awkward to get and
+include CSS and other assets from a CLJS library (in a jar file) into an HTML file.
 
-Inlining CSS into the document makes it much easier to initially setup Devcards.
+Inlining CSS into the document makes the initial setup of Devcards much easier.
 
 There are four CSS files that are included:
 
@@ -33,9 +33,9 @@ will see four `<style>`  tags with these ids:
 ## CSS override
 
 The way to override styles in Devcards may seem strange at first, but
-it easily allows you to kill two birds with one stone. You can add a
-`<link>` tag to the style you want and by adding one of the above `id`s to
-that link you will be **excluding** the default inlined CSS.
+it allows you to kill two birds with one stone. You can add a `<link>`
+tag to the style you want **and** at the same time, you can **exclude**
+inlined system CSS by adding one of the above `id`s to the same `<link>` tag.
 
 For example, you can override the standard Devcards CSS by putting a link
 to your own stylesheet into the head of your document and giving it the `id`
@@ -65,8 +65,9 @@ tricky CSS issues.
 
 ## Highlight.js
 
-Currently Devcards inlines a custom highlight.js library into the head
-of the your Devcards UI document. If you inspect the head of your
+Currently Devcards inlines a
+custom [Highlight.js](https://highlightjs.org/) library into the head
+of the your Devcards UI document. If you inspect the `<head>` of your
 document you will see the element with the id
 `com-rigsomelight-code-highlighting`. If you would like to prevent
 this or use another custom Highlight.js pack you can use a similar

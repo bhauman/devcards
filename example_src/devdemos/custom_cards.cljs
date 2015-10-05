@@ -28,6 +28,7 @@ Here is a sketch of such usage:
 
 (defcard state-over-time-view
   (fn [state _]
+    ;; return a ReactElement
     (sab/html 
       [:div 
          (your-component state)
@@ -59,18 +60,24 @@ convenient to use.
 
 ## Reaching into Devcards arguments with IDevcardOptions
 
-If you want to intercept the arguments that the `defcard` macro is
-receiving and alter them. You can do this with
+Using React components works great if you are focussing on the content
+area of a card. But sometimes you want to leverage the aregument
+parsing of the `defcard` macro and the functionality of the base
+devcard system itself.
+
+If you want to intercept the arguments that the `defcard` macro has
+parsed and alter them. You can do this with
 `devcards.core/IDevcardOptions`.
 
-Let's use this feature to discover the options that are passed to `-devcard-options`.
+Let's use `IDevcardOptions` to discover the options that are passed
+to its protocol method `-devcard-options`.
 
 ```clojure
 (defcard devcard-options-example-name
   \"Devcard options documentation.\"
   (reify dc/IDevcardOptions
     (-devcard-options [_ opts]
-      (assoc opts :main-obj opts))) ;; <-- alter :main-obj to be the opts
+      (assoc opts :main-obj opts))) ;; <-- alter :main-obj to be the passed in opts
   {:devcards-options-init-state true})
 ```
 
@@ -79,7 +86,7 @@ intercept the arguments that have been passed to the original
 `defcard`. You can see resulting card rendered below:
 ")
 
-(defcard devcard-options-example-name
+(defcard devcard-options-example-namee
   "Devcard options documentation."
   (reify dc/IDevcardOptions
     (-devcard-options [_ opts]
@@ -87,17 +94,18 @@ intercept the arguments that have been passed to the original
   {:devcards-options-init-state true})
 
 (defcard
-  "As you can see above, we are intercepting the options being sent to the
-  underlying devcards system.
+  "As you can see above, we are intercepting the options that were
+  parsed out by the `defcard` macro and we have a chance to operate on
+  them before they are sent to the underlying system.
   
-  These args are:
+  These options are:
 
-  * `:name` - the name of the card
+  * `:name` - the name of the card (changing this affects nothing)
   * `:documentation` - the docs associated with the card
   * `:main-obj` - the main object that is subject of display
   * `:initial-data` - the initial data for the card state atom
   * `:options`      - the options for the devcard system (like `:inspect-data true`)
-  * `:path` - the path to the card in the devcards interface (normally [ns var])
+  * `:path` - the path to the card in the devcards interface (normally `[ns var]`)
 
   You can alter any of these args before returning the `opts`.
 
@@ -112,6 +120,8 @@ intercept the arguments that have been passed to the original
               :this-is-a-changed-path-name]))))
 ```
 
+And you can see this card rendered below:
+
 ")
 
 
@@ -124,13 +134,13 @@ intercept the arguments that have been passed to the original
               :this-is-a-changed-path-name]))))
 
 (defcard
-  "So the above card's heading has been altered from `example-2` to
+  "The above card's heading has been altered from `example-2` to
   `this-is-a-changed-path-name`. We could have changed the `ns` part
   of the path name but then the card would no longer be on this page!
 
 You may have noticed that we are getting a JavaScript Object of some sort
 rendered in the body of the card. This is because the `:main-obj` is
-the reified IDevcardOptions. This is where the magic comes in. You can
+the reified instance of IDevcardOptions. This is where the magic comes in, you can
 specify any `:main-obj` you like.
 
 Here's an example where we create a `state-reset` control that we can
@@ -206,8 +216,8 @@ value.
   demonstrate that `IDevcardOptions` can offer a bit of flexibility
   when creating tools for devcards.
 
-  Don't forget you can wrap all of this in a macro to make a great
-  number of different tools.")
+  Don't forget you can wrap all of this in a macro to make expressive
+  consice tools for your workflow.")
 
 (defcard
   "## The `IDevcard` protocol
@@ -259,3 +269,25 @@ You can see this in action below
          :registered-card]
   :func (fn [] (sab/html [:h1 "** Registered card **"]))})
 
+(defcard
+  "## The `devcards.core/defcard*` macro
+
+The `devcard*` macro makes it easy to bypass base `devcard`
+functionality.
+
+It is defined as so:
+
+```clojure
+(defmacro defcard*
+  ([vname expr]
+   (when (utils/devcards-active?)
+     `(devcards.core/register-card  ~{:path (name->path &env vname)
+                                      :func  `(fn [] ~expr)}))))
+```
+
+As you can see it uses the `register-card` function but also captures
+path information. The `defcard*` macro can be helpful when composing
+your own macros for Devcards.
+
+
+")
