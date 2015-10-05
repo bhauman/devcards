@@ -1,6 +1,7 @@
 # Devcards
 
 ### Current release:
+
 [![Clojars Project](https://clojars.org/devcards/latest-version.svg)](https://clojars.org/devcards)
 
 Devcards aims to provide ClojureScript developers with an interactive

@@ -50,8 +50,11 @@
    can also keep them separate like a test suite.
 
    With [figwheel](https://github.com/bhauman/lein-figwheel), Devcards
-   configuration couldn't be simpler. Just add `[devcards
-   \"0.2.0-SNAPSHOT\"]` and create a new build config with `:figwheel
+   configuration couldn't be simpler. Just add 
+
+[![Clojars Project](https://clojars.org/devcards/latest-version.svg)](https://clojars.org/devcards)
+
+   to your dependencies and create a new build config with `:figwheel
    {:devcards true}`. See the Quick Start instructions at the end of
    this document.
 
@@ -68,7 +71,7 @@
    The [defcard api](#!/devdemos.defcard_api)
    is intended to be small and intuitive.
 
-   And you can see this devcard rendered below:")
+   You can see this devcard rendered below:")
 
 ;; code from the reagent page adapted to plain reagent
 (defn calc-bmi [bmi-data]
@@ -169,8 +172,8 @@
 
    Implementing your own cards is easy. You can simply create an
    arbitrary ReactElement and `defcard` will render it. If you want to
-   create a completely custom card there are the **IDevcardOptions**
-   and **IDevcard** protocols.
+   create a completely custom card there are the [**IDevcardOptions**
+   and **IDevcard** protocols](#!/devdemos.custom_cards).
    " )
 
 (defcard
@@ -234,6 +237,12 @@
       (is (= (+ 1 0 0 0) 1))        
       (t/is (= (+ 3 4 55555) 4))
       (t/is false))))
+
+(defcard
+  "You can learn more about testing with devcards [here](#!/devdemos.testing)"
+  )
+
+
 
 (defn om-slider [bmi-data param value min max]
   (sab/html
@@ -359,7 +368,11 @@
    requires a seperate build, similar to how you would create a test
    build.
 
-   Add `[devcards \"0.2.0-SNAPSHOT\"]` as a dependency.
+   Add
+
+[![Clojars Project](https://clojars.org/devcards/latest-version.svg)](https://clojars.org/devcards)
+
+as a dependency.
 
    Require the devcards macros: 
 
@@ -407,7 +420,7 @@
   ```
 
   A quick way to prevent your main application from running is to make
-  it conditional on the presense of the DOM node it's expecting to
+  it conditional on the presence of the DOM node it's expecting to
   mount and then just include that DOM node on HTML pages where your
   app is going to launch.
 
@@ -424,5 +437,54 @@
   For now refer to the
   [devcards-template](https://github.com/bhauman/devcards-template)
   for a more complete picture of setting up decards.
+
+## Devcards without Figwheel
+
+Figwheel does some magic so that Devcards can be included or excluded
+from your code easily. You can certainly use Devcards without Figwheel,
+but there are three things that you will need to do.
+
+#### You need to specify `:devcards true` **in the build-options** of your ClojureScript build
+
+```clojure
+{ :main    \"{{name}}.core\"
+  :devcards true
+  :asset-path \"js/compiled/devcards_out\"
+  :output-to  \"resources/public/js/{{sanitized}}_devcards.js\"
+  :output-dir \"resources/public/js/devcards_out\"
+  :source-map-timestamp true }
+```
+
+This is important as it is a signal to the `defcard` macro to render
+the cards.
+
+#### You will need to require `devcards.core` in the files that use devcards as such:
+
+```clojure
+(ns example.core
+  (:require
+   [devcards.core :as dc] ; <-- here
+   [sablono.core :as sab]) ; just for this example
+  (:require-macros
+   [devcards.core :refer [defcard]])) ; <-- and here
+
+(defcard my-first-card
+  (sab/html [:h1 \"Devcards is freaking awesome!\"]))
+```
+
+This isn't required with Figwheel because it puts `devcards.core` into the
+build automatically.
+
+#### You will need to start the Devcards UI
+
+```
+(devcards.core/start-devcard-ui!)
+```
+
+As mentioned above, you don't want the Devcards UI to compete with
+your application's UI so you will want to make sure it isn't getting
+launched.
+
+
   
   ")
