@@ -178,7 +178,7 @@
   will be interpreted as markdown.
 
   ``` 
-  (defcard (str \"This is the main object and it will be interpreted as markdown\"))
+  (defcard (str \"This is the main object and it **will** be interpreted as markdown\"))
   ```
 ")
 
