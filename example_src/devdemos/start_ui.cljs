@@ -11,6 +11,7 @@
    [devdemos.extentions]
    [devdemos.edn-render]
    [devdemos.css-opt-out]
+   [devdemos.custom-cards]
    [devdemos.core]))
 
 ;; The main function here is actually used in a documentation
