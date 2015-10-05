@@ -1,7 +1,7 @@
 # Devcards
 
 ### Current release:
-[![Clojars Project](https://clojars.org/devcards/latest-version.svg)](https://clojars.org/lein-figwheel)
+[![Clojars Project](https://clojars.org/devcards/latest-version.svg)](https://clojars.org/devcards)
 
 Devcards aims to provide ClojureScript developers with an interactive
 visual REPL. Devcards makes it simple to interactively surface code
