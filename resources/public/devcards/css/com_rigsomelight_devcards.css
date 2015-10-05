@@ -52,13 +52,6 @@ body .hljs {
     padding-right: 14px;
 }
 
-.cccom-rigsomelight-devcards-card-hide-border .com-rigsomelight-devcards-markdown pre {
-    margin-right: -3000px;
-    margin-left: -3000px;
-    padding-right: 3000px;
-    padding-left: 3000px;        
-}
-
 /* end fremless markdown style */
 
 .com-rigsomelight-devcards-padding-top-border {
