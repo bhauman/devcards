@@ -412,7 +412,7 @@
               (:message e)]
              [:span
               {:style { :flex "1 100px" }}
-              " Recieved: " [:code (pr-str (:value e))]]]))
+              " Received: " [:code (pr-str (:value e))]]]))
 
 (defn assert-options-map [m]
   (if-not (or (nil? m) (map? m))
