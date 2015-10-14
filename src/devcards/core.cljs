@@ -134,12 +134,15 @@
 ;; returns a react component of rendered edn
 
 (defn- naked-card [children card]
-  (sab/html
-   [:div
-    {:class
-     (str devcards.system/devcards-rendered-card-class
-          (if (get-in card [:options :padding]) " com-rigsomelight-devcards-devcard-padding" "")) }
-    children]))
+  (let [classname (get-in card [:options :classname])
+        padding?  (get-in card [:options :padding])]
+    (sab/html
+      [:div
+       {:class
+        (cond-> devcards.system/devcards-rendered-card-class
+          padding? (str " com-rigsomelight-devcards-devcard-padding")
+          (not-empty classname) (str " " classname))}
+       children])))
 
 (defn- frame
   ([children]
