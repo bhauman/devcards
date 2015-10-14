@@ -143,16 +143,16 @@ All the tests after that exception will not be run.
   "## This is an async test
    You should see some tests here"
 
-  (t/testing "yepo"
+  (t/testing "Let's run async tests!"
       (is (= (+ 3 4 55555) 4) "Testing the adding")
-      (is (= (+ 1 0 0 0) 1) "This shouldn't work")
+      (is (= (+ 1 0 0 0) 1) "This should work")
       (is (= 1 3))              
       (is true)
       (async done
              (go
                (<! (timeout 100))
                (is (= (+ 3 4 55555) 4) "Testing the adding")
-               (is (= (+ 1 0 0 0) 1) "This shouldn't work")
+               (is (= (+ 1 0 0 0) 1) "This should work")
                (is (throw "heck")) ;; all the tests from here down
                ;; will not be rendered
                (is (= 1 3))              
