@@ -8,7 +8,7 @@
                  [org.clojure/clojurescript "1.7.122"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [sablono "0.3.6"]
-                 [cljsjs/react "0.13.1-0"]
+                 [cljsjs/react "0.13.3-1"]
                  [cljs-react-reload "0.1.1"]
                  [cljsjs/showdown "0.4.0-1"]]
 
@@ -22,8 +22,8 @@
 
   :profiles {
    :dev {
-      :dependencies [[org.omcljs/om "0.8.8"]
-                     [reagent "0.5.0"]]                   
+      :dependencies [[org.omcljs/om "0.9.0"]
+                     [reagent "0.5.1"]]                   
       :plugins [#_[lein-cljsbuild "1.0.5"]
                 [lein-figwheel "0.4.0"]]
       :resource-paths ["resources" "example-resources"]   
