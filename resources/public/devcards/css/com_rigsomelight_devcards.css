@@ -82,19 +82,29 @@ body .hljs {
 
 }
 
+
 .com-rigsomelight-devcards-typog {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 1.42857143;
 }
 
-
+.com-rigsomelight-devcards-typog h1,
+.com-rigsomelight-devcards-typog h2,
+.com-rigsomelight-devcards-typog h3,
+.com-rigsomelight-devcards-typog h4,
+.com-rigsomelight-devcards-typog h5,
 .com-rigsomelight-devcards-markdown h1,
 .com-rigsomelight-devcards-markdown h2,
 .com-rigsomelight-devcards-markdown h3,
 .com-rigsomelight-devcards-markdown h4,
 .com-rigsomelight-devcards-markdown h5 {
     font-weight: 500;
+}
+
+.com-rigsomelight-devcards-typog a {
+    color: #428bca;
+    text-decoration: none;
 }
 
 .com-rigsomelight-devcards-markdown h1:first-child,
