@@ -21,3 +21,20 @@ body {
     font-size: 16px;
     line-height: 1.42857143;
 }
+
+.com-rigsomelight-devcards_rendered-card code {
+    font-size: 90%;
+}
+
+.com-rigsomelight-devcards-base h1,
+.com-rigsomelight-devcards-base h2,
+.com-rigsomelight-devcards-base h3,
+.com-rigsomelight-devcards-base h4,
+.com-rigsomelight-devcards-base h5 {
+    font-weight: 500;
+}
+
+.com-rigsomelight-devcards-base a {
+    color: #428bca;
+    text-decoration: none;
+}
