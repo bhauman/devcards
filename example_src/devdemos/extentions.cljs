@@ -58,11 +58,11 @@
   [:div
    [:p "I am a component!"]
    [:p.someclass
-    "I have " [:strong "bold"]
+    "I have " [:strong "bolder"]
     [:span {:style {:color "red"}} " and red "] "text."]])
 
 (defcard reagent
-  (rg/as-element simple-component))
+  (dc/reagent simple-component))
 
 
 (defonce click-count (rg/atom 0))
@@ -75,7 +75,9 @@
             :on-click #(swap! click-count inc)}]])
 
 (defcard reagent-counter
-  (dc/reagent (counting-component)))
+  (dc/reagent counting-component)
+  {}
+  {:inspect-data true})
 
 ;; experimenting with reloadable local state
 (defn elapsed-template [seconds-elapsed props]
