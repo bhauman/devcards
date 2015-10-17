@@ -70,7 +70,7 @@ body .hljs {
 
 .com-rigsomelight-devcards-markdown pre code {
   padding: 0;
-  font-size: inherit;
+  font-size: 1em;
   color: inherit;
   white-space: pre; 
   background-color: transparent;
