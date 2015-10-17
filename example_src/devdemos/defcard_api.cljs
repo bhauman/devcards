@@ -228,7 +228,7 @@
 (defcard
   "## Atoms are displayed as observed edn
 
-   When you pass an atom to `defcard` as the main object it's contents
+   When you pass an atom to `defcard` as the main object its contents
    will be rendered as edn. And when the atom changes so will the
    displayed edn.
    
@@ -385,18 +385,18 @@
 
   ```
   { 
-    :frame true         ;; wether to enclose the card in a padded frame
-    :heading true       ;; wether to add a heading panel to the card
-    :padding true       ;; wether to have padding around the body of the card
-    :hidden false       ;; wether to diplay the card or not
-    :inspect-data false ;; wether to display the data in the card atom
-    :watch-atom true    ;; wether to watch the atom and render on change 
-    :history false      ;; wether to record a change history of the atom
+    :frame true         ;; whether to enclose the card in a padded frame
+    :heading true       ;; whether to add a heading panel to the card
+    :padding true       ;; whether to have padding around the body of the card
+    :hidden false       ;; whether to diplay the card or not
+    :inspect-data false ;; whether to display the data in the card atom
+    :watch-atom true    ;; whether to watch the atom and render on change 
+    :history false      ;; whether to record a change history of the atom
     :classname ""       ;; provide card with a custom classname
   }
   ```
 
-  Most of these are farily straight forward. Whats important to know
+  Most of these are fairly straight forward. Whats important to know
   is that you can change any of these live and the card will respond
   with the new behavior.
 
@@ -410,7 +410,7 @@
   {:frame false})
 
 (defcard no-heading
-  (str "# this card is hiding it's heading")
+  (str "# this card is hiding its heading")
   {}
   {:heading false})
 
