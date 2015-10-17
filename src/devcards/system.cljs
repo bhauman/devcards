@@ -412,7 +412,8 @@
 (defn start-ui-with-renderer [channel renderer]
   (defonce devcards-ui-setup
     (do
-      (js/React.initializeTouchEvents true)
+      (when (exists? js/React.initializeTouchEvents)
+        (js/React.initializeTouchEvents true))
       (go
         (<! (load-data-from-channel! channel))
 
@@ -434,7 +435,8 @@
 (defn start-ui [channel]
   (defonce devcards-ui-setup
     (do
-      (js/React.initializeTouchEvents true)
+      (when (exists? js/React.initializeTouchEvents)
+        (js/React.initializeTouchEvents true))
       (render-base-if-necessary!)
       (go
         ;; initial load

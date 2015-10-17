@@ -392,6 +392,7 @@
     :inspect-data false ;; wether to display the data in the card atom
     :watch-atom true    ;; wether to watch the atom and render on change 
     :history false      ;; wether to record a change history of the atom
+    :classname ""       ;; provide card with a custom classname
   }
   ```
 
@@ -417,6 +418,11 @@
   (str " this card is has no padding on its body")
   {}
   {:padding false})
+
+(defcard custom-classname
+  (str " this card has a custom class `.red-box`")
+  {}
+  {:classname "red-box"})
 
 (defcard inspect-data
   (fn [data-atom owner]

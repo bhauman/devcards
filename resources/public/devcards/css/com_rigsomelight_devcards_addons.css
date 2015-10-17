@@ -16,8 +16,25 @@ body {
 }
 
 /* default typography */
-.com-rigsomelight-devcards-base {
+.com-rigsomelight-devcards_rendered-card {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 1.42857143;
+}
+
+.com-rigsomelight-devcards_rendered-card code {
+    font-size: 90%;
+}
+
+.com-rigsomelight-devcards_rendered-card h1,
+.com-rigsomelight-devcards_rendered-card h2,
+.com-rigsomelight-devcards_rendered-card h3,
+.com-rigsomelight-devcards_rendered-card h4,
+.com-rigsomelight-devcards_rendered-card h5 {
+    font-weight: 500;
+}
+
+.com-rigsomelight-devcards_rendered-card a {
+    color: #428bca;
+    text-decoration: none;
 }

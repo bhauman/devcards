@@ -15,7 +15,7 @@ see how they behave in an actual DOM.
 
 Devcards is centered around a notion of a *card*. Every card
 represents some code to be displayed. Devcards provides an interface
-which allows the developer navigate to different namespaces and view
+which allows the developer to navigate to different namespaces and view
 the *cards* that have been defined in that namespace. 
 
 When used in conjunction with [lein figwheel][leinfigwheel] the cards
@@ -160,9 +160,33 @@ First make sure you include the following `:dependencies` in your `project.clj` 
 [devcards "0.2.0-3"]
 ```
 
-lein figwheel is not required to use Devcards but ... if you want to
-experience interactive coding with Devcards you will want to try it initially with 
-[lein-figwheel](https://github.com/bhauman/lein-figwheel) configured.
+
+You will need an HTML file to host the devcards interface. It makes
+sense to have a separate file to host devcards. I would 
+create the following `resources/public/cards.html` file (this is the same
+file as in the leiningen template).
+
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <link href="/css/example.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <script src="/js/compiled/example.js" type="text/javascript"></script>
+  </body>
+</html>
+```
+
+
+##Usage With Figwheel
+
+[lein-figwheel](https://github.com/bhauman/lein-figwheel) 
+is not required to use Devcards but it is definitely recommended
+if you want to experience interactive coding with Devcards.
 See the [lein-figwheel repo](https://github.com/bhauman/lein-figwheel)
 for instructions on how to do that.
 
@@ -182,22 +206,6 @@ Configure your devcards build:
 }                
 ```
 
-You will need an HTML file to host the devcards interface. It makes
-sense to have a separate file to host devcards. I would create the
-following `resources/public/devcards/index.html` file.
-
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-  </head>
-  <body>
-    <script src="js/compiled/example.js" type="text/javascript"></script>
-  </body>
-</html>
-```
 
 Next you will need to include the Devcards macros into your file:
 
@@ -214,10 +222,9 @@ Next you will need to include the Devcards macros into your file:
 
 This will create a card in the devcards interface.
 
-
 Take a look at [the `defcard` api](http://rigsomelight.com/devcards/#!/devdemos.defcard_api) ([src](https://github.com/bhauman/devcards/blob/master/example_src/devdemos/defcard_api.cljs))
 
-## Devcards without Figwheel
+## Usage without Figwheel
 
 Figwheel does some magic so that Devcards can be included or excluded
 from your code easily. You can certainly use Devcards without Figwheel,
@@ -227,7 +234,7 @@ but there are three things that you will need to do.
 
 ```clojure
 { :main    "{{name}}.core"
-  :devcards true
+  :devcards true ; <- note this
   :asset-path "js/compiled/devcards_out"
   :output-to  "resources/public/js/{{sanitized}}_devcards.js"
   :output-dir "resources/public/js/devcards_out"
@@ -235,7 +242,9 @@ but there are three things that you will need to do.
 ```
 
 This is important as it is a signal to the `defcard` macro to render
-the cards.
+the cards. This is equivalent to adding `:figwheel { :devcards true }` 
+in our figwheel based build above, but since we aren't using figwheel
+in this build adding the figwheel options doesn't help.
 
 #### You will need to require `devcards.core` in the files that use devcards as such:
 
@@ -260,9 +269,70 @@ build automatically.
 (devcards.core/start-devcard-ui!)
 ```
 
-As mentioned above, you don't want the Devcards UI to compete with
+Make sure this is included in the file you have specified as `:main` 
+in your build options. As mentioned above, you don't want the Devcards UI to compete with
 your application's UI so you will want to make sure it isn't getting
-launched.
+launched. 
+
+
+## Devcards as a Standalone Website
+
+Devcards can easily be hosted as a standalone website by following
+steps similar to those needed to use it locally without figwheel.
+In this example, we will be adding a `hostedcards` profile to build
+our site.
+
+#### Add `:devcards true` **to the build-options** of our ClojureScript build profile
+
+```clojure
+{:id "hostedcards"
+ :source-paths ["src"]
+ :compiler {:main "{{your lib name}}.core"
+            :devcards true ; <- note this
+            :asset-path "js/compiled/out"
+            :output-to  "resources/public/js/compiled/{{your lib name}}.js"
+            :optimizations :advanced}}
+```
+
+#### Require `devcards.core`in the files that use devcards
+
+```clojure
+(ns {{your lib name}}.core
+  (:require
+   [devcards.core :as dc]) 
+  (:require-macros
+   [devcards.core :refer [defcard]])) 
+```
+
+### Start the Devcards UI in {{your lib name}}.core
+```clojure
+(devcards.core/start-devcard-ui!)   
+```
+
+### Include the compiled JS in our HTML 
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/css/{{your lib name}.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div id="main-app-area"></div>
+    <script src="/js/compiled/{{your lib name}}.js" type="text/javascript"></script>
+  </body>
+</html>
+``` 
+
+
+### Run our Build
+
+`lein cljsbuild once hostedcards`
+
+Once the build is complete, simply copy the contents of `resources\public` 
+to your webserver and serve it up as you would any other page. You 
 
 ## FAQ
 

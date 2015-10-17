@@ -68,13 +68,9 @@ body .hljs {
   border-radius: 4px;
 }
 
-.com-rigsomelight-devcards_rendered-card code {
-  font-size: 90%;
-} 
-
 .com-rigsomelight-devcards-markdown pre code {
   padding: 0;
-  font-size: inherit;
+  font-size: 1em;
   color: inherit;
   white-space: pre; 
   background-color: transparent;
@@ -86,24 +82,29 @@ body .hljs {
 
 }
 
+
 .com-rigsomelight-devcards-typog {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 1.42857143;
 }
 
-
+.com-rigsomelight-devcards-typog h1,
+.com-rigsomelight-devcards-typog h2,
+.com-rigsomelight-devcards-typog h3,
+.com-rigsomelight-devcards-typog h4,
+.com-rigsomelight-devcards-typog h5,
 .com-rigsomelight-devcards-markdown h1,
 .com-rigsomelight-devcards-markdown h2,
 .com-rigsomelight-devcards-markdown h3,
 .com-rigsomelight-devcards-markdown h4,
-.com-rigsomelight-devcards-markdown h5,
-.com-rigsomelight-devcards-base h1,
-.com-rigsomelight-devcards-base h2,
-.com-rigsomelight-devcards-base h3,
-.com-rigsomelight-devcards-base h4,
-.com-rigsomelight-devcards-base h5 {
+.com-rigsomelight-devcards-markdown h5 {
     font-weight: 500;
+}
+
+.com-rigsomelight-devcards-typog a {
+    color: #428bca;
+    text-decoration: none;
 }
 
 .com-rigsomelight-devcards-markdown h1:first-child,
@@ -114,11 +115,6 @@ body .hljs {
     margin-top: 14px;
 }
                                            
-.com-rigsomelight-devcards-base a {
-    color: #428bca;
-    text-decoration: none;
-}
-
 .com-rigsomelight-devcards-markdown code,
 .com-rigsomelight-devcards-markdown kbd,
 .com-rigsomelight-devcards-markdown pre,

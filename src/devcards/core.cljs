@@ -21,6 +21,14 @@
 ;; this channel is only used for card registration notifications
 (defonce devcard-event-chan (chan))
 
+(def react-element-type-symbol
+  "Make a react Symbol the same way as React 0.14"
+  (or (and (exists? js/Symbol)
+           (fn? js/Symbol)
+           (aget js/Symbol "for")
+           ((aget js/Symbol "for") "react.element"))
+      0xeac7))
+
 ;; its possible to record the meta-data for the loaded ns's being
 ;; shipped by figwheel, by ataching a before load listener and storing
 ;; the meta data, might be better to have figwheel do that.
@@ -134,12 +142,15 @@
 ;; returns a react component of rendered edn
 
 (defn- naked-card [children card]
-  (sab/html
-   [:div
-    {:class
-     (str devcards.system/devcards-rendered-card-class
-          (if (get-in card [:options :padding]) " com-rigsomelight-devcards-devcard-padding" "")) }
-    children]))
+  (let [classname (get-in card [:options :classname])
+        padding?  (get-in card [:options :padding])]
+    (sab/html
+      [:div
+       {:class
+        (cond-> devcards.system/devcards-rendered-card-class
+          padding? (str " com-rigsomelight-devcards-devcard-padding")
+          (not-empty classname) (str " " classname))}
+       children])))
 
 (defn- frame
   ([children]
@@ -355,7 +366,9 @@
          :value x})))
 
 (defn react-element? [main-obj]
-  (aget main-obj "_isReactElement"))
+  (or (aget main-obj "_isReactElement") ;; react 0.13
+      (= react-element-type-symbol      ;; react 0.14
+         (aget main-obj "$$typeof"))))
 
 (defn validate-card-options [opts]
   (if (map? opts)
@@ -412,7 +425,7 @@
               (:message e)]
              [:span
               {:style { :flex "1 100px" }}
-              " Recieved: " [:code (pr-str (:value e))]]]))
+              " Received: " [:code (pr-str (:value e))]]]))
 
 (defn assert-options-map [m]
   (if-not (or (nil? m) (map? m))
