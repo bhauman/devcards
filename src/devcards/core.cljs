@@ -25,8 +25,8 @@
   "Make a react Symbol the same way as React 0.14"
   (or (and (exists? js/Symbol)
            (fn? js/Symbol)
-           (.-for js/Symbol)
-           ((.-for js/Symbol) "react.element"))
+           (aget js/Symbol "for")
+           ((aget js/Symbol "for") "react.element"))
       0xeac7))
 
 ;; its possible to record the meta-data for the loaded ns's being
