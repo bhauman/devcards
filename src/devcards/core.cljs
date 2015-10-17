@@ -44,8 +44,7 @@
                          #(put! devcard-event-chan [:jsreload (.-detail %)]))
       true)))
 
-;; this needs to be private because devcards needs to be turned on
-(defn- start-devcard-ui!* []
+(defn start-devcard-ui!* []
   (dev/start-ui devcard-event-chan)
   (register-figwheel-listeners!))
 
