@@ -1,4 +1,4 @@
-## 0.2.0-4
+## 0.2.0-5
 
 * isolated more css into the addons css - thanks to magnars
 * a new `:classname` option to the devcard options that will be added
