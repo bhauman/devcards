@@ -392,7 +392,7 @@
     :inspect-data false ;; whether to display the data in the card atom
     :watch-atom true    ;; whether to watch the atom and render on change 
     :history false      ;; whether to record a change history of the atom
-    :classname ""       ;; provide card with a custom classname
+    :classname \"\"       ;; provide card with a custom classname
   }
   ```
 
