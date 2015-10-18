@@ -10,7 +10,7 @@
   `devcards.core/reagent` or `devcards.core/defcard-rg` You always
   need to pass a Reagent element of the form `[component ... args]`
   This makes reagent support consistent with the `defcard` api where you have to
-  supply an ReactElement and not a component
+  supply a ReactElement and not a component
 
 ## 0.2.0-5
 
