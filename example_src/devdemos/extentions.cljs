@@ -73,7 +73,7 @@
             :on-click #(swap! click-count inc)}]])
 
 (defcard reagent-counter
-  (dc/reagent counting-component))
+  (dc/reagent [counting-component]))
 
 ;; experimenting with reloadable local state
 (defn elapsed-template [seconds-elapsed props]
