@@ -4,6 +4,8 @@
 * **Reagent breaking change** you can no longer supply bare reagent components to
   `devcards.core/reagent` You always need to pass a reagent element of
   the form [component ... args]
+  This makes reagent support consistent with the normal use of `defcard` you have to
+  supply an element and not a component
 * **addeded `devcards.core/devcard-rg` as a shortcut to defining
   `(defcard title (dc/reagent [:div "hey"]))` which can now be
   expressed as `(defcard-rg title [:div "hey"])`
