@@ -9,6 +9,7 @@
   expressed as `(defcard-rg title [:div "hey"])`
 * improved reagent documentation - I could really use some more
   help with reagent docs
+  see: http://rigsomelight.com/devcards/#!/devdemos.reagent
 
 ## 0.2.0-5
 
