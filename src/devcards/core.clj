@@ -142,7 +142,7 @@
   `(create-idevcard
     (let [v# ~body]
       (if (fn? v#)
-        (fn [data-atom# owner#] (reagent->react (v# data-atom# owner#)))
+        (fn [data-atom# owner#] (reagent.core/as-element (v# data-atom# owner#)))
         (reagent.core/as-element v#)))
     {}))
 
