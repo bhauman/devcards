@@ -1,3 +1,15 @@
+## 0.2.0-6
+
+* fixed some basic reagent issues
+* **reagent breaking change** you can't supply bare reagent compoents to
+  `devcards.core/reagent` You always need to pass a reagent element of
+  the form [component ... args]
+* **addeded `devcards.core/devcard-rg` as a shortcut to defining
+  `(defcard title (dc/reagent [:div "hey"]))` which can now be
+  expressed as `(defcard-rg title [:div "hey"])`
+* improved reagent documentation - I could really use some more
+  help with reagent docs
+
 ## 0.2.0-5
 
 * isolated more css into the addons css - thanks to magnars
@@ -7,11 +19,6 @@ to the card body - thanks to codebeige
 * added base support for React 14 - thanks to minimal
 * made `start-devcard-ui*` public
 * a bunch of documentation has been added to rigsomelight.com/devcards
-
-Note: I found out why Reagent has some rendering problems and I've
-reported it https://github.com/reagent-project/reagent/issues/195. I
-don't want a hard dependency on Reagent so I'm going to need to wait
-for that fix.
 
 ## 0.2.0-2 First documented release
 
