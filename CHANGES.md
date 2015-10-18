@@ -1,4 +1,4 @@
-## 0.2.0-6
+## 0.2.0-7
 
 * fixed some basic reagent issues
 * **reagent breaking change** you can't supply bare reagent compoents to
