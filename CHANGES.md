@@ -5,13 +5,12 @@
   expressed as `(defcard-rg title [:div "hey"])`
 * improved Reagent documentation
   see: http://rigsomelight.com/devcards/#!/devdemos.reagent
-  - I could really use some more help with reagent docs
+  - I could really use some more help with Reagent docs
 * **Reagent breaking change** you can no longer supply bare reagent components to
-  `devcards.core/reagent` You always need to pass a Reagent element of
-  the form [component ... args]
+  `devcards.core/reagent` or `devcards.core/defcard-rg` You always
+  need to pass a Reagent element of the form `[component ... args]`
   This makes reagent support consistent with the `defcard` api where you have to
   supply an ReactElement and not a component
-
 
 ## 0.2.0-5
 
