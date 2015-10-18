@@ -92,13 +92,13 @@ macro it will behave just like passing a function as the main object to `defcard
 
 I'll explore uses for this in just a bit.
 
-Since typeing `(defcard reagent-macro-1 (dc/reagent ...))` is a tad
+Since typing `(defcard reagent-macro-1 (dc/reagent ...))` is a tad
 verbose Devcards provides the `devcards.core/defcard-rg` macro.
 
 With `defcard-rg` you can create all the above examples without
-explicitely calling `dc/reagent`. 
+explicitly calling `dc/reagent`. 
 
-The follwing two examples work and are a bit cleaner:
+The following two examples work and are a bit cleaner:
 
 
 ```clojure
