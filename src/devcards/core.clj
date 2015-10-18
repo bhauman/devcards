@@ -138,14 +138,23 @@
 ;; reagent helpers
 
 (defmacro reagent->react [body]
-  `(js/React.createElement (reagent.core/reactify-component (fn [_#] ~body))))
+  ;; this convenience for rendering a component is stupid
+  ;; I shouldn't be doing it
+  `(reagent.core/as-element (let [v# ~body] (if (fn? v#) [v#] v#))))
 
 (defmacro reagent [body]
-  `(create-idevcard (let [v# ~body]
-                      (if (fn? v#)
-                        (fn [data-atom# owner#] (reagent->react (v# data-atom# owner#)))
-                        (reagent->react  v#)))
-                    {:watch-atom false}))
+  `(create-idevcard
+    (let [v# ~body]
+      ;; if there is a fn of two args
+      (if (and (fn? v#) (aget v# "length") (= (aget v# "length") 2))
+        (fn [data-atom# owner#] (reagent->react (v# data-atom# owner#)))
+        (reagent->react  v#)))
+    {}))
+
+(defmacro defcard-rg [& exprs]
+  (when (utils/devcards-active?)
+    (let [[vname docu main initial-data options] (parse-card-args exprs 'reagent-card)]
+      (card vname docu `(devcards.core/reagent ~main) initial-data options))))
 
 ;; om helpers
 

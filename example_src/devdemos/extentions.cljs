@@ -53,7 +53,6 @@
        (render [_]
          (sab/html [:h1 "This is om now!!!"]))))))
 
-
 (defn simple-component []
   [:div
    [:p "I am a component!"]
@@ -62,8 +61,7 @@
     [:span {:style {:color "red"}} " and red "] "text."]])
 
 (defcard reagent
-  (rg/as-element simple-component))
-
+  (rg/as-element [simple-component]))
 
 (defonce click-count (rg/atom 0))
 
@@ -75,7 +73,7 @@
             :on-click #(swap! click-count inc)}]])
 
 (defcard reagent-counter
-  (dc/reagent (counting-component)))
+  (dc/reagent counting-component))
 
 ;; experimenting with reloadable local state
 (defn elapsed-template [seconds-elapsed props]
@@ -95,7 +93,6 @@
 (defn timer-app [_]
   [:div [:h1 "I'm a timer app"]
    (rg/create-element timer #js {:name "George" })])
-
 
 (defonce timer-apper (rg/reactify-component timer-app))
 
