@@ -1,4 +1,4 @@
-## 0.2.0-7 Improved Reagent support
+## 0.2.0-8 Improved Reagent support
 
 * **added `devcards.core/devcard-rg`** as a shortcut to defining
   `(defcard title (dc/reagent [:div "hey"]))` which can now be
@@ -11,6 +11,8 @@
   need to pass a Reagent element of the form `[component ... args]`
   This makes reagent support consistent with the `defcard` api where you have to
   supply a ReactElement and not a component
+
+## 0.2.0-7 Reagent support with bad bug
 
 ## 0.2.0-5
 
