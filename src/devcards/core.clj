@@ -14,6 +14,7 @@
 (defmacro start-devcard-ui! []
   `(devcards.core/start-devcard-ui!*))
 
+
 #_(defmacro start-single-card-ui! []
   (enable-devcards!)
   `(devcards.core/start-single-card-ui!*))
@@ -137,18 +138,12 @@
 
 ;; reagent helpers
 
-(defmacro reagent->react [body]
-  ;; this convenience for rendering a component is stupid
-  ;; I shouldn't be doing it
-  `(reagent.core/as-element (let [v# ~body] (if (fn? v#) [v#] v#))))
-
 (defmacro reagent [body]
   `(create-idevcard
     (let [v# ~body]
-      ;; if there is a fn of two args
-      (if (and (fn? v#) (aget v# "length") (= (aget v# "length") 2))
+      (if (fn? v#)
         (fn [data-atom# owner#] (reagent->react (v# data-atom# owner#)))
-        (reagent->react  v#)))
+        (reagent.core/as-element v#)))
     {}))
 
 (defmacro defcard-rg [& exprs]
