@@ -129,7 +129,7 @@ Alright let's look at some more examples:
 "
   [:div {:style {:border "10px solid blue" :padding "20px"}}
     [:h1  "Composing Reagent Hiccup on the fly"]
-    [:p "adding arbitrary "]])
+    [:p "adding arbitrary hiccup"]])
 
 
 ;; counter 1
@@ -325,6 +325,7 @@ We can pass in an arbitray number of arguments to our reagent component if we wr
                          :button-text "increment isolated state"}])
   (reagent/atom {:count 0}) ; <-- intial ratom
   {:inspect-data true})
+
 
 
 
