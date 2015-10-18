@@ -1,14 +1,18 @@
-## 0.2.0-6
+## 0.2.0-8 Improved Reagent support
 
-* fixed some basic reagent issues
-* **reagent breaking change** you can't supply bare reagent compoents to
-  `devcards.core/reagent` You always need to pass a reagent element of
-  the form [component ... args]
-* **addeded `devcards.core/devcard-rg` as a shortcut to defining
+* **added `devcards.core/devcard-rg`** as a shortcut to defining
   `(defcard title (dc/reagent [:div "hey"]))` which can now be
   expressed as `(defcard-rg title [:div "hey"])`
-* improved reagent documentation - I could really use some more
-  help with reagent docs
+* improved Reagent documentation
+  see: http://rigsomelight.com/devcards/#!/devdemos.reagent
+  - I could really use some more help with Reagent docs
+* **Reagent breaking change** you can no longer supply bare reagent components to
+  `devcards.core/reagent` or `devcards.core/defcard-rg` You always
+  need to pass a Reagent element of the form `[component ... args]`
+  This makes reagent support consistent with the `defcard` api where you have to
+  supply a ReactElement and not a component
+
+## 0.2.0-7 Reagent support with bad bug
 
 ## 0.2.0-5
 
