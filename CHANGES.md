@@ -1,15 +1,15 @@
 ## 0.2.0-7
 
 * fixed some basic reagent issues
-* **reagent breaking change** you can't supply bare reagent compoents to
+* **Reagent breaking change** you can no longer supply bare reagent components to
   `devcards.core/reagent` You always need to pass a reagent element of
   the form [component ... args]
 * **addeded `devcards.core/devcard-rg` as a shortcut to defining
   `(defcard title (dc/reagent [:div "hey"]))` which can now be
   expressed as `(defcard-rg title [:div "hey"])`
-* improved reagent documentation - I could really use some more
-  help with reagent docs
+* improved Reagent documentation
   see: http://rigsomelight.com/devcards/#!/devdemos.reagent
+  - I could really use some more help with reagent docs
 
 ## 0.2.0-5
 
