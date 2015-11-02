@@ -11,9 +11,8 @@
    [clojure.java.io :as io])
   (:refer-clojure :exclude (munge defonce)))
 
-(defmacro start-devcard-ui! []
-  `(devcards.core/start-devcard-ui!*))
-
+(defmacro start-devcard-ui! [& [options]]
+  `(devcards.core/start-devcard-ui!* ~options))
 
 #_(defmacro start-single-card-ui! []
   (enable-devcards!)
