@@ -157,7 +157,7 @@ First make sure you include the following `:dependencies` in your `project.clj` 
 
 ```clojure
 [org.clojure/clojurescript "1.7.122"]
-[devcards "0.2.0-3"]
+[devcards "0.2.0-8"]
 ```
 
 
@@ -357,7 +357,7 @@ That being said it is often helpful to move the bulk of your cards to
 a different buildpath that is only built when working on the **devcards**
 build.
 
-When working with devcards I oftern have three builds "devcards",
+When working with devcards I often have three builds "devcards",
 "dev", "prod".
 
 
