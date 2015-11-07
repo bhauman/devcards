@@ -44,7 +44,16 @@
                          #(put! devcard-event-chan [:jsreload (.-detail %)]))
       true)))
 
-(defn start-devcard-ui!* []
+(defn assert-options-map [m]
+  (if-not (or (nil? m) (map? m))
+    {:propagated-errors [{:label :options
+                          :message "should be a Map or nil."
+                          :value m}]}
+    m))
+
+(defn start-devcard-ui!* [& [options]]
+  (let [options (or options {})]
+    (swap! dev/app-state assoc :default-options (assert-options-map options)))
   (dev/start-ui devcard-event-chan)
   (register-figwheel-listeners!))
 
@@ -426,13 +435,6 @@
               {:style { :flex "1 100px" }}
               " Received: " [:code (pr-str (:value e))]]]))
 
-(defn assert-options-map [m]
-  (if-not (or (nil? m) (map? m))
-    {:propagated-errors [{:label :options 
-                          :message "should be a Map or nil."
-                          :value m}]}
-    m))
-
 (defn render-errors [opts errors]
   (sab/html
    [:div.com-rigsomelight-devcards-card-base-no-pad
@@ -499,7 +501,9 @@
       :else (IdentiyOptions. main-obj))))
 
 (defn card-base [opts]
-  (let [opts (assoc opts :path (:path devcards.system/*devcard-data*))]
+  (let [opts (-> opts
+                 (assoc :path (:path devcards.system/*devcard-data*))
+                 (update :options #(merge (:default-options @dev/app-state) %)))]
     (if (satisfies? IDevcard (:main-obj opts))
       (-devcard (:main-obj opts) opts)
       (card-with-errors
