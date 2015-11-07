@@ -51,11 +51,16 @@
                           :value m}]}
     m))
 
-(defn start-devcard-ui!* [& [options]]
-  (let [options (or options {})]
-    (swap! dev/app-state assoc :default-options (assert-options-map options)))
-  (dev/start-ui devcard-event-chan)
-  (register-figwheel-listeners!))
+(defn start-devcard-ui!*
+  ([] (start-devcard-ui!* {}))
+  ([options]
+   (when (and (map? options)
+              (map? (:default-card-options options)))
+     (swap! dev/app-state update-in
+            [:base-card-options]
+            (fn [opts] (merge opts (:default-card-options options)))))
+   (dev/start-ui devcard-event-chan)
+   (register-figwheel-listeners!)))
 
 ;; Register a new card
 ;; this is normally called from the defcard macro
@@ -501,9 +506,7 @@
       :else (IdentiyOptions. main-obj))))
 
 (defn card-base [opts]
-  (let [opts (-> opts
-                 (assoc :path (:path devcards.system/*devcard-data*))
-                 (update :options #(merge (:default-options @dev/app-state) %)))]
+  (let [opts (assoc opts :path (:path devcards.system/*devcard-data*))]
     (if (satisfies? IDevcard (:main-obj opts))
       (-devcard (:main-obj opts) opts)
       (card-with-errors
