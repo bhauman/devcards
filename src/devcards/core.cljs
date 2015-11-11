@@ -219,19 +219,27 @@
     (aget (.-state this) (name k))))
 
 ;; this is not currently being used
-#_(defonce-react-class DontUpdate
+(defonce-react-class DontUpdate
   #js {:shouldComponentUpdate
-       (fn [a b] false)
+       (fn [next-props b]
+         (this-as this
+                  (let [update? (= (aget next-props "change_count")
+                                   (get-props this :change_count))]
+                    #_(if update?
+                        (prn "Updating ")
+                        (prn "Not updating"))
+                    update?)))
        :render
        (fn []
          (this-as
           this
-          (sab/html [:div (get-props this :children_thunk)])))})
+          (sab/html [:div.com-rigsomelight-dont-update (get-props this :children_thunk)])))})
 
 ;; this is not currently being used
-#_(defn dont-update [children-thunk]
+(defn dont-update [change-count children-thunk]
   (js/React.createElement DontUpdate
-                          #js { :children_thunk children-thunk}))
+                          #js { :change_count change-count
+                                :children_thunk children-thunk}))
 
 (defn wrangle-inital-data [this]
   (let [data (or (:initial-data (get-props this :card)) {})]
@@ -249,7 +257,8 @@
 (defonce-react-class DevcardBase
   #js {:getInitialState
        (fn []
-         #js {:unique_id (gensym 'devcards-base-)})
+         #js {:unique_id (gensym 'devcards-base-)
+              :state_change_count 0})
        :componentDidUpdate
        (fn [_ _]
          (this-as
@@ -289,7 +298,10 @@
             this
             (when-let [data_atom (get-state this :data_atom)]
               (when-let [id (get-state this :unique_id)]
-                (add-watch data_atom id (fn [_ _ _ _] (.forceUpdate this)))))))
+                (add-watch data_atom id
+                           (fn [_ _ _ _]
+                             (.setState this #js {:state_change_count
+                                                  (inc (get-state this :state_change_count))})))))))
          (fn []))
         :render
         (fn []
@@ -297,18 +309,24 @@
            this
            (let [data-atom (get-data-atom this)
                  card      (get-props this :card)
+                 change-count (get-state this :state_change_count)
                  options   (:options card)
                  ;; some components have their own internal render
                  ;; loop
                  ;; maybe we should have a :render-to-string false
                  ;; option?
+                 
                  main-obj'  (let [m (:main-obj card)]
-                             (if (fn? m) (m data-atom this) m))
+                              (if (fn? m) (m data-atom this) m))
                  main-obj (if (and (not (nil? main-obj'))
                                    (not (react-element? main-obj')))
                              (code-highlight (utils/pprint-code main-obj') "clojure")
                              main-obj') 
-                 main      main-obj
+                 main      (if (false? (:watch-atom options))
+                             ;; only rerenders when render _isn't_
+                             ;; driven by state change
+                             (dont-update change-count main-obj)
+                             main-obj)
                  hist-ctl  (when (:history options)
                              (hist-recorder* data-atom))
                  document  (when-let [docu (:documentation card)]
@@ -326,6 +344,8 @@
              (if (:frame options)
                (frame children card) ;; make component and forward options
                (sab/html [:div.com-rigsomelight-devcards-frameless {} children])))))})
+
+;; this is going to capture and  handle the raw options
 
 (def render-into-dom
   (if (html-env?)
