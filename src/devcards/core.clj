@@ -151,7 +151,9 @@
 (defmacro defcard-rg [& exprs]
   (when (utils/devcards-active?)
     (let [[vname docu main initial-data options] (parse-card-args exprs 'reagent-card)]
-      (card vname docu `(devcards.core/reagent ~main) initial-data options))))
+      (card vname docu `(devcards.core/reagent ~main) initial-data (assoc
+                                                                    options
+                                                                    :watch-atom false)))))
 
 ;; om helpers
 
