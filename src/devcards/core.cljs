@@ -9,7 +9,7 @@
    [devcards.util.edn-renderer :as edn-rend]
    
    [clojure.string :as string]
-
+   
    [cljs.test]
    [cljs.core.async :refer [put! chan timeout <! close! alts!] :as async])
   (:require-macros
@@ -209,7 +209,7 @@
 
 (defn ref->node [this ref]
   (when-let [comp (aget (.. this -refs) ref)]
-    (js/React.findDOMNode comp)))
+    (js/ReactDOM.findDOMNode comp)))
 
 (defn get-props [this k]
   (aget (.-props this) (name k)))

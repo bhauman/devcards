@@ -7,7 +7,9 @@
    [goog.events :as events]
    [goog.history.EventType :as EventType]
    [goog.labs.userAgent.device :as device]
-   [devcards.util.utils :as utils])
+   [devcards.util.utils :as utils]
+   [cljsjs.react]
+   [cljsjs.react.dom])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]
    [devcards.system :refer [inline-resouce-file]]
@@ -321,7 +323,7 @@
 
 (defn renderer [state-atom]
   #_(prn "Rendering")
-  (js/React.render
+  (js/ReactDOM.render
    (js/React.createElement DevcardsRoot)
    #_(sab/html [:div
               (main-template state-atom)
