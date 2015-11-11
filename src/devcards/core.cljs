@@ -371,7 +371,7 @@
          (this-as
           this
           (when-let [node (ref->node this (get-state this :unique_id))]
-            (js/React.unmountComponentAtNode node))))
+            (js/ReactDOM.unmountComponentAtNode node))))
        :componentDidMount
        (fn [] (this-as this (render-into-dom this)))
        :render
@@ -596,6 +596,8 @@
 
 (comment
   would be nice to have a drop down of history diffs)
+
+;; really need to have this take a protocol 
 
 (defn can-go-back [this]
   (let [{:keys [history pointer]} @(get-state this :history_atom)]
