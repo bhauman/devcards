@@ -11,9 +11,11 @@
    [clojure.java.io :as io])
   (:refer-clojure :exclude (munge defonce)))
 
-(defmacro start-devcard-ui! []
-  `(devcards.core/start-devcard-ui!*))
-
+(defmacro start-devcard-ui!
+  ([]
+   `(devcards.core/start-devcard-ui!*))
+  ([options]
+   `(devcards.core/start-devcard-ui!* ~options)))
 
 #_(defmacro start-single-card-ui! []
   (enable-devcards!)
@@ -149,7 +151,9 @@
 (defmacro defcard-rg [& exprs]
   (when (utils/devcards-active?)
     (let [[vname docu main initial-data options] (parse-card-args exprs 'reagent-card)]
-      (card vname docu `(devcards.core/reagent ~main) initial-data options))))
+      (card vname docu `(devcards.core/reagent ~main) initial-data (assoc
+                                                                    options
+                                                                    :watch-atom false)))))
 
 ;; om helpers
 

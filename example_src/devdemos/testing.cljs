@@ -195,14 +195,11 @@ The following example shows this usage:
 ```
 ")
 
-
 (defcard some-tests
   (dc/tests
    "## this should show up"
    (is (= 1 1))
    (is (= 1 2))))
 
-
-
-
+#_(js/setTimeout  (fn [] (cljs.test/run-tests 'devdemos.testing)) 500)
 

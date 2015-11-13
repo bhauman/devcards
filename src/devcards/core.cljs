@@ -9,7 +9,7 @@
    [devcards.util.edn-renderer :as edn-rend]
    
    [clojure.string :as string]
-
+   
    [cljs.test]
    [cljs.core.async :refer [put! chan timeout <! close! alts!] :as async])
   (:require-macros
@@ -44,9 +44,23 @@
                          #(put! devcard-event-chan [:jsreload (.-detail %)]))
       true)))
 
-(defn start-devcard-ui!* []
-  (dev/start-ui devcard-event-chan)
-  (register-figwheel-listeners!))
+(defn assert-options-map [m]
+  (if-not (or (nil? m) (map? m))
+    {:propagated-errors [{:label :options
+                          :message "should be a Map or nil."
+                          :value m}]}
+    m))
+
+(defn start-devcard-ui!*
+  ([] (start-devcard-ui!* {}))
+  ([options]
+   (when (and (map? options)
+              (map? (:default-card-options options)))
+     (swap! dev/app-state update-in
+            [:base-card-options]
+            (fn [opts] (merge opts (:default-card-options options)))))
+   (dev/start-ui devcard-event-chan)
+   (register-figwheel-listeners!)))
 
 ;; Register a new card
 ;; this is normally called from the defcard macro
@@ -195,7 +209,7 @@
 
 (defn ref->node [this ref]
   (when-let [comp (aget (.. this -refs) ref)]
-    (js/React.findDOMNode comp)))
+    (js/ReactDOM.findDOMNode comp)))
 
 (defn get-props [this k]
   (aget (.-props this) (name k)))
@@ -205,19 +219,27 @@
     (aget (.-state this) (name k))))
 
 ;; this is not currently being used
-#_(defonce-react-class DontUpdate
+(defonce-react-class DontUpdate
   #js {:shouldComponentUpdate
-       (fn [a b] false)
+       (fn [next-props b]
+         (this-as this
+                  (let [update? (= (aget next-props "change_count")
+                                   (get-props this :change_count))]
+                    #_(if update?
+                        (prn "Updating ")
+                        (prn "Not updating"))
+                    update?)))
        :render
        (fn []
          (this-as
           this
-          (sab/html [:div (get-props this :children_thunk)])))})
+          (sab/html [:div.com-rigsomelight-dont-update (get-props this :children_thunk)])))})
 
 ;; this is not currently being used
-#_(defn dont-update [children-thunk]
+(defn dont-update [change-count children-thunk]
   (js/React.createElement DontUpdate
-                          #js { :children_thunk children-thunk}))
+                          #js { :change_count change-count
+                                :children_thunk children-thunk}))
 
 (defn wrangle-inital-data [this]
   (let [data (or (:initial-data (get-props this :card)) {})]
@@ -235,7 +257,8 @@
 (defonce-react-class DevcardBase
   #js {:getInitialState
        (fn []
-         #js {:unique_id (gensym 'devcards-base-)})
+         #js {:unique_id (gensym 'devcards-base-)
+              :state_change_count 0})
        :componentDidUpdate
        (fn [_ _]
          (this-as
@@ -275,7 +298,10 @@
             this
             (when-let [data_atom (get-state this :data_atom)]
               (when-let [id (get-state this :unique_id)]
-                (add-watch data_atom id (fn [_ _ _ _] (.forceUpdate this)))))))
+                (add-watch data_atom id
+                           (fn [_ _ _ _]
+                             (.setState this #js {:state_change_count
+                                                  (inc (get-state this :state_change_count))})))))))
          (fn []))
         :render
         (fn []
@@ -283,18 +309,24 @@
            this
            (let [data-atom (get-data-atom this)
                  card      (get-props this :card)
+                 change-count (get-state this :state_change_count)
                  options   (:options card)
                  ;; some components have their own internal render
                  ;; loop
                  ;; maybe we should have a :render-to-string false
                  ;; option?
+                 
                  main-obj'  (let [m (:main-obj card)]
-                             (if (fn? m) (m data-atom this) m))
+                              (if (fn? m) (m data-atom this) m))
                  main-obj (if (and (not (nil? main-obj'))
                                    (not (react-element? main-obj')))
                              (code-highlight (utils/pprint-code main-obj') "clojure")
                              main-obj') 
-                 main      main-obj
+                 main      (if (false? (:watch-atom options))
+                             ;; only rerenders when render _isn't_
+                             ;; driven by state change
+                             (dont-update change-count main-obj)
+                             main-obj)
                  hist-ctl  (when (:history options)
                              (hist-recorder* data-atom))
                  document  (when-let [docu (:documentation card)]
@@ -312,6 +344,8 @@
              (if (:frame options)
                (frame children card) ;; make component and forward options
                (sab/html [:div.com-rigsomelight-devcards-frameless {} children])))))})
+
+;; this is going to capture and  handle the raw options
 
 (def render-into-dom
   (if (html-env?)
@@ -337,7 +371,7 @@
          (this-as
           this
           (when-let [node (ref->node this (get-state this :unique_id))]
-            (js/React.unmountComponentAtNode node))))
+            (js/ReactDOM.unmountComponentAtNode node))))
        :componentDidMount
        (fn [] (this-as this (render-into-dom this)))
        :render
@@ -425,13 +459,6 @@
              [:span
               {:style { :flex "1 100px" }}
               " Received: " [:code (pr-str (:value e))]]]))
-
-(defn assert-options-map [m]
-  (if-not (or (nil? m) (map? m))
-    {:propagated-errors [{:label :options 
-                          :message "should be a Map or nil."
-                          :value m}]}
-    m))
 
 (defn render-errors [opts errors]
   (sab/html
@@ -569,6 +596,13 @@
 
 (comment
   would be nice to have a drop down of history diffs)
+
+;; really need to have this take a protocol
+
+;; managed history
+;; we should be able to abstract a system with a list of 
+
+
 
 (defn can-go-back [this]
   (let [{:keys [history pointer]} @(get-state this :history_atom)]
@@ -762,11 +796,19 @@
                body])
       body))
 
-(defn render-pass-fail [{:keys [expected] :as m}]
+(defn render-pass-fail [{:keys [expected actual type] :as m}]
   (display-message
    m
-   (js/React.createElement CodeHighlight #js {:code (utils/pprint-code expected)
-                                              :lang "clojure"})))
+   (sab/html
+    [:div
+     (js/React.createElement CodeHighlight #js {:code (utils/pprint-code expected)
+                                                :lang "clojure"})
+     (when (= type :fail)
+       (sab/html [:div {:style {:marginTop "5px"}}
+                  [:div {:style {:position "absolute" :fontSize "0.9em"}} "▶"]
+                  [:div {:style {:marginLeft "20px"}}
+                   (js/React.createElement CodeHighlight #js {:code (utils/pprint-code actual)
+                                                              :lang "clojure"})]]))])))
 
 (defmethod test-render :pass [m]
   (render-pass-fail m))
@@ -775,7 +817,8 @@
   (render-pass-fail m))
 
 (defmethod test-render :error [m]
-  (display-message m (sab/html  [:div [:strong "Error: "] [:code (str (:actual m))]])))
+  (display-message m (sab/html  [:div [:strong "Error: "]
+                                 [:code (str (:actual m))]])))
 
 (defmethod test-render :test-doc [m]
   (sab/html [:div (markdown->react (:documentation m))]))
@@ -817,8 +860,8 @@
       {}
       (reverse tests)))]))
 
-;; This should be IDevcard at this point
 (defn render-tests [this path test-summary]
+  
   (let [error? (:error test-summary)
         tests (:_devcards_collect_tests test-summary)
         some-tests (filter (fn [{:keys [type]}] (not= type :test-doc))
