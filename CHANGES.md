@@ -1,3 +1,10 @@
+## 0.2.1 React 14
+
+* now depends on React 14
+* fixing the `:watch-atom false` option 
+* added the `:actual` output for failing tests
+* allowing the config of default card options 
+
 ## 0.2.0-8 Improved Reagent support
 
 * **added `devcards.core/devcard-rg`** as a shortcut to defining
