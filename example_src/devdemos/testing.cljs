@@ -205,4 +205,5 @@ The following example shows this usage:
 
 
 
+#_(js/setTimeout  (fn [] (cljs.test/run-tests 'devdemos.testing)) 500)
 

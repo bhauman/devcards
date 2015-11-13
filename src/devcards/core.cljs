@@ -597,7 +597,12 @@
 (comment
   would be nice to have a drop down of history diffs)
 
-;; really need to have this take a protocol 
+;; really need to have this take a protocol
+
+;; managed history
+;; we should be able to abstract a system with a list of 
+
+
 
 (defn can-go-back [this]
   (let [{:keys [history pointer]} @(get-state this :history_atom)]
@@ -791,11 +796,19 @@
                body])
       body))
 
-(defn render-pass-fail [{:keys [expected] :as m}]
+(defn render-pass-fail [{:keys [expected actual type] :as m}]
   (display-message
    m
-   (js/React.createElement CodeHighlight #js {:code (utils/pprint-code expected)
-                                              :lang "clojure"})))
+   (sab/html
+    [:div
+     (js/React.createElement CodeHighlight #js {:code (utils/pprint-code expected)
+                                                :lang "clojure"})
+     (when (= type :fail)
+       (sab/html [:div {:style {:marginTop "5px"}}
+                  [:div {:style {:position "absolute" :fontSize "0.9em"}} "▶"]
+                  [:div {:style {:marginLeft "20px"}}
+                   (js/React.createElement CodeHighlight #js {:code (utils/pprint-code actual)
+                                                              :lang "clojure"})]]))])))
 
 (defmethod test-render :pass [m]
   (render-pass-fail m))
@@ -804,7 +817,8 @@
   (render-pass-fail m))
 
 (defmethod test-render :error [m]
-  (display-message m (sab/html  [:div [:strong "Error: "] [:code (str (:actual m))]])))
+  (display-message m (sab/html  [:div [:strong "Error: "]
+                                 [:code (str (:actual m))]])))
 
 (defmethod test-render :test-doc [m]
   (sab/html [:div (markdown->react (:documentation m))]))
@@ -846,8 +860,8 @@
       {}
       (reverse tests)))]))
 
-;; This should be IDevcard at this point
 (defn render-tests [this path test-summary]
+  
   (let [error? (:error test-summary)
         tests (:_devcards_collect_tests test-summary)
         some-tests (filter (fn [{:keys [type]}] (not= type :test-doc))
