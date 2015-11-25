@@ -116,7 +116,8 @@
          (this-as
           this
           (sab/html
-           [:pre {:className (if (get-hljs) "com-rigsomelight-devcards-code-highlighting"  "")}
+           [:pre {:className (if (get-hljs) "com-rigsomelight-devcards-code-highlighting"  "")
+                  :key (hash (get-props this :code))}
             [:code {:className (or (get-props this :lang) "")
                     :ref "code-ref"}
              (get-props this :code)]])))})
@@ -131,7 +132,8 @@
   (-> content mark/markdown-to-html react-raw))
 
 (defmethod markdown-block->react :code-block [{:keys [content] :as block}]
-  (js/React.createElement CodeHighlight #js {:code (:content block) :lang (:lang block)}))
+  (js/React.createElement CodeHighlight #js {:code (:content block)
+                                             :lang (:lang block)}))
 
 (declare react-element?)
 
@@ -159,7 +161,8 @@
         padding?  (get-in card [:options :padding])]
     (sab/html
       [:div
-       {:class
+       {:key (str (hash card) "2")
+        :className
         (cond-> devcards.system/devcards-rendered-card-class
           padding? (str " com-rigsomelight-devcards-devcard-padding")
           (not-empty classname) (str " " classname))}
@@ -182,6 +185,7 @@
         (sab/html
          [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad {:key (prn-str path)}
           [:div.com-rigsomelight-devcards-panel-heading.com-rigsomelight-devcards-typog
+           {:key (str (hash card) "1")}
            (if path
              (sab/html
               [:a
