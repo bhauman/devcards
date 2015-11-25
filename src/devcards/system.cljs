@@ -254,7 +254,8 @@
      (sab/html [:span.com-rigsomelight-devcards-breadcrumb-sep "/"])
      (map (fn [[n path]]
             (sab/html
-             [:span {:style {:display "inline-block" }}
+             [:span {:style {:display "inline-block" }
+                     :key (path->unique-card-id path)}
               [:a.com-rigsomelight-devcards_set-current-path
                {:href "#"
                 :onClick      (prevent-> #(set-current-path! state-atom path))}
