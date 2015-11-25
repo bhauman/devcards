@@ -1,4 +1,4 @@
-(defproject devcards "0.2.1"
+(defproject devcards "0.2.1-1"
   :description "Devcards is a ClojureScript library that provides a lab space to you develop your UI components independently and interactively."
   :url "http://github.com/bhauman/devcards"
   :license {:name "Eclipse Public License"
@@ -26,13 +26,12 @@
       :dependencies [[org.omcljs/om "0.9.0"]
                      [reagent "0.5.1"]]                   
       :plugins [[lein-cljsbuild "1.1.1"]
-                [lein-figwheel "0.5.0"]]
+                [lein-figwheel "0.5.0-2"]]
       :resource-paths ["resources" "example-resources"]   
       :cljsbuild {
         :builds [{:id "devcards-demos"
                   :source-paths ["example_src" "src"]
-                  :figwheel { :devcards true
-                              #_:websocket-host #_:js-client-host }
+                  :figwheel { :devcards true }
                   :compiler {
                              :main "devdemos.start-ui"
                              :asset-path "js/compiled/out"
