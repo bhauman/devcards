@@ -7,7 +7,7 @@
   (when-let [ws (second (re-matches #"^([\s]*).*"  s))]
     (.-length ws)))
 
-(defn is-bullet-item? [s] (re-matches #"^\s*([*-+]|[0-9]+\.)\s.*" s))
+(defn is-bullet-item? [s] (boolean (re-matches #"^\s*([-*+]|[0-9]+\.)\s.*" s)))
 
 (defn bullets-left-edge "Find the common left edge of bullet lists in a collection of lines."
   [lines]
