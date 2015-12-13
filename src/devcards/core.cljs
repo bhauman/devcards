@@ -11,6 +11,7 @@
    [clojure.string :as string]
    
    [cljs.test]
+   
    [cljs.core.async :refer [put! chan timeout <! close! alts!] :as async])
   (:require-macros
    [cljs-react-reload.core :refer [defonce-react-class def-react-class]]
@@ -926,18 +927,37 @@
 
 (defonce test-channel (chan))
 
-(defn run-card-tests [test-thunks]
+(defn closing-test-fn [c]
+  (put! c (cljs.test/get-current-env))
+  (close! c))
+
+;; Find any fixtures defined for ns and add them to the current test environment.
+;; Duplicates code in the cljs.test/test-all-vars-block macro
+;; Will break when using Closure optimizations
+(defn setup-fixtures [env ns]
+  (println "setting up fixtures for namespace: " ns)
+  (when-let [fixtures (js/goog.getObjectByName (munge (str ns ".cljs-test-once-fixtures")))]
+    (cljs.test/update-current-env! [:once-fixtures] assoc ns fixtures))
+  (when-let [fixtures (js/goog.getObjectByName (munge (str ns ".cljs-test-each-fixtures")))]
+    (cljs.test/update-current-env! [:each-fixtures] assoc ns fixtures)))
+
+
+(defn run-card-tests [[var-under-test test-doc-fn]]
   (let [out (chan)
         test-env (assoc (cljs.test/empty-env)
                         :reporter :_devcards_test_card_reporter)]
     (cljs.test/set-env! test-env)
-    (let [tests (concat test-thunks
-                        [(fn []
-                           (put! out (cljs.test/get-current-env))
-                           (close! out))])]
       (prn "Running tests!!")
-      (cljs.test/run-block tests)
-      out)))
+      (setup-fixtures test-env (:ns (meta var-under-test)))
+      (when test-doc-fn
+        (test-doc-fn))
+
+      ;; run-block makes sure all async tests are finshed before reporting a complete run.
+      (cljs.test/run-block (concat (cljs.test/test-vars-block [var-under-test])
+                                   [(fn []
+                                      (put! out (cljs.test/get-current-env))
+                                      (close! out))]))
+      out))
 
 (defonce test-loop
   (go
@@ -948,7 +968,7 @@
           (if (not= ch timer)
             (callback result)
             (do
-              (collect-test {:type :error :actual "Tests timed out. Please check Dev Console for Exceptions" })
+              (collect-test {:type :error :actual "Tests timed out. Please check Dev Console for Exceptions" }) 
               (callback (assoc (cljs.test/get-current-env)
                                :error "Execution timed out!"))))
           (cljs.test/clear-env!)
@@ -968,13 +988,13 @@
    (fn []
      (this-as
       this
-      (when-let [test-thunks (get-props this :test_thunks)]
-        (test-card-test-run this test-thunks))))
+      (when-let [test-args (get-props this :test_args)]
+        (test-card-test-run this test-args))))
    :componentWillReceiveProps
    (fn [next-props]
      (this-as this
-              (when-let [test-thunks (aget next-props (name :test_thunks))]
-                (test-card-test-run this test-thunks))))
+              (when-let [test-args (aget next-props (name :test_args))]
+                (test-card-test-run this test-args))))
    :render (fn []
              (this-as
               this
@@ -982,13 +1002,14 @@
                     path         (get-props this :path)]
                 (render-tests this path test-summary))))})
 
-(defn test-card [& test-thunks]
+;; Invoked with a var to test and an optional docstring
+(defn test-card [& test-args]
   (reify
     IDevcard
     (-devcard [this devcard-opts]
       (let [path (:path devcards.system/*devcard-data*)]
         (js/React.createElement TestDevcard
-                                #js {:test_thunks test-thunks
+                                #js {:test_args test-args
                                      :path path})))))
 
 ;; render namespace to string

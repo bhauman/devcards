@@ -123,20 +123,19 @@
 
 ;; testing
 
-(defmacro tests [& parts]
-  (when (utils/devcards-active?)
-    `(devcards.core/test-card
-                 ~@(map (fn [p] (if (string? p)
-                                `(fn [] (devcards.core/test-doc ~p))
-                                `(fn [] ~p))) parts))))
-
+;;
+;; Call the test-card component with a var to test and the optional test doc string.
 (defmacro deftest [vname & parts]
   `(do
+     (cljs.test/deftest ~vname
+        ~@parts)
      ~(when (utils/devcards-active?)
         `(devcards.core/defcard ~vname
-           (devcards.core/tests ~@parts)))
-     (cljs.test/deftest ~vname
-        ~@parts)))
+           (devcards.core/test-card
+            (var ~vname)
+            ~@(keep (fn [part]
+                      (when (string? part)
+                        `(fn [] (devcards.core/test-doc ~part)))) parts))))))
 
 ;; reagent helpers
 
