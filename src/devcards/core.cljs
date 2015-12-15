@@ -932,7 +932,7 @@
   (close! c))
 
 ;; Find any fixtures defined for ns and add them to the current test environment.
-;; Duplicates code in the cljs.test/test-all-vars-block macro
+;; Duplicates code in the cljs.test/test-all-vars-block macro (but at runtime instead of compile time)
 ;; Will break when using Closure optimizations
 (defn setup-fixtures [env ns]
   (println "setting up fixtures for namespace: " ns)
@@ -952,7 +952,7 @@
       (when test-doc-fn
         (test-doc-fn))
 
-      ;; run-block makes sure all async tests are finshed before reporting a complete run.
+      ;; run-block makes sure all async tests are finished before reporting a complete run.
       (cljs.test/run-block (concat (cljs.test/test-vars-block [var-under-test])
                                    [(fn []
                                       (put! out (cljs.test/get-current-env))
