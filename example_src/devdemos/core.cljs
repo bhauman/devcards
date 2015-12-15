@@ -404,7 +404,7 @@ as a dependency.
  
   It's important to make sure that your application isn't launching
   itself on load. We don't want your application to run. We want the
-  Devards application to run. So having a seperate HTML file for the
+  Devcards application to run. So having a seperate HTML file for the
   devcards build is the best solution.
 
   ```
