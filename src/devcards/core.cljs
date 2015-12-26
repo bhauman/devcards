@@ -4,12 +4,12 @@
 
    [devcards.util.markdown :as mark]
    [devcards.util.utils :as utils :refer [html-env?]]
-   
+
    [sablono.core :as sab :include-macros true]
    [devcards.util.edn-renderer :as edn-rend]
-   
+
    [clojure.string :as string]
-   
+
    [cljs.test]
    
    [cljs.core.async :refer [put! chan timeout <! close! alts!] :as async])
@@ -147,9 +147,12 @@
       (let [blocks (mapcat mark/parse-out-blocks strs)]
         (sab/html
          [:div.com-rigsomelight-devcards-markdown.com-rigsomelight-devcards-typog
-          (map markdown-block->react blocks)]))
+          (map-indexed
+            (fn [i data]
+              (sab/html [:div {:key i} (markdown-block->react data)]))
+            blocks)]))
       (do
-        (let [message "Devcards Error: Didn't pass a seq of strings to less-sensitive-markdown. 
+        (let [message "Devcards Error: Didn't pass a seq of strings to less-sensitive-markdown.
  You are probably trying to pass react to markdown instead of strings. (defcard-doc (doc ...)) won't work."]
           (try (.error js/console message))
           (sab/html [:div {:style {:color "#a94442"}}
@@ -320,13 +323,13 @@
                  ;; loop
                  ;; maybe we should have a :render-to-string false
                  ;; option?
-                 
+
                  main-obj'  (let [m (:main-obj card)]
                               (if (fn? m) (m data-atom this) m))
                  main-obj (if (and (not (nil? main-obj'))
                                    (not (react-element? main-obj')))
                              (code-highlight (utils/pprint-code main-obj') "clojure")
-                             main-obj') 
+                             main-obj')
                  main      (if (false? (:watch-atom options))
                              ;; only rerenders when render _isn't_
                              ;; driven by state change
@@ -345,7 +348,10 @@
                                        (nil? main-obj))
                              (assoc-in card [:options :hide-border] true)
                              card)
-                 children  (keep identity (list document main hist-ctl edn))]
+                 children  (keep-indexed
+                             (fn [i child]
+                               (sab/html [:div {:key i} child]))
+                             (list document main hist-ctl edn))]
              (if (:frame options)
                (frame children card) ;; make component and forward options
                (sab/html [:div.com-rigsomelight-devcards-frameless {} children])))))})
@@ -367,7 +373,7 @@
        (fn [prevP, prevS]
          (this-as
           this
-          (when (and (get-props this :node_fn) 
+          (when (and (get-props this :node_fn)
                      (not= (get-props this :node_fn)
                            (aget prevP "node_fn")))
             (render-into-dom this))))
@@ -392,7 +398,7 @@
 (defn booler? [key opts]
   (let [x (get opts key)]
     (or (true? x) (false? x) (nil? x)
-     {:label key 
+     {:label key
       :message "should be boolean or nil"
       :value x})))
 
@@ -418,12 +424,12 @@
                             options]} opts]
                 (concat
                  propagated-errors
-                 [(or (map? options) 
+                 [(or (map? options)
                       (nil? options)
-                      {:label   :options 
+                      {:label   :options
                        :message "should be a Map or nil"
                        :value options})
-                  (stringer? :name opts)                
+                  (stringer? :name opts)
                   (stringer? :documentation opts)
                   #_(or (nil? main-obj) (fn? main-obj) (react-element? main-obj)
                         {:label   :main-obj
@@ -473,7 +479,7 @@
             (str (:name opts) ": ")) "Devcard received bad options")]
     (naked-card
      (sab/html
-      [:div 
+      [:div
        [:div
         (map error-line errors)]
        (when (map? opts)
@@ -605,7 +611,7 @@
 ;; really need to have this take a protocol
 
 ;; managed history
-;; we should be able to abstract a system with a list of 
+;; we should be able to abstract a system with a list of
 
 
 
@@ -659,7 +665,7 @@
        (fn []
          (this-as this
                   (swap! (get-state this :history_atom)
-                         assoc-in [:history] (list @(get-props this :data_atom)))))        
+                         assoc-in [:history] (list @(get-props this :data_atom)))))
        :componentDidMount
        (fn []
          (this-as
@@ -689,7 +695,7 @@
                                                  (cons n hist)
                                                  hist))
                                     :ignore-click false))))))))
-       
+
        :render
        (fn []
          (this-as
@@ -769,7 +775,7 @@
   m)
 
 (defmethod cljs.test/report [:_devcards_test_card_reporter :fail] [m]
-  (cljs.test/inc-report-counter! :fail)  
+  (cljs.test/inc-report-counter! :fail)
   (collect-test m)
   m)
 
@@ -795,8 +801,8 @@
 
 (defn- display-message [{:keys [message]} body]
   (if message
-    (sab/html [:div 
-               [:span.com-rigsomelight-devcards-test-message 
+    (sab/html [:div
+               [:span.com-rigsomelight-devcards-test-message
                 message]
                body])
       body))
@@ -831,16 +837,18 @@
 (defmethod test-render :context [{:keys [testing-contexts]}]
   (sab/html [:div
              (interpose " / "
-                        (concat (map (fn [t] [:span {:style {:color "#bbb"}} t " "])
+                        (concat (map-indexed
+                                  (fn [i t] [:span {:key i :style {:color "#bbb"}} t " "])
                                      (reverse (rest testing-contexts)))
-                                (list [:span (first testing-contexts)])))]))
+                                (list [:span {:key -1}(first testing-contexts)])))]))
 
 (defn- test-doc [s]
   (cljs.test/report {:type :test-doc :documentation s}))
 
 (defn- test-renderer [t]
   [:div
-   {:className (str "com-rigsomelight-devcards-test-line com-rigsomelight-devcards-"
+   {:key (pr-str t)
+    :className (str "com-rigsomelight-devcards-test-line com-rigsomelight-devcards-"
                     (name (:type t)))}
    (test-render t)])
 
@@ -848,10 +856,10 @@
   (sab/html
    [:div.com-rigsomelight-devcards-test-card
     (:html-list
-     (reduce 
+     (reduce
       (fn [{:keys [last-context html-list]} t]
         { :last-context (:testing-contexts t)
-         :html-list 
+         :html-list
          (let [res (list (test-renderer t))
                res (if (= last-context
                           (:testing-contexts t))
@@ -866,7 +874,7 @@
       (reverse tests)))]))
 
 (defn render-tests [this path test-summary]
-  
+
   (let [error? (:error test-summary)
         tests (:_devcards_collect_tests test-summary)
         some-tests (filter (fn [{:keys [type]}] (not= type :test-doc))
@@ -903,7 +911,7 @@
                           (.setState this
                                      #js {:filter (fn [{:keys [type]}]
                                                     (#{:fail :error} type))})))}
-             (str (+ fail error))]))          
+             (str (+ fail error))]))
          (when-not (or (nil? pass) (zero? pass))
            (sab/html
             [:button.com-rigsomelight-devcards-badge
@@ -1067,7 +1075,7 @@
   (dev/start-ui-with-renderer devcards.core/devcard-event-chan (partial render-ns ns-symbol)))
 
 #_(devcards.core/defcard render-namespace-to-string
-  "# Support rendering a namespace to a string 
+  "# Support rendering a namespace to a string
 
    This is to support writing blog posts and publishing static pages.
 
