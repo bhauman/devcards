@@ -137,6 +137,20 @@
                       (when (string? part)
                         `(fn [] (devcards.core/test-doc ~part)))) parts))))))
 
+;; Add export metadata to the fixture symbols so they are not munged by the closure compiler
+;; and can be retrieved at runtime by the devcard test loop.
+(defmacro use-fixtures [type & fns]
+  (condp = type
+    :once
+    `(def ~(with-meta 'cljs-test-once-fixtures {:export true})
+       [~@fns])
+    :each
+    `(def ~(with-meta 'cljs-test-each-fixtures {:export true})
+       [~@fns])
+    :else
+    (throw
+      (Exception. "First argument to cljs.test/use-fixtures must be :once or :each"))))
+
 ;; reagent helpers
 
 (defmacro reagent [body]
