@@ -185,7 +185,7 @@
    using `(run-tests)` as well.
   
    The test card has controls in the upper right hand corner that not
-   only summerize testing status but also allow you to focus on passing or
+   only summarize testing status but also allow you to focus on passing or
    failing tests.
 
    Go ahead and click on the numbers in the header of this card.
