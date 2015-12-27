@@ -19,7 +19,7 @@
    Once you have Devcards setup and have required the devcards macros as below
    ```clojure
    (:require-macros
-     [devcards.core :as dc :refer [defcard]))
+     [devcards.core :as dc :refer [defcard]])
    ```
    You can then use the `defcard` macro. `defcard` is a multipurpose
    macro which is designed to take what you are working on elevate
