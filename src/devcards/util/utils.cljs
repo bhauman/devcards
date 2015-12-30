@@ -9,6 +9,8 @@
 (defn node-env? [] (not (nil? goog/nodeGlobalRequire)))
 
 (defn pprint-str [obj]
+  ;; this is currently only to handle the
+  ;; problem of printing JavaScript Symbols
   (try
     (with-out-str (pprint/pprint obj))
     (catch js/Error e1
