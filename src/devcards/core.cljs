@@ -9,7 +9,6 @@
    [devcards.util.edn-renderer :as edn-rend]
 
    [clojure.string :as string]
-
    [cljs.test]
    [cljs.core.async :refer [put! chan timeout <! close! alts!] :as async])
   (:require-macros
