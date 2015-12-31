@@ -248,19 +248,26 @@
 (declare cljs-logo)
 
 (defn breadcrumbs-templ [crumbs state-atom]
-  (sab/html
-   [:div.com-rigsomelight-devcards-card-base.com-rigsomelight-devcards-breadcrumbs.com-rigsomelight-devcards-typog
-    (interpose
-     (sab/html [:span.com-rigsomelight-devcards-breadcrumb-sep "/"])
-     (map (fn [[n path]]
-            (sab/html
-             [:span {:style {:display "inline-block" }}
-              [:a.com-rigsomelight-devcards_set-current-path
-               {:href "#"
-                :onClick      (prevent-> #(set-current-path! state-atom path))}
-               (str n)]]))
-          crumbs))
-    (cljs-logo)]))
+  (let [counter (atom 0)
+        sep-fn (fn [_] (sab/html [:span.com-rigsomelight-devcards-breadcrumb-sep
+                                 {:key (do (swap! counter inc) @counter)}
+                                 "/"]))]
+    (sab/html
+     [:div.com-rigsomelight-devcards-card-base.com-rigsomelight-devcards-breadcrumbs.com-rigsomelight-devcards-typog
+      {:key "breadcrumbs-templ"}
+      (rest
+       (interleave 
+        (iterate sep-fn (sep-fn nil))
+       (map (fn [[n path]]
+              (sab/html
+               [:span {:style {:display "inline-block" }
+                       :key (path->unique-card-id path)}
+                [:a.com-rigsomelight-devcards_set-current-path
+                 {:href "#"
+                  :onClick      (prevent-> #(set-current-path! state-atom path))}
+                 (str n)]]))
+            crumbs)))
+      (cljs-logo)])))
 
 (defn navigate-to-path [key state-atom]
   (swap! state-atom
@@ -277,6 +284,7 @@
              (sab/html
               [:a.com-rigsomelight-devcards-list-group-item
                {:href "#"
+                :key (str key)
                 :onClick
                 (prevent->
                  (fn [e] (navigate-to-path key state-atom)))

@@ -7,6 +7,23 @@
   (when-let [ws (second (re-matches #"^([\s]*).*"  s))]
     (.-length ws)))
 
+(defn is-bullet-item? [s] (boolean (re-matches #"^\s*([-*+]|[0-9]+\.)\s.*" s)))
+
+(defn bullets-left-edge "Find the common left edge of bullet lists in a collection of lines."
+  [lines]
+  (or
+    (->> lines
+      (filter is-bullet-item?)
+      (map leading-space-count)
+      (apply min))
+    0))
+
+(defn strip-left-margin "Strip the left margin's extra whitespace, but leave bullet list indents in tact."
+  [s margin]
+  (if (is-bullet-item? s)
+    (subs s margin)
+    (string/trim s)))
+
 (let [conv-class (.-converter js/Showdown)
       converter (conv-class.)]
   (defn markdown-to-html
@@ -21,8 +38,8 @@
   (fn [{:keys [stage]} line]
     [(if (matches-delim? line) :delim :line) (:type stage)]))
 
-(defmethod block-parser [:line :markdown] [{:keys [stage] :as st} line]
-  (update-in st [:stage :content] conj (string/trim line)))
+(defmethod block-parser [:line :markdown] [{:keys [stage left-margin] :as st} line]
+  (update-in st [:stage :content] conj (strip-left-margin line left-margin)))
 
 (defmethod block-parser [:line :code-block] [{:keys [stage] :as st} line]
   (update-in st [:stage :content] conj (subs line (:leading-spaces stage))))
@@ -43,9 +60,10 @@
     (assoc :stage {:type :markdown :content []})))
 
 (defn parse-out-blocks* [m]
-  (reduce block-parser
-   {:stage {:type :markdown :content []} :accum []}
-   (string/split m "\n")))
+  (let [lines (string/split m "\n")]
+    (reduce block-parser
+     {:stage {:type :markdown :content []} :accum [] :left-margin (bullets-left-edge lines)}
+     lines)))
 
 (defn parse-out-blocks [m]
   (let [{:keys [stage accum]} (parse-out-blocks* m)]

@@ -185,7 +185,7 @@
    using `(run-tests)` as well.
   
    The test card has controls in the upper right hand corner that not
-   only summerize testing status but also allow you to focus on passing or
+   only summarize testing status but also allow you to focus on passing or
    failing tests.
 
    Go ahead and click on the numbers in the header of this card.
@@ -215,7 +215,7 @@
        (is false))))
    ```
 
-   The `testing` and is macros are the ones from `cljs.test`
+   The `testing` and `is` macros are the ones from `cljs.test`
 
    These tests are rendered below:")
 
@@ -404,7 +404,7 @@ as a dependency.
  
   It's important to make sure that your application isn't launching
   itself on load. We don't want your application to run. We want the
-  Devards application to run. So having a seperate HTML file for the
+  Devcards application to run. So having a seperate HTML file for the
   devcards build is the best solution.
 
   ```
