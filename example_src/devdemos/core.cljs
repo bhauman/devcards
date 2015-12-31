@@ -215,7 +215,7 @@
        (is false))))
    ```
 
-   The `testing` and is macros are the ones from `cljs.test`
+   The `testing` and `is` macros are the ones from `cljs.test`
 
    These tests are rendered below:")
 
