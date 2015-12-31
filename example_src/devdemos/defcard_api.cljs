@@ -239,9 +239,9 @@
       a))
 
    (defcard atom-observing-card observed-atom)
-   ``` 
-   
-   This will produce the timer card that you that you can see below:")
+   ```
+
+   This will produce the timer card that you can see below:")
 
 (defonce observed-atom
   (let [a (atom {:time 0})]
