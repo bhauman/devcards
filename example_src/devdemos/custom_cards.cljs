@@ -60,8 +60,8 @@ convenient to use.
 
 ## Reaching into Devcards arguments with IDevcardOptions
 
-Using React components works great if you are focussing on the content
-area of a card. But sometimes you want to leverage the aregument
+Using React components works great if you are focusing on the content
+area of a card. But sometimes you want to leverage the argument
 parsing of the `defcard` macro and the functionality of the base
 devcard system itself.
 

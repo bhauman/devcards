@@ -1,3 +1,10 @@
+## 0.2.1-3
+
+* markdown bullet indentation fix
+* got rid of a bunch of React warnings
+* fix printing JavaScript Symbols
+* various documentation updates
+
 ## 0.2.1 React 14
 
 * now depends on React 14

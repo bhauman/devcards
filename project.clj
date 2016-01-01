@@ -1,4 +1,4 @@
-(defproject devcards "0.2.1-2"
+(defproject devcards "0.2.1-3"
   :description "Devcards is a ClojureScript library that provides a lab space to you develop your UI components independently and interactively."
   :url "http://github.com/bhauman/devcards"
   :license {:name "Eclipse Public License"
@@ -21,44 +21,52 @@
   :scm { :name "git"
          :url "https://github.com/bhauman/devcards" }
 
-  :profiles {
-   :dev {
-      :dependencies [[org.omcljs/om "0.9.0"]
-                     [reagent "0.5.1"]]                   
-      :plugins [[lein-cljsbuild "1.1.1"]
-                [lein-figwheel "0.5.0-2"]]
-      :resource-paths ["resources" "example-resources"]   
-      :cljsbuild {
-        :builds [{:id "devcards-demos"
-                  :source-paths ["example_src" "src"]
-                  :figwheel { :devcards true }
-                  :compiler {
-                             :main "devdemos.start-ui"
-                             :asset-path "js/compiled/out"
-                             :output-to "example-resources/public/devcards/js/compiled/devdemos.js"
-                             :output-dir "example-resources/public/devcards/js/compiled/out"
-                             :recompile-dependents false                             
-                             :optimizations :none
-                             :source-map-timestamp true}}
-                 {:id "website"
-                  :source-paths ["example_src" "src"]
-                  ;; :figwheel { :devcards true }
-                  :compiler {
-                             :main "devdemos.start-ui"
-                             :asset-path "site/out"
-                             :output-to "site/devdemos.js"
-                             :output-dir "site/out"
-                             :devcards true
-                             ;; :pseudo-names true                             
-                             :recompile-dependents true                             
-                             ;; :optimizations :simple
-                             :optimizations :advanced
-                             }}
-                 ]}
-         
+  :cljsbuild {
+              :builds [{:id "devcards-demos"
+                        :source-paths ["example_src" "src"]
+                        :figwheel { :devcards true }
+                        :compiler {
+                                   :main "devdemos.start-ui"
+                                   :asset-path "js/compiled/out"
+                                   :output-to "example-resources/public/devcards/js/compiled/devdemos.js"
+                                   :output-dir "example-resources/public/devcards/js/compiled/out"
+                                   :recompile-dependents false                             
+                                   :optimizations :none
+                                   :source-map-timestamp true}}
+                       {:id "website"
+                        :source-paths ["example_src" "src"]
+                        ;; :figwheel { :devcards true }
+                        :compiler {
+                                   :main "devdemos.start-ui"
+                                   :asset-path "site/out"
+                                   :output-to "site/devdemos.js"
+                                   :output-dir "site/out"
+                                   :devcards true
+                                   ;; :pseudo-names true                             
+                                   :recompile-dependents true                             
+                                   ;; :optimizations :simple
+                                   :optimizations :advanced
+                                   }}
+                       ]}
+  
          :figwheel { :css-dirs ["resources/public/devcards/css"]
                      :open-file-command "emacsclient"
                     ;;:nrepl-port 7888
                     }
+
+  
+  :profiles {
+   :repl { :plugins [[cider/cider-nrepl "0.10.0-SNAPSHOT"]]
+           :repl-options {:init (set! *print-length* 500)}}             
+   :dev {
+      :dependencies [[org.omcljs/om "0.9.0"]
+                     [reagent "0.5.1"]
+                     [figwheel-sidecar "0.5.0-2"]
+                     [com.cemerick/piggieback "0.2.1"]
+                     [org.clojure/tools.nrepl "0.2.12"]]                   
+      :plugins [[lein-cljsbuild "1.1.1"]
+                [lein-figwheel "0.5.0-2"]]
+      :resource-paths ["resources" "example-resources"]   
+
      }})
 
