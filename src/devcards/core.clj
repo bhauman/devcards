@@ -123,6 +123,8 @@
 
 ;; testing
 
+    
+
 ;;
 ;; Call the test-card component with a var to test and the optional test doc string.
 (defmacro deftest [vname & parts]
@@ -136,6 +138,20 @@
             ~@(keep (fn [part]
                       (when (string? part)
                         `(fn [] (devcards.core/test-doc ~part)))) parts))))))
+
+;; Anonymous tests, same as above, but don't generate a card and
+;; put the tests under a generated symbol
+(defmacro tests [& parts]
+  (when (utils/devcards-active?)
+    (let [vname (gensym "devcards-test-")]
+      `(do
+        (cljs.test/deftest ~vname
+          ~@parts)
+        (devcards.core/test-card
+         (var ~vname)
+         ~@(keep (fn [part]
+                  (when (string? part)
+                    `(fn [] (devcards.core/test-doc ~part)))) parts))))))
 
 ;; Add export metadata to the fixture symbols so they are not munged by the closure compiler
 ;; and can be retrieved at runtime by the devcard test loop.

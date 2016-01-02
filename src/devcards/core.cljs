@@ -940,7 +940,6 @@
 
 ;; Find any fixtures defined for ns and add them to the current test environment.
 ;; Duplicates code in the cljs.test/test-all-vars-block macro (but at runtime instead of compile time)
-;; Will break when using Closure optimizations
 (defn setup-fixtures [env ns]
   (println "setting up fixtures for namespace: " ns)
   (when-let [fixtures (js/goog.getObjectByName (munge (str ns ".cljs-test-once-fixtures")))]
