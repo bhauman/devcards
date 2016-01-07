@@ -3,6 +3,7 @@
    [devcards.core]
    [devdemos.defcard-api]
    [devdemos.om]
+   [devdemos.om-next]
    [devdemos.reagent]
    [devdemos.source-code-display]
    [devdemos.two-zero]
