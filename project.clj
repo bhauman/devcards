@@ -59,7 +59,8 @@
    :repl { :plugins [[cider/cider-nrepl "0.10.0-SNAPSHOT"]]
            :repl-options {:init (set! *print-length* 500)}}             
    :dev {
-      :dependencies [[org.omcljs/om "0.9.0"]
+      :dependencies [;[org.omcljs/om "0.9.0"]
+                     [org.omcljs/om "1.0.0-alpha28"]
                      [reagent "0.5.1"]
                      [figwheel-sidecar "0.5.0-2"]
                      [com.cemerick/piggieback "0.2.1"]
@@ -69,4 +70,3 @@
       :resource-paths ["resources" "example-resources"]   
 
      }})
-
