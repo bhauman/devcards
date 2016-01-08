@@ -33,9 +33,8 @@
 (defn literal [class x]
   (sab/html [:span { :className class :key (get-key)} (utils/pprint-str x)]))
 
-(defn html-val
-  ([index v]
-   (sab/html [:span {:key index} (html v)])))
+(defn html-val [index v]
+  (sab/html [:span {:key index} (html v)]))
 
 (defn join-html [separator coll]
   (interpose-separator (into [] (map-indexed html-val coll))
