@@ -179,26 +179,33 @@
 ;; om next helpers
 
 (defmacro om-next-root
+  ([om-next-comp]
+   (when (utils/devcards-active?)
+     `(om-next-root ~om-next-comp nil {})))
   ([om-next-comp om-next-reconciler]
    (when (utils/devcards-active?)
-     `(create-idevcard
-       (devcards.core/dom-node*
-        (fn [data-atom# node#]
-          (let [state# (if (map? ~om-next-reconciler) (atom ~om-next-reconciler) data-atom#)
+     `(om-next-root ~om-next-comp ~om-next-reconciler {})))
+  ([om-next-comp om-next-reconciler options]
+   (when (utils/devcards-active?)
+       `(devcards.core/OmNextDevcard.
+          (let [state# (when-not (om.next/reconciler? ~om-next-reconciler)
+                         (if (map? ~om-next-reconciler)
+                           (atom ~om-next-reconciler)
+                           (atom {})))
                 reconciler# (if (om.next/reconciler? ~om-next-reconciler)
                               ~om-next-reconciler
                               (om.next/reconciler {:state state#
-                                                   :parser (om.next/parser {:read (fn [] {:value data-atom#})})}))]
-            (om.next/add-root! reconciler# ~om-next-comp node#))))
-       {:watch-atom false})))
-  ([om-next-comp]
-   (when (utils/devcards-active?)
-     `(om-next-root ~om-next-comp nil))))
+                                                   :parser (om.next/parser {:read (fn [] {:value state#})})}))]
+            {:mount-fn #(om.next/add-root! reconciler# ~om-next-comp %)
+             :data_atom (om.next/app-state reconciler#)
+             :reconciler reconciler#
+             :component ~om-next-comp})
+        ~options))))
 
 (defmacro defcard-om-next [& exprs]
   (when (utils/devcards-active?)
-    (let [[vname docu om-next-comp om-next-reconciler initial-data options] (parse-card-args exprs 'om-next-root-card)]
-      (card vname docu `(om-next-root ~om-next-comp ~om-next-reconciler) initial-data options))))
+    (let [[vname docu om-next-comp om-next-reconciler options] (parse-card-args exprs 'om-next-root-card)]
+      (card vname docu `(om-next-root ~om-next-comp ~om-next-reconciler) nil options))))
 
 ;; formatting for markdown cards
 
