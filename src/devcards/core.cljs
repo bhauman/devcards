@@ -279,6 +279,9 @@
                             (not (react-element? main-obj')))
                       (code-highlight (utils/pprint-code main-obj') "clojure")
                       main-obj')
+          ;; add the option to pass our (overridden-)`main` instead of inferring it.
+          ;; In the Om Next case this means passing the element where we mount
+          ;; the Om Next component.
           main      (cond
                       (not (nil? overridden-main))
                       overridden-main
