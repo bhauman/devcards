@@ -331,7 +331,7 @@ our site.
 `lein cljsbuild once hostedcards`
 
 Once the build is complete, simply copy the contents of `resources\public` 
-to your webserver and serve it up as you would any other page. You 
+to your webserver and serve it up as you would any other page.
 
 ## FAQ
 

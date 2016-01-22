@@ -205,6 +205,30 @@
     (let [[vname docu om-comp-fn initial-data om-options options] (parse-card-args exprs 'om-root-card)]
       (card vname docu `(om-root ~om-comp-fn ~om-options) initial-data options))))
 
+;; om next helpers
+
+(defmacro om-next-root
+  ([om-next-comp om-next-reconciler]
+   (when (utils/devcards-active?)
+     `(create-idevcard
+       (devcards.core/dom-node*
+        (fn [data-atom# node#]
+          (let [state# (if (map? ~om-next-reconciler) (atom ~om-next-reconciler) data-atom#)
+                reconciler# (if (om.next/reconciler? ~om-next-reconciler)
+                              ~om-next-reconciler
+                              (om.next/reconciler {:state state#
+                                                   :parser (om.next/parser {:read (fn [] {:value data-atom#})})}))]
+            (om.next/add-root! reconciler# ~om-next-comp node#))))
+       {:watch-atom false})))
+  ([om-next-comp]
+   (when (utils/devcards-active?)
+     `(om-next-root ~om-next-comp nil))))
+
+(defmacro defcard-om-next [& exprs]
+  (when (utils/devcards-active?)
+    (let [[vname docu om-next-comp om-next-reconciler initial-data options] (parse-card-args exprs 'om-next-root-card)]
+      (card vname docu `(om-next-root ~om-next-comp ~om-next-reconciler) initial-data options))))
+
 ;; formatting for markdown cards
 
 (defmacro pprint-str [obj]
@@ -241,4 +265,3 @@
                     :namespace `(quote ~x)
                     :munged-namespace `(quote ~(munge x))))
       (ana-api/all-ns)))))
-
