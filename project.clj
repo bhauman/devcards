@@ -1,4 +1,4 @@
-(defproject devcards "0.2.1-4"
+(defproject devcards "0.2.1-5"
   :description "Devcards is a ClojureScript library that provides a lab space in which you can develop your UI components independently and interactively."
   :url "http://github.com/bhauman/devcards"
   :license {:name "Eclipse Public License"
@@ -6,7 +6,7 @@
 
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.170"]
-                 [org.clojure/core.async  "0.2.374"]
+                 [org.clojure/core.async  "0.2.374" :exclusions [org.clojure/tools.reader]]
                  [cljsjs/react "0.14.3-0"]
                  [cljsjs/react-dom "0.14.3-1"]
                  [cljsjs/react-dom-server "0.14.3-0"]                 
@@ -62,11 +62,11 @@
       :dependencies [;[org.omcljs/om "0.9.0"]
                      [org.omcljs/om "1.0.0-alpha28"]
                      [reagent "0.5.1"]
-                     [figwheel-sidecar "0.5.0-3"]
+                     [figwheel-sidecar "0.5.0-4"]
                      [com.cemerick/piggieback "0.2.1"]
                      [org.clojure/tools.nrepl "0.2.12"]]                   
-      :plugins [[lein-cljsbuild "1.1.1"]
-                [lein-figwheel "0.5.0-3"]]
+      :plugins [[lein-cljsbuild "1.1.2" :exclusions [org.clojure/clojure]]
+                [lein-figwheel "0.5.0-4"]]
       :resource-paths ["resources" "example-resources"]   
 
      }})
