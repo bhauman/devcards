@@ -364,7 +364,7 @@
 
    ## Existing project
 
-   Integrating devcards into an existing is fairly straightforward and
+   Integrating devcards into an existing project is straightforward and
    requires a seperate build, similar to how you would create a test
    build.
 
