@@ -1,3 +1,7 @@
+## 0.2.1-5 Fixing minor dependency conflicts
+
+* getting rid of dep conflicts 
+
 ## 0.2.1-4 Om Next Helpers
 
 * bumping sablono deps
