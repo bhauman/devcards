@@ -163,7 +163,7 @@
         padding?  (get-in card [:options :padding])]
     (sab/html
       [:div
-       {:key (str (hash card) "2")
+       {:key "devcards_naked-card"
         :className
         (cond-> devcards.system/devcards-rendered-card-class
           padding? (str " com-rigsomelight-devcards-devcard-padding")
@@ -187,7 +187,7 @@
         (sab/html
          [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad {:key (prn-str path)}
           [:div.com-rigsomelight-devcards-panel-heading.com-rigsomelight-devcards-typog
-           {:key (str (hash card) "1")}
+           {:key "devcards_frame-normal-body"}
            (if path
              (sab/html
               [:a

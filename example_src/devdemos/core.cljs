@@ -16,7 +16,6 @@
      ;; be created when the :devcards is set to true in the build config.
      [devcards.core :as dc :refer [defcard defcard-doc deftest dom-node]]))
 
-
 (def ^:export front-matter
   {:layout false
    :title "The Hard Sell"
