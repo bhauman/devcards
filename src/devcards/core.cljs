@@ -260,6 +260,43 @@
 
 (declare atom-like?)
 
+(defn default-derive-main [parent-elem card data-atom change-count]
+  (let [options  (:options card)
+        main-obj' (let [m (:main-obj card)]
+                    (if (fn? m) (m data-atom parent-elem) m))
+        main-obj (if (and (not (nil? main-obj'))
+                          (not (react-element? main-obj')))
+                   (code-highlight (utils/pprint-code main-obj') "clojure")
+                   main-obj')] 
+    (if (false? (:watch-atom options))
+      ;; only rerenders when render _isn't_
+      ;; driven by state change
+      (dont-update change-count main-obj)
+      main-obj)))
+
+(defn render-all-card-elements [main data-atom card]
+  (let [options   (:options card)
+        hist-ctl  (when (:history options)
+                    (hist-recorder* data-atom))
+        document  (when-let [docu (:documentation card)]
+                    (markdown->react docu))
+        edn       (when (:inspect-data options)
+                    (sab/html
+                     [:div.com-rigsomelight-devcards-padding-top-border
+                      (edn-rend/html-edn @data-atom)]))
+        ;; only documentation?
+        card      (if (or (string? main)
+                          (nil? main))
+                    (assoc-in card [:options :hide-border] true)
+                    card)
+        children  (keep-indexed
+                   (fn [i child]
+                     (sab/html [:div {:key i} child]))
+                   (list document main hist-ctl edn))]
+    (if (:frame options)
+      (frame children card) ;; make component and forward options
+      (sab/html [:div.com-rigsomelight-devcards-frameless {} children]))))
+
 (defonce-react-class DevcardBase
   #js {:getInitialState
        (fn []
@@ -311,48 +348,12 @@
          (fn []))
         :render
         (fn []
-          (this-as
-           this
-           (let [data-atom (get-data-atom this)
-                 card      (get-props this :card)
-                 change-count (get-state this :state_change_count)
-                 options   (:options card)
-                 ;; some components have their own internal render
-                 ;; loop
-                 ;; maybe we should have a :render-to-string false
-                 ;; option?
-
-                 main-obj'  (let [m (:main-obj card)]
-                              (if (fn? m) (m data-atom this) m))
-                 main-obj (if (and (not (nil? main-obj'))
-                                   (not (react-element? main-obj')))
-                             (code-highlight (utils/pprint-code main-obj') "clojure")
-                             main-obj')
-                 main      (if (false? (:watch-atom options))
-                             ;; only rerenders when render _isn't_
-                             ;; driven by state change
-                             (dont-update change-count main-obj)
-                             main-obj)
-                 hist-ctl  (when (:history options)
-                             (hist-recorder* data-atom))
-                 document  (when-let [docu (:documentation card)]
-                             (markdown->react docu))
-                 edn       (when (:inspect-data options)
-                             (sab/html
-                              [:div.com-rigsomelight-devcards-padding-top-border
-                               (edn-rend/html-edn @data-atom)]))
-                            ;; only documentation?
-                 card      (if (or (string? main-obj)
-                                       (nil? main-obj))
-                             (assoc-in card [:options :hide-border] true)
-                             card)
-                 children  (keep-indexed
-                             (fn [i child]
-                               (sab/html [:div {:key i} child]))
-                             (list document main hist-ctl edn))]
-             (if (:frame options)
-               (frame children card) ;; make component and forward options
-               (sab/html [:div.com-rigsomelight-devcards-frameless {} children])))))})
+          (this-as this
+            (let [data-atom    (get-data-atom this)
+                  card         (get-props this :card)
+                  change-count (get-state this :state_change_count)
+                  main         (default-derive-main this card data-atom change-count)]
+              (render-all-card-elements main data-atom card))))})
 
 ;; this is going to capture and  handle the raw options
 
@@ -1063,4 +1064,3 @@
    This is pretty darn cool.
    "
   (render-namespace-to-string 'devdemos.core))
-
