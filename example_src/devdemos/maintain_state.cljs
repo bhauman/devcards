@@ -1,12 +1,7 @@
 (ns devdemos.maintain_state
     (:require
-     [om.core :as om :include-macros true]
-     [om.dom :as dom :include-macros true]
-     [reagent.core :as reagent]
-     [clojure.string :as string]
      [sablono.core :as sab :include-macros true]
-     [devcards.core]
-     [cljs.test :as t :include-macros true :refer-macros [testing is]])
+     [devcards.core])
     (:require-macros
      ;; Notice that I am not including the 'devcards.core namespace
      ;; but only the macros. This helps ensure that devcards will only
