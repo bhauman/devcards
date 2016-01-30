@@ -123,7 +123,7 @@
   (componentWillUnmount [_]
     (println "unmounting this"))
   (render [_]
-    (dom/div nil "unmount")))
+    (dom/div nil "unmount sample")))
 
 (defcard-om-next sample-om-next-card
   UnmountSample)
