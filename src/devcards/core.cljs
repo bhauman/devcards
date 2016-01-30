@@ -145,6 +145,7 @@
       (let [blocks (mapcat mark/parse-out-blocks strs)]
         (sab/html
          [:div.com-rigsomelight-devcards-markdown.com-rigsomelight-devcards-typog
+          {:key "devcards-markdown-block"}
           (map-indexed
             (fn [i data]
               (sab/html [:div {:key i} (markdown-block->react data)]))
@@ -153,7 +154,7 @@
         (let [message "Devcards Error: Didn't pass a seq of strings to less-sensitive-markdown.
  You are probably trying to pass react to markdown instead of strings. (defcard-doc (doc ...)) won't work."]
           (try (.error js/console message))
-          (sab/html [:div {:style {:color "#a94442"}}
+          (sab/html [:div {:style {:color "#a94442"} :key "devcards-markdown-error"}
                      message]))))))
 
 ;; returns a react component of rendered edn
@@ -281,21 +282,18 @@
         document  (when-let [docu (:documentation card)]
                     (markdown->react docu))
         edn       (when (:inspect-data options)
-                    (sab/html
-                     [:div.com-rigsomelight-devcards-padding-top-border
-                      (edn-rend/html-edn @data-atom)]))
+                    (edn-rend/html-edn @data-atom))
         ;; only documentation?
         card      (if (or (string? main)
                           (nil? main))
                     (assoc-in card [:options :hide-border] true)
                     card)
-        children  (keep-indexed
-                   (fn [i child]
-                     (sab/html [:div {:key i} child]))
-                   (list document main hist-ctl edn))]
+        main      (sab/html [:div {:key "devcards-main-section"} main])
+        children  (keep identity (list document main hist-ctl edn))]
     (if (:frame options)
       (frame children card) ;; make component and forward options
       (sab/html [:div.com-rigsomelight-devcards-frameless {} children]))))
+
 
 (defonce-react-class DevcardBase
   #js {:getInitialState
@@ -715,7 +713,7 @@
                      :href "#"
                      :onClick action
                      :onTouchEnd action}
-                 [:span.com-rigsomelight-devcards-history-control-left ""]]))
+                    [:span.com-rigsomelight-devcards-history-control-left ""]]))
                 (let [action (fn [e]
                                (.preventDefault e)
                                ;; touch the data atom
@@ -727,7 +725,7 @@
                     {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
                      :onClick action
                      :onTouchEnd action}
-                 [:span.com-rigsomelight-devcards-history-stop ""]]))
+                    [:span.com-rigsomelight-devcards-history-stop ""]]))
                 (let [action (fn [e]
                                 (.preventDefault e)
                                 (forward-in-history! this))]
@@ -752,11 +750,10 @@
                 #_(edn->html @(.. this -state -history_atom))]
                ))))})
 
-
 ;; keep
 (defn- hist-recorder* [data-atom]
   (js/React.createElement HistoryComponent
-                         #js { :data_atom data-atom }))
+                         #js { :data_atom data-atom :key "devcards-history-control-bar"}))
 
 ;; Testing via cljs.test
 (comment
