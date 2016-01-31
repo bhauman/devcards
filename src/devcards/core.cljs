@@ -146,6 +146,7 @@
       (let [blocks (mapcat mark/parse-out-blocks strs)]
         (sab/html
          [:div.com-rigsomelight-devcards-markdown.com-rigsomelight-devcards-typog
+          {:key "devcards-markdown-block"}
           (map-indexed
             (fn [i data]
               (sab/html [:div {:key i} (markdown-block->react data)]))
@@ -154,7 +155,7 @@
         (let [message "Devcards Error: Didn't pass a seq of strings to less-sensitive-markdown.
  You are probably trying to pass react to markdown instead of strings. (defcard-doc (doc ...)) won't work."]
           (try (.error js/console message))
-          (sab/html [:div {:style {:color "#a94442"}}
+          (sab/html [:div {:style {:color "#a94442"} :key "devcards-markdown-error"}
                      message]))))))
 
 ;; returns a react component of rendered edn
@@ -164,7 +165,7 @@
         padding?  (get-in card [:options :padding])]
     (sab/html
       [:div
-       {:key (str (hash card) "2")
+       {:key "devcards_naked-card"
         :className
         (cond-> devcards.system/devcards-rendered-card-class
           padding? (str " com-rigsomelight-devcards-devcard-padding")
@@ -188,7 +189,7 @@
         (sab/html
          [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-card-base-no-pad {:key (prn-str path)}
           [:div.com-rigsomelight-devcards-panel-heading.com-rigsomelight-devcards-typog
-           {:key (str (hash card) "1")}
+           {:key "devcards_frame-normal-body"}
            (if path
              (sab/html
               [:a
@@ -261,6 +262,40 @@
 
 (declare atom-like?)
 
+(defn default-derive-main [parent-elem card data-atom change-count]
+  (let [options  (:options card)
+        main-obj' (let [m (:main-obj card)]
+                    (if (fn? m) (m data-atom parent-elem) m))
+        main-obj (if (and (not (nil? main-obj'))
+                          (not (react-element? main-obj')))
+                   (code-highlight (utils/pprint-code main-obj') "clojure")
+                   main-obj')] 
+    (if (false? (:watch-atom options))
+      ;; only rerenders when render _isn't_
+      ;; driven by state change
+      (dont-update change-count main-obj)
+      main-obj)))
+
+(defn render-all-card-elements [main data-atom card]
+  (let [options   (:options card)
+        hist-ctl  (when (:history options)
+                    (hist-recorder* data-atom))
+        document  (when-let [docu (:documentation card)]
+                    (markdown->react docu))
+        edn       (when (:inspect-data options)
+                    (edn-rend/html-edn @data-atom))
+        ;; only documentation?
+        card      (if (or (string? main)
+                          (nil? main))
+                    (assoc-in card [:options :hide-border] true)
+                    card)
+        main      (sab/html [:div {:key "devcards-main-section"} main])
+        children  (keep identity (list document main hist-ctl edn))]
+    (if (:frame options)
+      (frame children card) ;; make component and forward options
+      (sab/html [:div.com-rigsomelight-devcards-frameless {} children]))))
+
+
 (defonce-react-class DevcardBase
   #js {:getInitialState
        (fn []
@@ -312,48 +347,12 @@
          (fn []))
         :render
         (fn []
-          (this-as
-           this
-           (let [data-atom (get-data-atom this)
-                 card      (get-props this :card)
-                 change-count (get-state this :state_change_count)
-                 options   (:options card)
-                 ;; some components have their own internal render
-                 ;; loop
-                 ;; maybe we should have a :render-to-string false
-                 ;; option?
-
-                 main-obj'  (let [m (:main-obj card)]
-                              (if (fn? m) (m data-atom this) m))
-                 main-obj (if (and (not (nil? main-obj'))
-                                   (not (react-element? main-obj')))
-                             (code-highlight (utils/pprint-code main-obj') "clojure")
-                             main-obj')
-                 main      (if (false? (:watch-atom options))
-                             ;; only rerenders when render _isn't_
-                             ;; driven by state change
-                             (dont-update change-count main-obj)
-                             main-obj)
-                 hist-ctl  (when (:history options)
-                             (hist-recorder* data-atom))
-                 document  (when-let [docu (:documentation card)]
-                             (markdown->react docu))
-                 edn       (when (:inspect-data options)
-                             (sab/html
-                              [:div.com-rigsomelight-devcards-padding-top-border
-                               (edn-rend/html-edn @data-atom)]))
-                            ;; only documentation?
-                 card      (if (or (string? main-obj)
-                                       (nil? main-obj))
-                             (assoc-in card [:options :hide-border] true)
-                             card)
-                 children  (keep-indexed
-                             (fn [i child]
-                               (sab/html [:div {:key i} child]))
-                             (list document main hist-ctl edn))]
-             (if (:frame options)
-               (frame children card) ;; make component and forward options
-               (sab/html [:div.com-rigsomelight-devcards-frameless {} children])))))})
+          (this-as this
+            (let [data-atom    (get-data-atom this)
+                  card         (get-props this :card)
+                  change-count (get-state this :state_change_count)
+                  main         (default-derive-main this card data-atom change-count)]
+              (render-all-card-elements main data-atom card))))})
 
 ;; this is going to capture and  handle the raw options
 
@@ -715,7 +714,7 @@
                      :href "#"
                      :onClick action
                      :onTouchEnd action}
-                 [:span.com-rigsomelight-devcards-history-control-left ""]]))
+                    [:span.com-rigsomelight-devcards-history-control-left ""]]))
                 (let [action (fn [e]
                                (.preventDefault e)
                                ;; touch the data atom
@@ -727,7 +726,7 @@
                     {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
                      :onClick action
                      :onTouchEnd action}
-                 [:span.com-rigsomelight-devcards-history-stop ""]]))
+                    [:span.com-rigsomelight-devcards-history-stop ""]]))
                 (let [action (fn [e]
                                 (.preventDefault e)
                                 (forward-in-history! this))]
@@ -752,11 +751,10 @@
                 #_(edn->html @(.. this -state -history_atom))]
                ))))})
 
-
 ;; keep
 (defn- hist-recorder* [data-atom]
   (js/React.createElement HistoryComponent
-                         #js { :data_atom data-atom }))
+                         #js { :data_atom data-atom :key "devcards-history-control-bar"}))
 
 ;; Testing via cljs.test
 (comment
@@ -1083,4 +1081,3 @@
    This is pretty darn cool.
    "
   (render-namespace-to-string 'devdemos.core))
-

@@ -27,9 +27,14 @@
 
     Please refer to code of this file to see how these Om Next examples are
     built.
+
+    ### One more thing
+    - If you want to experience the best of a live-programming environment, don't forget to write reloadable code:
+      - `defui ^:once` your components
+      - `defonce` your reconcilers!
 ")
 
-(defui Widget
+(defui ^:once Widget
   Object
   (render [this]
     (sab/html [:h2 "This is an Om Next card, " (:text (om/props this))])))
@@ -54,7 +59,7 @@
 
 (defcard om-next-share-atoms
   (dc/doc
-   "#### You can share an Atom between `om-next-root` cards.
+   "#### You can share an Atom between `om-next-root`/`defcard-om-next` cards.
 
     Interact with the counters below."))
 
@@ -85,62 +90,40 @@
 
 (def om-next-counter-inc (counter inc "inc"))
 
-(defcard-om-next om-next-card-shared-ex-1
-  om-next-counter-inc
+(defonce rec1
   (om/reconciler {:state om-test-atom
                   :parser (om/parser {:read counter-read
                                       :mutate counter-mutate})
                   :shared {:title "First counter "}}))
 
+(defcard-om-next om-next-card-shared-ex-1
+  om-next-counter-inc
+  rec1)
+
 (def om-next-counter-dec (counter dec "dec"))
 
-(defcard-om-next om-next-card-shared-ex-2
-  om-next-counter-dec
+(defonce rec2
   (om/reconciler {:state om-test-atom
                   :parser (om/parser {:read counter-read
                                       :mutate counter-mutate})
                   :shared {:title "Second counter "}}))
 
-(dc/defcard om-test-atom-data
+(defcard-om-next om-next-card-shared-ex-2
+  om-next-counter-dec
+  rec2)
+
+(defcard om-test-atom-data
   "### You can share an Atom with an `edn-card` too:"
   om-test-atom)
 
-(defui UnmountSample
+(defui ^:once UnmountSample
   Object
   (componentDidMount [_]
     (println "mounting"))
   (componentWillUnmount [_]
     (println "unmounting this"))
   (render [_]
-    (dom/div nil "unmount")))
+    (dom/div nil "unmount sample")))
 
 (defcard-om-next sample-om-next-card
   UnmountSample)
-
-(defn display-state [c [k v]]
-  (dom/li nil
-    (str k ": " v)
-    (dom/button #js {:key (str k)
-                     :onClick #(om/update-state! c update k inc)} "inc!")))
-
-(defui ^:once ComponentWithLocalState
-  Object
-  (initLocalState [this]
-    {:a 1
-     :b 2})
-  (render [this]
-    (dom/div nil
-      (map #(display-state this %) (om/get-state this)))))
-
-(defcard-om-next local-state-om-next-card
-  "we can define components with `:once` metadata"
-  ComponentWithLocalState)
-
-(defcard local-state-mock-root
-  "Unfortunately, components will lose their local state upon reload
-   This is also true with a root mocking approach, as demoed in this card"
-  (p/add-root!
-    (om.next/reconciler {:state {}
-                         :parser (om.next/parser {:read (fn [] {:value {}})})})
-    ComponentWithLocalState
-    nil nil))

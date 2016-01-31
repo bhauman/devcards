@@ -64,13 +64,13 @@
                       (create-style-element "com-rigsomelight-code-highlight-css"
                                             (inline-resouce-file "public/devcards/css/com_rigsomelight_github_highlight.css"))))
 
-      
+
       (when-not (get-element-by-id "com-rigsomelight-devcards-css")
         (.appendChild head (create-style-element "com-rigsomelight-devcards-css"
                                                  (inline-resouce-file "public/devcards/css/com_rigsomelight_devcards.css"))))
       (when-not (get-element-by-id "com-rigsomelight-devcards-addons-css")
-        (.appendChild head (create-style-element "com-rigsomelight-devcards-css"
-                                                 (inline-resouce-file "public/devcards/css/com_rigsomelight_devcards_addons.css"))))      
+        (.appendChild head (create-style-element "com-rigsomelight-devcards-addons-css"
+                                                 (inline-resouce-file "public/devcards/css/com_rigsomelight_devcards_addons.css"))))
       (when-not (get-element-by-id "com-rigsomelight-edn-css")
         (.appendChild head
                       (create-style-element "com-rigsomelight-edn-css"
@@ -256,7 +256,7 @@
      [:div.com-rigsomelight-devcards-card-base.com-rigsomelight-devcards-breadcrumbs.com-rigsomelight-devcards-typog
       {:key "breadcrumbs-templ"}
       (rest
-       (interleave 
+       (interleave
         (iterate sep-fn (sep-fn nil))
        (map (fn [[n path]]
               (sab/html
@@ -340,11 +340,11 @@
 
 (comment
 
-  
+
   a debug option :debug-card true
-  
+
   when initial state changes we should reset the state
-  
+
   an iterator to delinate a card in many states
 
   speed test pprint and hightlighting versus edn-renderer
@@ -354,22 +354,22 @@
   look at upndown.js and marked.js
 
   probably switch to marked for markdown parsing
-  
+
   fix loading race
 
   move highlighting out and force folks to require hljs if they want it?
-  
+
   generate blog posts from a namespace with devcards
-  - can implement code modules 
+  - can implement code modules
   - look at dev mode and prod mode for this
   - front matter in ns meta data
 
   fix style of history so that there is no margin under it
     when there is no data being inspected
-  
+
   move documentation cards into more descriptive namespaces
   fill out details better
-  
+
   look at being able to render cursors
 
   BACKBURNER
@@ -393,8 +393,8 @@
 ;; level that take more than the wait time this could be a problem
 (defn off-the-books
   "Run sequential messages off the books outside of the atom and
-   then difference the result so we can only display the new cards 
-   that have arrived. This prevents multiple renders and allows us 
+   then difference the result so we can only display the new cards
+   that have arrived. This prevents multiple renders and allows us
    to delete cards live."
   [channel start-data first-message]
   (let [;timer (timeout 3000)
@@ -455,10 +455,10 @@
         ;; and then load the accumulated state into the
         ;; app-state
         (<! (load-data-from-channel! channel))
-        
+
         #_(let [new-state (<! (off-the-books channel @app-state []))]
           (reset! app-state new-state))
-        
+
         ;; escape core async context for better errors
         (js/setTimeout #(renderer app-state) 0)
 
