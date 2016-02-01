@@ -1,3 +1,9 @@
+## 0.2.1-6
+
+* Fixed a regression where Component local state was lost during reload
+* refactored to accommodate Om Next extension
+* fixed some React missing key warnings
+
 ## 0.2.1-5 Fixing minor dependency conflicts
 
 * getting rid of dep conflicts 
