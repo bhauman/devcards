@@ -295,7 +295,6 @@
       (frame children card) ;; make component and forward options
       (sab/html [:div.com-rigsomelight-devcards-frameless {} children]))))
 
-
 (defonce-react-class DevcardBase
   #js {:getInitialState
        (fn []
