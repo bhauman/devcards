@@ -840,9 +840,9 @@
 (defn- test-doc [s]
   (cljs.test/report {:type :test-doc :documentation s}))
 
-(defn- test-renderer [t]
+(defn- test-renderer [t i]
   [:div
-   {:key (pr-str t)
+   {:key (pr-str t i) ; prevent react duplicate key errors when a testing block contains the same "is" form.
     :className (str "com-rigsomelight-devcards-test-line com-rigsomelight-devcards-"
                     (name (:type t)))}
    (test-render t)])
@@ -852,21 +852,21 @@
    [:div.com-rigsomelight-devcards-test-card
     (:html-list
      (reduce
-      (fn [{:keys [last-context html-list]} t]
+      (fn [{:keys [last-context html-list]} [i t]]
         { :last-context (:testing-contexts t)
          :html-list
-         (let [res (list (test-renderer t))
+         (let [res (list (test-renderer t i))
                res (if (= last-context
                           (:testing-contexts t))
                      res
                      (if (not-empty (:testing-contexts t))
                        (cons (test-renderer (merge {:type :context}
-                                                   (select-keys t [:testing-contexts])))
+                                                   (select-keys t [:testing-contexts])) i)
                              res)
                        res))]
-           (concat html-list res ))})
+           (concat html-list res))})
       {}
-      (reverse tests)))]))
+      (map-indexed vector (reverse tests))))]))
 
 (defn render-tests [this path test-summary]
 
