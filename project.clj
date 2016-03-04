@@ -57,16 +57,16 @@
   
   :profiles {
    :repl { :plugins [[cider/cider-nrepl "0.10.1"]]
-           :repl-options {:init (set! *print-length* 500)}}             
+           :repl-options {:init (set! *print-length* 50)}}
    :dev {
       :dependencies [;[org.omcljs/om "0.9.0"]
                      [org.omcljs/om "1.0.0-alpha28"]
                      [reagent "0.5.1"]
-                     [figwheel-sidecar "0.5.0-4"]
+                     [figwheel-sidecar "0.5.0-6"]
                      [com.cemerick/piggieback "0.2.1"]
                      [org.clojure/tools.nrepl "0.2.12"]]                   
       :plugins [[lein-cljsbuild "1.1.2" :exclusions [org.clojure/clojure]]
-                [lein-figwheel "0.5.0-4"]]
+                [lein-figwheel "0.5.0-6"]]
       :resource-paths ["resources" "example-resources"]   
 
      }})
