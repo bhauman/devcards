@@ -1,14 +1,14 @@
-(defproject devcards "0.2.1-6"
+(defproject devcards "0.2.1-7"
   :description "Devcards is a ClojureScript library that provides a lab space in which you can develop your UI components independently and interactively."
   :url "http://github.com/bhauman/devcards"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.170"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [org.clojure/clojurescript "1.8.51"]
                  [org.clojure/core.async  "0.2.374" :exclusions [org.clojure/tools.reader]]
                  [cljsjs/react "0.14.3-0"]
-                 [cljsjs/react-dom "0.14.3-1"]
+                 [cljsjs/react-dom "0.14.3-0"]
                  [cljsjs/react-dom-server "0.14.3-0"]                 
                  [sablono "0.5.3"]
                  [cljs-react-reload "0.1.1"]
@@ -56,17 +56,18 @@
                     }
   
   :profiles {
-   :repl { :plugins [[cider/cider-nrepl "0.10.1"]]
+   :repl { ;:plugins [[cider/cider-nrepl "0.11.1"]]
            :repl-options {:init (set! *print-length* 50)}}
    :dev {
       :dependencies [;[org.omcljs/om "0.9.0"]
                      [org.omcljs/om "1.0.0-alpha28"]
                      [reagent "0.5.1"]
-                     [figwheel-sidecar "0.5.0-6"]
+                     [figwheel-sidecar "0.5.3"]
                      [com.cemerick/piggieback "0.2.1"]
                      [org.clojure/tools.nrepl "0.2.12"]]                   
-      :plugins [[lein-cljsbuild "1.1.2" :exclusions [org.clojure/clojure]]
-                [lein-figwheel "0.5.0-6"]]
+      :plugins [[lein-cljsbuild "1.1.3" :exclusions [org.clojure/clojure]]
+                [lein-figwheel "0.5.3"]]
       :resource-paths ["resources" "example-resources"]   
 
-     }})
+         }})
+
