@@ -1009,14 +1009,14 @@
 
 (defn get-cards-for-ns [ns-symbol]
   (when-let [cards (:cards @dev/app-state)]
-    (when-let [card (get-in cards [(keyword ns-symbol)])]
+    (when-let [card (get-in cards [(keyword (munge ns-symbol))])]
       card)))
 
 (defn ^:export load-data-from-channel! []
   (devcards.system/load-data-from-channel! devcards.core/devcard-event-chan))
 
 (defn ^:export merge-front-matter-options! [ns-symbol]
-  (when-let [base-card-options (:base-card-options (get-front-matter (name ns-symbol)))]
+  (when-let [base-card-options (:base-card-options (get-front-matter (name (munge ns-symbol))))]
     (println "Adding base card options!" (prn-str  base-card-options))
     (swap! dev/app-state update-in [:base-card-options] (fn [opts] (merge opts base-card-options)))))
 
@@ -1025,7 +1025,7 @@
     (merge-front-matter-options! ns-symbol)
     (str
      "<div id=\"com-rigsomelight-devcards-main\">"
-     (js/React.renderToString
+     (js/ReactDOMServer.renderToString
       (sab/html
        [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
         (dev/render-cards (dev/display-cards card) dev/app-state)]))
