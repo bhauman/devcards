@@ -166,7 +166,7 @@
       [:div
        {:key "devcards_naked-card"
         :className
-        (cond-> devcards.system/devcards-rendered-card-class
+        (cond-> dev/devcards-rendered-card-class
           padding? (str " com-rigsomelight-devcards-devcard-padding")
           (not-empty classname) (str " " classname))}
        children])))
@@ -191,14 +191,14 @@
            {:key "devcards_frame-normal-body"}
            (if path
              (sab/html
-              [:a
-               {:href "#"
-                :onClick
-                (devcards.system/prevent->
-                 #(devcards.system/set-current-path!
-                   devcards.system/app-state
-                   path))}
-               (name (last path))  " "])
+               [:a
+                {:href "#"
+                 :onClick
+                 (dev/prevent->
+                   #(dev/set-current-path!
+                     dev/app-state
+                     path))}
+                (name (last path)) " "])
              (sab/html [:span (:name card)]))]
           (naked-card children card)]))
       (sab/html [:span])))))

@@ -5,6 +5,7 @@
    [sablono.core :as sab]
    [devcards.util.edn-renderer :as edn-rend]
    [goog.events :as events]
+   [goog.events.KeyCodes :as KeyCodes]
    [goog.history.EventType :as EventType]
    [goog.labs.userAgent.device :as device]
    [devcards.util.utils :as utils]
@@ -206,6 +207,17 @@
        (:cards data)
        (get-in (:cards data) (:current-path data))))
 
+(defn all-cards [state]
+  (sort-by :position (mapcat vals (vals (:cards state)))))
+
+(defn previous-card [state]
+  (when-let [curr-pos (some-> state current-page :position)]
+    (first (filter #(< (:position %) curr-pos) (reverse (all-cards state))))))
+
+(defn next-card [state]
+  (when-let [curr-pos (some-> state current-page :position)]
+    (first (filter #(> (:position %) curr-pos) (all-cards state)))))
+
 (defn display-single-card? [state]
   (devcard? (current-page state)))
 
@@ -267,7 +279,25 @@
                   :onClick      (prevent-> #(set-current-path! state-atom path))}
                  (str n)]]))
             crumbs)))
-      (cljs-logo)])))
+      (cljs-logo)
+      (let [previous-path (:path (previous-card @app-state))
+            next-path (:path (next-card @app-state))]
+        (when (or previous-path next-path)
+          [:div {:style {:float "right" :padding-right "20px"}}
+           (if previous-path
+             [:button
+              {:on-click
+               (fn [e]
+                 (set-current-path! app-state previous-path))}
+              "<"]
+             [:button "-"])
+           (if next-path
+             [:button
+              {:on-click
+               (fn [e]
+                 (set-current-path! app-state next-path))}
+              ">"]
+             [:button "-"])]))])))
 
 (defn navigate-to-path [key state-atom]
   (swap! state-atom
@@ -318,15 +348,25 @@
        [:div
         (main-cards-template state-atom)]]])))
 
+(defn on-keydown [e]
+  (condp = (.-keyCode e)
+    KeyCodes/LEFT (some->> @app-state previous-card :path (set-current-path! app-state))
+    KeyCodes/RIGHT (some->> @app-state next-card :path (set-current-path! app-state))
+    nil))
+
 (defonce-react-class DevcardsRoot
   #js {:componentDidMount
        (fn []
+         (events/listen js/document "keydown" on-keydown)
          (this-as this
-                  (add-watch app-state
-                             :renderer-watch
-                             (fn [_ _ _ _]
-                               (.forceUpdate this)))))
-       :render (fn [] (main-template app-state)) } )
+           (add-watch app-state
+                      :renderer-watch
+                      (fn [_ _ _ _]
+                        (.forceUpdate this)))))
+       :componentWillUnmount
+       (fn []
+         (events/unlisten js/document "keydown" on-keydown))
+       :render (fn [] (main-template app-state))})
 
 
 (defn renderer [state-atom]
