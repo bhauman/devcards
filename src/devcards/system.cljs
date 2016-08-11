@@ -169,6 +169,8 @@
                             :cards {}
                             :path-collision-count {}
                             :base-card-options { :frame true
+                                                 :slideshow-keys true
+                                                 :slideshow-buttons true
                                                  :heading true
                                                  :padding true
                                                  :hidden false
@@ -349,10 +351,11 @@
         (main-cards-template state-atom)]]])))
 
 (defn on-keydown [e]
-  (condp = (.-keyCode e)
-    KeyCodes/LEFT (some->> @app-state previous-card :path (set-current-path! app-state))
-    KeyCodes/RIGHT (some->> @app-state next-card :path (set-current-path! app-state))
-    nil))
+  (when (= (.-target e) (.-body js/document))
+    (condp = (.-keyCode e)
+      KeyCodes/LEFT (some->> @app-state previous-card :path (set-current-path! app-state))
+      KeyCodes/RIGHT (some->> @app-state next-card :path (set-current-path! app-state))
+      nil)))
 
 (defonce-react-class DevcardsRoot
   #js {:componentDidMount
