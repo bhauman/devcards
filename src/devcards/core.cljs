@@ -197,10 +197,10 @@
                {:href "#"
                 :onClick
                 (devcards.system/prevent->
-                  #(devcards.system/set-current-path!
-                    devcards.system/app-state
-                    path))}
-               (name (last path)) " "])
+                 #(devcards.system/set-current-path!
+                   devcards.system/app-state
+                   path))}
+               (name (last path))  " "])
              (sab/html [:span (:name card)]))]
           (naked-card children card)]))
       (sab/html [:span])))))
