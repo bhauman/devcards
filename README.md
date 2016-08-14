@@ -271,8 +271,15 @@ build automatically.
 Make sure this is included in the file you have specified as `:main` 
 in your build options. As mentioned above, you don't want the Devcards UI to compete with
 your application's UI so you will want to make sure it isn't getting
-launched. 
+launched.
 
+You can pass options which will override the default card options.
+There are also two options to govern card view navigation:
+
+```
+{:enable-key-nav true
+ :enable-button-nav false}
+```
 
 ## Devcards as a Standalone Website
 

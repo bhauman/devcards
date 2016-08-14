@@ -1,3 +1,10 @@
+## 0.2.x
+
+* When in card view, buttons are shown to navigate to next and previous card.
+  You can disable this feature by passing {:enable-button-nav false} in start options.
+* If you specify {:enable-key-nav true} in the start options,
+  left and right arrows will navigate to next and previous in card view.
+
 ## 0.2.1-7 Some reagent fixes
 
 * Improved Reagent reloading PR #100
