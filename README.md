@@ -277,7 +277,9 @@ You can pass options which will override the default card options.
 There are also two options to govern card view navigation:
 
 ```
-{:enable-key-nav true
+{;; left/right arrow navigation in card view
+ :enable-key-nav true
+ ;; hide navigation in card view
  :enable-button-nav false}
 ```
 
