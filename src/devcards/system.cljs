@@ -366,11 +366,11 @@
   #js {:componentDidMount
        (fn []
          (this-as this
-           (add-watch app-state
-                      :renderer-watch
-                      (fn [_ _ _ _]
-                        (.forceUpdate this)))))
-       :render (fn [] (main-template app-state))})
+                  (add-watch app-state
+                             :renderer-watch
+                             (fn [_ _ _ _]
+                               (.forceUpdate this)))))
+       :render (fn [] (main-template app-state)) } )
 
 
 (defn renderer [state-atom]
