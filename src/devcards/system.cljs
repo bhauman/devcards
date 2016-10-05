@@ -7,6 +7,7 @@
    [goog.events :as events]
    [goog.history.EventType :as EventType]
    [goog.labs.userAgent.device :as device]
+   [goog.object :as gobject]
    [devcards.util.utils :as utils]
    [cljsjs.react]
    [cljsjs.react.dom])
@@ -122,7 +123,9 @@
 
 (defn hash-routing-init [state-atom]
   (events/listen history EventType/NAVIGATE
-                 #(swap! state-atom set-current-path (token->path (.-token %))))
+                 (fn [e]
+                   (gobject/set (.-body js/document) "scrollTop" 0)
+                   (swap! state-atom set-current-path (token->path (.-token e)))))
   ;; we should probably just get the location and parse this out to
   ;; avoid the initial race condition where .getToken isn't populated
   (when-let [token (aget js/location "hash")]
