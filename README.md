@@ -273,6 +273,15 @@ in your build options. As mentioned above, you don't want the Devcards UI to com
 your application's UI so you will want to make sure it isn't getting
 launched. 
 
+You can pass options which will override the default card options.
+There are also two options to govern card view navigation:
+
+```
+{;; left/right arrow navigation in card view
+ :enable-key-nav true
+ ;; hide navigation in card view
+ :enable-button-nav false}
+```
 
 ## Devcards as a Standalone Website
 

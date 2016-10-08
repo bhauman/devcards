@@ -53,11 +53,13 @@
 (defn start-devcard-ui!*
   ([] (start-devcard-ui!* {}))
   ([options]
-   (when (and (map? options)
-              (map? (:default-card-options options)))
-     (swap! dev/app-state update-in
-            [:base-card-options]
-            (fn [opts] (merge opts (:default-card-options options)))))
+   (when (map? options)
+     (when (:enable-key-nav options)
+       (dev/key-nav-enable!))
+     (when (map? (:default-card-options options))
+       (swap! dev/app-state update-in
+              [:base-card-options]
+              (fn [opts] (merge opts (:default-card-options options))))))
    (dev/start-ui devcard-event-chan)
    (register-figwheel-listeners!)))
 
