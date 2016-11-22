@@ -143,7 +143,7 @@ cd devcards
 lein figwheel
 ```
 
-Then visit `http://localhost:3449/devcards/index.html`
+Then visit `http://localhost:3449/cards.html`
 
 The code for the cards you are viewing in the devcards interface is
 located in the `example_src` directory.
