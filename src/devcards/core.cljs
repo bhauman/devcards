@@ -494,7 +494,7 @@
       (render-errors card-options errors)
       (js/React.createElement DevcardBase #js { :card (add-environment-defaults card-options) }))))
 
-(defrecord IdentiyOptions [obj]
+(defrecord IdentityOptions [obj]
   IDevcardOptions
   (-devcard-options [this opts] opts))
 
@@ -530,7 +530,7 @@
     (cond
       (atom-like? main-obj) (AtomLikeOptions. main-obj)
       (edn-like?  main-obj) (EdnLikeOptions.  main-obj)
-      :else (IdentiyOptions. main-obj))))
+      :else (IdentityOptions. main-obj))))
 
 (defn card-base [opts]
   (let [opts (assoc opts :path (:path devcards.system/*devcard-data*))]
