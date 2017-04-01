@@ -180,8 +180,7 @@ file as in the leiningen template).
 </html>
 ```
 
-
-##Usage With Figwheel
+## Usage With Figwheel
 
 [lein-figwheel](https://github.com/bhauman/lein-figwheel) 
 is not required to use Devcards but it is definitely recommended
