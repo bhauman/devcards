@@ -123,20 +123,49 @@
 
 ;; testing
 
-(defmacro tests [& parts]
-  (when (utils/devcards-active?)
-    `(devcards.core/test-card
-                 ~@(map (fn [p] (if (string? p)
-                                `(fn [] (devcards.core/test-doc ~p))
-                                `(fn [] ~p))) parts))))
+    
 
+;;
+;; Call the test-card component with a var to test and the optional test doc string.
 (defmacro deftest [vname & parts]
   `(do
+     (cljs.test/deftest ~vname
+        ~@parts)
      ~(when (utils/devcards-active?)
         `(devcards.core/defcard ~vname
-           (devcards.core/tests ~@parts)))
-     (cljs.test/deftest ~vname
-        ~@parts)))
+           (devcards.core/test-card
+            (var ~vname)
+            ~@(keep (fn [part]
+                      (when (string? part)
+                        `(fn [] (devcards.core/test-doc ~part)))) parts))))))
+
+;; Anonymous tests, same as above, but don't generate a card and
+;; put the tests under a generated symbol
+(defmacro tests [& parts]
+  (when (utils/devcards-active?)
+    (let [vname (gensym "devcards-test-")]
+      `(do
+        (cljs.test/deftest ~vname
+          ~@parts)
+        (devcards.core/test-card
+         (var ~vname)
+         ~@(keep (fn [part]
+                  (when (string? part)
+                    `(fn [] (devcards.core/test-doc ~part)))) parts))))))
+
+;; Add export metadata to the fixture symbols so they are not munged by the closure compiler
+;; and can be retrieved at runtime by the devcard test loop.
+(defmacro use-fixtures [type & fns]
+  (condp = type
+    :once
+    `(def ~(with-meta 'cljs-test-once-fixtures {:export true})
+       [~@fns])
+    :each
+    `(def ~(with-meta 'cljs-test-each-fixtures {:export true})
+       [~@fns])
+    :else
+    (throw
+      (Exception. "First argument to cljs.test/use-fixtures must be :once or :each"))))
 
 ;; reagent helpers
 

@@ -110,7 +110,8 @@ it should just render a heading with a counter of zero.
 Devcards supports standard `cljs.test` async testing. 
 
 If you look at the source for the examples below you will see async
-testing in use.
+testing in use. Note (as also stated on the cljs.test wiki), that the async
+block must be the last expression in the deftest form, or it won't run.
 
 During async tests exceptions and errors are much more difficult to
 catch in the testing system each. For this reason
@@ -143,22 +144,6 @@ All the tests after that exception will not be run.
   "## This is an async test
    You should see some tests here"
 
-  (t/testing "Let's run async tests!"
-      (is (= (+ 3 4 55555) 4) "Testing the adding")
-      (is (= (+ 1 0 0 0) 1) "This should work")
-      (is (= 1 3))              
-      (is true)
-      (async done
-             (go
-               (<! (timeout 100))
-               (is (= (+ 3 4 55555) 4) "Testing the adding")
-               (is (= (+ 1 0 0 0) 1) "This should work")
-               (is (throw "heck")) ;; all the tests from here down
-               ;; will not be rendered
-               (is (= 1 3))              
-               (is true)
-               (done))))
-    "## And here is more documentation"
   (t/testing "bad stuff"
     (is (= (+ 1 0 0 0) 1))        
     (t/is (= (+ 3 4 55555) 4))
@@ -166,7 +151,26 @@ All the tests after that exception will not be run.
     (t/testing "mad stuff"
       (is (= (+ 1 0 0 0) 1))        
       (t/is (= (+ 3 4 55555) 4))
-      (t/is false))))
+      (t/is false)))
+
+  "## And here is more documentation"
+
+  (t/testing "Let's run async tests!"
+    (is (= (+ 3 4 55555) 4) "Testing the adding")
+    (is (= (+ 1 0 0 0) 1) "This should work")
+    (is (= 1 3))              
+    (is true)
+    (async done
+           (go
+             (<! (timeout 100))
+             (testing "Inside the async test"
+               (is (= (+ 3 4 55555) 4) "Testing the adding")
+               (is (= (+ 1 0 0 0) 1) "This should work")
+               (is (throw "heck")) ;; all the tests from here down
+               ;; will not be rendered
+               (is (= 1 3))              
+               (is true)
+               (done))))))
 
 
 
