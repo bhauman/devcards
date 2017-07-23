@@ -1,11 +1,11 @@
-(defproject devcards "0.2.3"
+(defproject devcards "0.2.4-SNAPSHOT"
   :description "Devcards is a ClojureScript library that provides a lab space in which you can develop your UI components independently and interactively."
   :url "http://github.com/bhauman/devcards"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.229"]
+                 [org.clojure/clojurescript "1.9.671"]
                  [org.clojure/core.async  "0.3.442" :exclusions [org.clojure/tools.reader]]
                  [cljsjs/react "15.3.1-0"]
                  [cljsjs/react-dom "15.3.1-0"]
@@ -59,7 +59,8 @@
            :repl-options {:init (set! *print-length* 50)}}
    :dev {
       :dependencies [;[org.omcljs/om "0.9.0"]
-                     [org.omcljs/om "1.0.0-alpha46"]
+                     [org.omcljs/om "1.0.0-beta1"]
+                     [fulcrologic/fulcro "1.0.0-beta6.1"]
                      [reagent "0.6.0"]
                      [figwheel-sidecar "0.5.8"]
                      [com.cemerick/piggieback "0.2.1"]
