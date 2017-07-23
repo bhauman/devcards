@@ -4,6 +4,7 @@
    [devdemos.defcard-api]
    [devdemos.om]
    [devdemos.om-next]
+   [devdemos.fulcro]
    [devdemos.reagent]
    [devdemos.source-code-display]
    [devdemos.two-zero]
