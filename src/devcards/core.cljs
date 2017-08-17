@@ -974,7 +974,8 @@
 
 
 (defn get-front-matter [munged-namespace]
-  (reduce aget js/goog.global
+  (reduce #(gobj/get %1 %2)
+          js/goog.global
           (concat (string/split (name munged-namespace) ".") ["front_matter"])))
 
 (defn get-cards-for-ns [ns-symbol]

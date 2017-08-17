@@ -1,10 +1,11 @@
 (ns devcards.util.utils
   (:require
+   [goog.object :as gobj]
    [cljs.pprint :as pprint]))
 
 (defn html-env? []
   (if-let [doc js/goog.global.document]
-    (aget doc "write")))
+    (gobj/get doc "write")))
 
 (defn node-env? [] (not (nil? goog/nodeGlobalRequire)))
 

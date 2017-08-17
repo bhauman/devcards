@@ -4,6 +4,7 @@
    [cljs.core.async :refer [put! <! chan timeout]]
    [sablono.core :as sab]
    [devcards.util.edn-renderer :as edn-rend]
+   [goog.object :as gobj]
    [goog.events :as events]
    [goog.history.EventType :as EventType]
    [goog.labs.userAgent.device :as device]
@@ -114,7 +115,7 @@
 
 #_(prn (token->path (.getToken history)))
 
-#_(prn (token->path (aget js/location "hash")))
+#_(prn (token->path (gobj/get js/location "hash")))
 
 (defn hash-navigate [path]
   (.setToken history (path->token path)))
@@ -124,7 +125,7 @@
                  #(swap! state-atom set-current-path (token->path (.-token %))))
   ;; we should probably just get the location and parse this out to
   ;; avoid the initial race condition where .getToken isn't populated
-  (when-let [token (aget js/location "hash")]
+  (when-let [token (gobj/get js/location "hash")]
     (swap! state-atom set-current-path (token->path token))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
