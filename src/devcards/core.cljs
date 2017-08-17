@@ -3,16 +3,16 @@
    [devcards.system :as dev]
 
    [devcards.util.markdown :as mark]
-   [devcards.util.utils :as utils :refer [html-env?]]
+   [devcards.util.utils :as utils :refer [html-env?]
+    :refer-macros [define-react-class define-react-class-once]]
 
    [sablono.core :as sab :include-macros true]
    [devcards.util.edn-renderer :as edn-rend]
-
+   [goog.object :as gobj]
    [clojure.string :as string]
    [cljs.test]
    [cljs.core.async :refer [put! chan timeout <! close! alts!] :as async])
   (:require-macros
-   [cljs-react-reload.core :refer [defonce-react-class def-react-class]]
    [cljs.core.async.macros :refer [go]]))
 
 (enable-console-print!)
@@ -24,8 +24,8 @@
   "Make a react Symbol the same way as React 0.14"
   (or (and (exists? js/Symbol)
            (fn? js/Symbol)
-           (aget js/Symbol "for")
-           ((aget js/Symbol "for") "react.element"))
+           (gobj/get js/Symbol "for")
+           ((gobj/get js/Symbol "for") "react.element"))
       0xeac7))
 
 ;; its possible to record the meta-data for the loaded ns's being
@@ -97,29 +97,25 @@
 ;; syntax highlighting
 
 (defn get-hljs []
-  (aget js/goog.global "hljs"))
+  (gobj/get js/goog.global "hljs"))
 
 (defn highlight-node [this]
   (when-let [node (ref->node this "code-ref")]
     (when-let [hljs (get-hljs)]
-      (when-let [highlight-block (aget hljs "highlightBlock")]
+      (when-let [highlight-block (gobj/get hljs "highlightBlock")]
         (highlight-block node)))))
 
-(defonce-react-class CodeHighlight
-  #js {:componentDidMount
-       (fn [] (this-as this (highlight-node this)))
-       :componentDidUpdate
-       (fn [] (this-as this (highlight-node this)))
-       :render
-       (fn []
-         (this-as
-          this
-          (sab/html
-           [:pre {:className (if (get-hljs) "com-rigsomelight-devcards-code-highlighting"  "")
-                  :key (hash (get-props this :code))}
-            [:code {:className (or (get-props this :lang) "")
-                    :ref "code-ref"}
-             (get-props this :code)]])))})
+(define-react-class CodeHighlight
+  (componentDidMount [this] (highlight-node this))
+  (componentDidUpdate [this] (highlight-node this))
+  (render
+   [this]
+   (sab/html
+    [:pre {:className (if (get-hljs) "com-rigsomelight-devcards-code-highlighting"  "")
+           :key (hash (get-props this :code))}
+     [:code {:className (or (get-props this :lang) "")
+             :ref "code-ref"}
+      (get-props this :code)]])))
 
 (defn code-highlight [code-str lang]
   (js/React.createElement CodeHighlight #js {:code code-str
@@ -215,32 +211,26 @@
 ;; these are needed for advanced compilation
 
 (defn ref->node [this ref]
-  (when-let [comp (aget (.. this -refs) ref)]
+  (when-let [comp (gobj/get (.. this -refs) ref)]
     (js/ReactDOM.findDOMNode comp)))
 
 (defn get-props [this k]
-  (aget (.-props this) (name k)))
+  (gobj/get (.-props this) (name k)))
 
 (defn get-state [this k]
   (when (.-state this)
-    (aget (.-state this) (name k))))
+    (gobj/get (.-state this) (name k))))
 
 ;; this is not currently being used
-(defonce-react-class DontUpdate
-  #js {:shouldComponentUpdate
-       (fn [next-props b]
-         (this-as this
-                  (let [update? (= (aget next-props "change_count")
-                                   (get-props this :change_count))]
-                    #_(if update?
-                        (prn "Updating ")
-                        (prn "Not updating"))
-                    update?)))
-       :render
-       (fn []
-         (this-as
-          this
-          (sab/html [:div.com-rigsomelight-dont-update (get-props this :children_thunk)])))})
+(define-react-class DontUpdate
+  (shouldComponentUpdate
+   [this next-props b]
+   (let [update? (= (gobj/get next-props "change_count")
+                    (get-props this :change_count))]
+     update?))
+  (render
+   [this]
+   (sab/html [:div.com-rigsomelight-dont-update (get-props this :children_thunk)])))
 
 ;; this is not currently being used
 (defn dont-update [change-count children-thunk]
@@ -294,63 +284,55 @@
       (frame children card) ;; make component and forward options
       (sab/html [:div.com-rigsomelight-devcards-frameless {} children]))))
 
-(defonce-react-class DevcardBase
-  #js {:getInitialState
-       (fn []
-         #js {:unique_id (gensym 'devcards-base-)
-              :state_change_count 0})
-       :componentDidUpdate
-       (fn [_ _]
-         (this-as
-           this
-           (let [atom    (get-state this :data_atom)
-                 card    (get-props this :card)
-                 options (:options card)]
-             (when (:static-state options)
-               (let [initial-data (:initial-data card)
-                     data         (if (atom-like? initial-data) @initial-data initial-data)]
-                 (if (not= @atom data)
-                   (reset! atom data)))))))
-       :componentWillMount
-       (if (html-env?)
-         (fn []
-           (this-as
-            this
-            (.setState
-             this
-             (or (and (get-state this :data_atom)
-                      (.. this -state))
-                 #js {:data_atom
-                      (wrangle-inital-data this)}))))
-         (fn []))
-       :componentWillUnmount
-        (fn []
-          (this-as
-           this
-           (let [data_atom (get-state this :data_atom)
-                 id        (get-state this :unique_id)]
-             (when (and data_atom id)
-               (remove-watch data_atom id)))))
-       :componentDidMount
-       (if (html-env?)
-         (fn []
-           (this-as
-            this
-            (when-let [data_atom (get-state this :data_atom)]
-              (when-let [id (get-state this :unique_id)]
-                (add-watch data_atom id
-                           (fn [_ _ _ _]
-                             (.setState this #js {:state_change_count
-                                                  (inc (get-state this :state_change_count))})))))))
-         (fn []))
-        :render
-        (fn []
-          (this-as this
-            (let [data-atom    (get-data-atom this)
-                  card         (get-props this :card)
-                  change-count (get-state this :state_change_count)
-                  main         (default-derive-main this card data-atom change-count)]
-              (render-all-card-elements main data-atom card))))})
+(define-react-class DevcardBase
+  (constructor
+   [props]
+   (this-as this
+     (set! (.-state this)
+           #js {:unique_id (gensym 'devcards-base-)
+                :state_change_count 0})))
+  (componentDidUpdate
+   [this _ _]
+   (let [atom    (get-state this :data_atom)
+         card    (get-props this :card)
+         options (:options card)]
+     (when (:static-state options)
+       (let [initial-data (:initial-data card)
+             data         (if (atom-like? initial-data) @initial-data initial-data)]
+         (if (not= @atom data)
+           (reset! atom data))))))
+  (componentWillMount
+   [this]
+   (when (html-env?)
+     (.setState
+      this
+      (or (and (get-state this :data_atom)
+               (.. this -state))
+          #js {:data_atom
+               (wrangle-inital-data this)}))))
+  (componentWillUnmount
+   [this]
+   (let [data_atom (get-state this :data_atom)
+         id        (get-state this :unique_id)]
+     (when (and data_atom id)
+       (remove-watch data_atom id))))
+  (componentDidMount
+   [this]
+   (when (html-env?)
+     (when-let [data_atom (get-state this :data_atom)]
+       (when-let [id (get-state this :unique_id)]
+         (add-watch data_atom id
+                    (fn [_ _ _ _]
+                      (.setState this #js {:state_change_count
+                                           (inc (get-state this :state_change_count))})))))))
+  (render
+   [this]
+   (let [data-atom    (get-data-atom this)
+         card         (get-props this :card)
+         change-count (get-state this :state_change_count)
+         main         (default-derive-main this card data-atom change-count)]
+     (render-all-card-elements main data-atom card))))
+
 
 ;; this is going to capture and  handle the raw options
 
@@ -362,34 +344,30 @@
           (node-fn (get-props this :data_atom) node))))
     identity))
 
-(defonce-react-class DomComponent
-  #js {:getInitialState
-       (fn [] #js {:unique_id (str (gensym 'devcards-dom-component-))})
-       :componentDidUpdate
-       (fn [prevP, prevS]
-         (this-as
-          this
-          (when (and (get-props this :node_fn)
-                     (not= (get-props this :node_fn)
-                           (aget prevP "node_fn")))
-            (render-into-dom this))))
-       :componentWillUnmount
-       (fn []
-         (this-as
-          this
-          (when-let [node (ref->node this (get-state this :unique_id))]
-            (js/ReactDOM.unmountComponentAtNode node))))
-       :componentDidMount
-       (fn [] (this-as this (render-into-dom this)))
-       :render
-       (if (html-env?)
-         (fn []
-           (this-as
-            this
-            (js/React.DOM.div
-             #js { :className "com-rigsomelight-devcards-dom-node" :ref (get-state this :unique_id)}
-             "Card has not mounted DOM node.")))
-         (fn [] (js/React.DOM.div "Card has not mounted DOM node.")))})
+(define-react-class DomComponent
+  (constructor
+   [props]
+   (this-as this
+     (set! (.-state this)
+           #js {:unique_id (str (gensym 'devcards-dom-component-))})))
+  (componentDidUpdate
+   [this prevP prevS]
+   (when (and (get-props this :node_fn)
+              (not= (get-props this :node_fn)
+                    (gobj/get prevP "node_fn")))
+     (render-into-dom this)))
+  (componentWillUnmount
+   [this]
+   (when-let [node (ref->node this (get-state this :unique_id))]
+     (js/ReactDOM.unmountComponentAtNode node)))
+  (componentDidMount [this] (render-into-dom this))
+  (render
+   [this]
+   (if (html-env?)
+     (js/React.DOM.div
+      #js { :className "com-rigsomelight-devcards-dom-node" :ref (get-state this :unique_id)}
+      "Card has not mounted DOM node.")
+     (js/React.DOM.div "Card has not mounted DOM node."))))
 
 (defn booler? [key opts]
   (let [x (get opts key)]
@@ -406,9 +384,9 @@
          :value x})))
 
 (defn react-element? [main-obj]
-  (or (aget main-obj "_isReactElement") ;; react 0.13
+  (or (gobj/get main-obj "_isReactElement") ;; react 0.13
       (= react-element-type-symbol      ;; react 0.14
-         (aget main-obj "$$typeof"))))
+         (gobj/get main-obj "$$typeof"))))
 
 (defn validate-card-options [opts]
   (if (map? opts)
@@ -653,101 +631,98 @@
       (.forceUpdate this))))
 
 ;; keep
-(def-react-class HistoryComponent
-  #js {:getInitialState
-       (fn [] #js {:unique_id    (str (gensym 'devcards-history-runner-))
-                  :history_atom (atom {:history (list) :pointer 0})})
-       :componentWillMount
-       (fn []
-         (this-as this
-                  (swap! (get-state this :history_atom)
-                         assoc-in [:history] (list @(get-props this :data_atom)))))
-       :componentDidMount
-       (fn []
-         (this-as
-          this
-          (let [data_atom (get-props this :data_atom)
-                id        (get-state this :unique_id)
-                history-atom   (get-state this :history_atom)]
-            (when (and data_atom id)
-              (add-watch data_atom id
-                         (fn [_ _ _ n]
-                           (if (in-time-machine? this)
-                             (do
-                               (swap! history-atom
-                                      (fn [{:keys [pointer history ignore-click] :as ha}]
-                                        (if ignore-click
-                                          (assoc ha :ignore-click false)
-                                          (assoc ha
-                                                 :history
-                                                 (let [abridged-hist (drop pointer history)]
-                                                   (if (not= n (first abridged-hist))
-                                                     (cons n abridged-hist)
-                                                     abridged-hist))
-                                                 :pointer 0)))))
-                             (swap! history-atom assoc
-                                    :history (let [hist (:history @history-atom)]
-                                               (if (not= n (first hist))
-                                                 (cons n hist)
-                                                 hist))
-                                    :ignore-click false))))))))
-
-       :render
-       (fn []
-         (this-as
-          this
-          (when (or (can-go-back this)
-                    (can-go-forward this))
-            (sab/html
-               [:div.com-rigsomelight-devcards-history-control-bar
-                {:style { :display (if (or (can-go-back this)
-                                           (can-go-forward this))
-                                     "block" "none")}}
-                (let [action (fn [e]
-                               (.preventDefault e)
-                               (back-in-history! this))]
-                  (sab/html
-                   [:button
-                    {:style { :visibility (if (can-go-back this) "visible" "hidden")}
-                     :href "#"
-                     :onClick action
-                     :onTouchEnd action}
-                    [:span.com-rigsomelight-devcards-history-control-left ""]]))
-                (let [action (fn [e]
-                               (.preventDefault e)
-                               ;; touch the data atom
-                               (let [data-atom (get-props this :data_atom)]
-                                 (reset! data-atom @data-atom))
-                               )]
-                  (sab/html
-                   [:button
-                    {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
-                     :onClick action
-                     :onTouchEnd action}
-                    [:span.com-rigsomelight-devcards-history-stop ""]]))
-                (let [action (fn [e]
-                                (.preventDefault e)
-                                (forward-in-history! this))]
-                  (sab/html
-                   [:button
-                    {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
-                     :onClick action
-                     :onTouchEnd action}
-                    [:span.com-rigsomelight-devcards-history-control-right ""]]))
-                (let [listener (fn [e]
-                                (.preventDefault e)
-                                (continue-on! this))]
-                  (sab/html
-                   [:button
-                    {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
-                     :onClick listener
-                     :onTouchEnd listener}
-                    [:span.com-rigsomelight-devcards-history-control-small-arrow]
-                    [:span.com-rigsomelight-devcards-history-control-small-arrow]
-                    [:span.com-rigsomelight-devcards-history-control-block]
-                    ]))
-                #_(edn->html @(.. this -state -history_atom))]
-               ))))})
+(define-react-class HistoryComponent
+  (constructor
+   [props]
+   (this-as this
+     (set! (.-state this)
+           #js {:unique_id    (str (gensym 'devcards-history-runner-))
+                :history_atom (atom {:history (list) :pointer 0})})))
+  (componentWillMount
+   [this]
+   (swap! (get-state this :history_atom)
+          assoc-in [:history] (list @(get-props this :data_atom))))
+  (componentDidMount
+   [this]
+   (let [data_atom (get-props this :data_atom)
+         id        (get-state this :unique_id)
+         history-atom   (get-state this :history_atom)]
+     (when (and data_atom id)
+       (add-watch data_atom id
+                  (fn [_ _ _ n]
+                    (if (in-time-machine? this)
+                      (do
+                        (swap! history-atom
+                               (fn [{:keys [pointer history ignore-click] :as ha}]
+                                 (if ignore-click
+                                   (assoc ha :ignore-click false)
+                                   (assoc ha
+                                          :history
+                                          (let [abridged-hist (drop pointer history)]
+                                            (if (not= n (first abridged-hist))
+                                              (cons n abridged-hist)
+                                              abridged-hist))
+                                          :pointer 0)))))
+                      (swap! history-atom assoc
+                             :history (let [hist (:history @history-atom)]
+                                        (if (not= n (first hist))
+                                          (cons n hist)
+                                          hist))
+                             :ignore-click false)))))))
+  (render
+   [this]
+   (when (or (can-go-back this)
+             (can-go-forward this))
+     (sab/html
+      [:div.com-rigsomelight-devcards-history-control-bar
+       {:style { :display (if (or (can-go-back this)
+                                  (can-go-forward this))
+                            "block" "none")}}
+       (let [action (fn [e]
+                      (.preventDefault e)
+                      (back-in-history! this))]
+         (sab/html
+          [:button
+           {:style { :visibility (if (can-go-back this) "visible" "hidden")}
+            :href "#"
+            :onClick action
+            :onTouchEnd action}
+           [:span.com-rigsomelight-devcards-history-control-left ""]]))
+       (let [action (fn [e]
+                      (.preventDefault e)
+                      ;; touch the data atom
+                      (let [data-atom (get-props this :data_atom)]
+                        (reset! data-atom @data-atom))
+                      )]
+         (sab/html
+          [:button
+           {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
+            :onClick action
+            :onTouchEnd action}
+           [:span.com-rigsomelight-devcards-history-stop ""]]))
+       (let [action (fn [e]
+                      (.preventDefault e)
+                      (forward-in-history! this))]
+         (sab/html
+          [:button
+           {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
+            :onClick action
+            :onTouchEnd action}
+           [:span.com-rigsomelight-devcards-history-control-right ""]]))
+       (let [listener (fn [e]
+                        (.preventDefault e)
+                        (continue-on! this))]
+         (sab/html
+          [:button
+           {:style { :visibility (if (can-go-forward this) "visible" "hidden")}
+            :onClick listener
+            :onTouchEnd listener}
+           [:span.com-rigsomelight-devcards-history-control-small-arrow]
+           [:span.com-rigsomelight-devcards-history-control-small-arrow]
+           [:span.com-rigsomelight-devcards-history-control-block]
+           ]))
+           #_(edn->html @(.. this -state -history_atom))]
+      ))))
 
 ;; keep
 (defn- hist-recorder* [data-atom]
@@ -966,25 +941,20 @@
                                               #js {:test_results
                                                    results}))}))
 
-(defonce-react-class TestDevcard
-  #js
-  {:componentWillMount
-   (fn []
-     (this-as
-      this
-      (when-let [test-thunks (get-props this :test_thunks)]
-        (test-card-test-run this test-thunks))))
-   :componentWillReceiveProps
-   (fn [next-props]
-     (this-as this
-              (when-let [test-thunks (aget next-props (name :test_thunks))]
-                (test-card-test-run this test-thunks))))
-   :render (fn []
-             (this-as
-              this
-              (let [test-summary (get-state this :test_results)
-                    path         (get-props this :path)]
-                (render-tests this path test-summary))))})
+(define-react-class TestDevcard
+  (componentWillMount
+   [this]
+   (when-let [test-thunks (get-props this :test_thunks)]
+     (test-card-test-run this test-thunks)))
+  (componentWillReceiveProps
+   [this next-props]
+   (when-let [test-thunks (gobj/get next-props (name :test_thunks))]
+     (test-card-test-run this test-thunks)))
+  (render
+   [this]
+   (let [test-summary (get-state this :test_results)
+         path         (get-props this :path)]
+     (render-tests this path test-summary))))
 
 (defn test-card [& test-thunks]
   (reify

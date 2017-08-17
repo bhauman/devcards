@@ -7,13 +7,12 @@
    [goog.events :as events]
    [goog.history.EventType :as EventType]
    [goog.labs.userAgent.device :as device]
-   [devcards.util.utils :as utils]
+   [devcards.util.utils :as utils :refer-macros [define-react-class]]
    [cljsjs.react]
    [cljsjs.react.dom])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]
-   [devcards.system :refer [inline-resouce-file]]
-   [cljs-react-reload.core :refer [defonce-react-class]])
+   [devcards.system :refer [inline-resouce-file]])
   (:import
    [goog History]))
 
@@ -318,16 +317,11 @@
        [:div
         (main-cards-template state-atom)]]])))
 
-(defonce-react-class DevcardsRoot
-  #js {:componentDidMount
-       (fn []
-         (this-as this
-                  (add-watch app-state
-                             :renderer-watch
-                             (fn [_ _ _ _]
-                               (.forceUpdate this)))))
-       :render (fn [] (main-template app-state)) } )
-
+(define-react-class DevcardsRoot
+  (componentDidMount
+   [this]
+   (add-watch app-state :renderer-watch (fn [_ _ _ _] (.forceUpdate this))))
+  (render [this] (main-template app-state)))
 
 (defn renderer [state-atom]
   #_(prn "Rendering")
