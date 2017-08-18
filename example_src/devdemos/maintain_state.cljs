@@ -1,6 +1,7 @@
 (ns devdemos.maintain_state
     (:require
      [sablono.core :as sab :include-macros true]
+     [goog.object :as gobj]
      [devcards.util.utils :refer-macros [define-react-class-once]]
      [devcards.core])
     (:require-macros
@@ -23,7 +24,7 @@ This is mainly intended for verification of behavior.")
      (set! (.-state this) #js {:count 0})))
   (render
    [this]
-   (let [count (aget (.-state this) "count")]
+   (let [count (gobj/get (.-state this) "count")]
      (sab/html
       [:div [:h1 "Counter: " count]
        [:button {:onClick (fn [e] (.setState this #js {:count (inc count)}) )} "inc"]]))))
