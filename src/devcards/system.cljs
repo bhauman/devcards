@@ -9,8 +9,8 @@
    [goog.history.EventType :as EventType]
    [goog.labs.userAgent.device :as device]
    [devcards.util.utils :as utils :refer-macros [define-react-class]]
-   [cljsjs.react]
-   [cljsjs.react.dom])
+   [react :as react]
+   [react-dom :as react-dom])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]
    [devcards.system :refer [inline-resouce-file]])
@@ -326,8 +326,8 @@
 
 (defn renderer [state-atom]
   #_(prn "Rendering")
-  (js/ReactDOM.render
-   (js/React.createElement DevcardsRoot)
+  (react-dom/render
+   (react/createElement DevcardsRoot)
    #_(sab/html [:div
               (main-template state-atom)
               #_(edn-rend/html-edn @state-atom)])
@@ -417,8 +417,8 @@
 (defn start-ui-with-renderer [channel renderer]
   (defonce devcards-ui-setup
     (do
-      (when (exists? js/React.initializeTouchEvents)
-        (js/React.initializeTouchEvents true))
+      (when (exists? react/initializeTouchEvents)
+        (react/initializeTouchEvents true))
       (go
         (<! (load-data-from-channel! channel))
 
@@ -440,8 +440,8 @@
 (defn start-ui [channel]
   (defonce devcards-ui-setup
     (do
-      (when (exists? js/React.initializeTouchEvents)
-        (js/React.initializeTouchEvents true))
+      (when (exists? react/initializeTouchEvents)
+        (react/initializeTouchEvents true))
       (render-base-if-necessary!)
       (go
         ;; initial load
@@ -501,7 +501,7 @@
 </svg>")
 
 (defn cljs-logo []
-  (.span (.-DOM js/React)
+  (react/DOM.span
         (clj->js { :key "cljs-logo"
                   :dangerouslySetInnerHTML
                   { :__html

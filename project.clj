@@ -1,15 +1,15 @@
-(defproject devcards "0.2.4-SNAPSHOT"
+(defproject devcards "0.3.0-SNAPSHOT"
   :description "Devcards is a ClojureScript library that provides a lab space in which you can develop your UI components independently and interactively."
   :url "http://github.com/bhauman/devcards"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.229"]
-                 [org.clojure/core.async  "0.3.442" :exclusions [org.clojure/tools.reader]]
-                 [cljsjs/react "15.3.1-0"]
-                 [cljsjs/react-dom "15.3.1-0"]
-                 [sablono "0.7.4"]
+                 [org.clojure/clojurescript "1.9.908"]
+                 [org.clojure/core.async  "0.3.443" :exclusions [org.clojure/tools.reader]]
+                 [cljsjs/react "15.6.1-1"]
+                 [cljsjs/react-dom "15.6.1-1"]
+                 [sablono "0.8.0-SNAPSHOT"]
                  [cljs-react-reload "0.1.1"]
                  [cljsjs/showdown "0.4.0-1"]]
 
@@ -59,8 +59,8 @@
            :repl-options {:init (set! *print-length* 50)}}
    :dev {
       :dependencies [;[org.omcljs/om "0.9.0"]
-                     [org.omcljs/om "1.0.0-alpha46"]
-                     [reagent "0.6.0"]
+                     [org.omcljs/om "1.1.0-SNAPSHOT"]
+                     [reagent "0.8.0-alpha1"]
                      [figwheel-sidecar "0.5.8"]
                      [com.cemerick/piggieback "0.2.1"]
                      [org.clojure/tools.nrepl "0.2.12"]]                   
