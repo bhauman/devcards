@@ -24,7 +24,7 @@
     (subs s margin)
     (string/trim s)))
 
-(let [conv-class (.-converter js/Showdown)
+(let [conv-class (.-Converter js/showdown)
       converter (conv-class.)]
   (defn markdown-to-html
     "render markdown"

@@ -6,12 +6,11 @@
 
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.229"]
-                 [org.clojure/core.async  "0.3.442" :exclusions [org.clojure/tools.reader]]
+                 [org.clojure/core.async  "0.3.443"]
                  [cljsjs/react "15.3.1-0"]
                  [cljsjs/react-dom "15.3.1-0"]
                  [sablono "0.7.4"]
-                 [cljs-react-reload "0.1.1"]
-                 [cljsjs/showdown "0.4.0-1"]]
+                 [cljsjs/showdown "1.4.2-0"]]
 
   :source-paths ["src"]
 
