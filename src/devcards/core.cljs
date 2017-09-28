@@ -86,11 +86,10 @@
 
 (defn- react-raw [raw-html-str]
   "A React component that renders raw html."
-  (.div (.-DOM js/React)
-        (clj->js { :key (str (hash raw-html-str))
-                   :dangerouslySetInnerHTML
-                   { :__html
-                     raw-html-str }})))
+  (js/React.createElement "div"
+    #js {:key (str (hash raw-html-str))
+         :dangerouslySetInnerHTML
+         #js {:__html raw-html-str}}))
 
 (declare get-props ref->node)
 
@@ -258,7 +257,7 @@
         main-obj (if (and (not (nil? main-obj'))
                           (not (react-element? main-obj')))
                    (code-highlight (utils/pprint-code main-obj') "clojure")
-                   main-obj')] 
+                   main-obj')]
     (if (false? (:watch-atom options))
       ;; only rerenders when render _isn't_
       ;; driven by state change

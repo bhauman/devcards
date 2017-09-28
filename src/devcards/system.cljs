@@ -501,8 +501,7 @@
 </svg>")
 
 (defn cljs-logo []
-  (.span (.-DOM js/React)
-        (clj->js { :key "cljs-logo"
-                  :dangerouslySetInnerHTML
-                  { :__html
-                   cljs-logo-svg }})))
+  (js/React.createElement "span"
+    #js {:key "cljs-logo"
+         :dangerouslySetInnerHTML
+         #js {:__html cljs-logo-svg}}))
