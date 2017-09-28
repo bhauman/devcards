@@ -9,7 +9,7 @@
                  [org.clojure/core.async  "0.3.443"]
                  [cljsjs/react "15.3.1-0"]
                  [cljsjs/react-dom "15.3.1-0"]
-                 [sablono "0.7.4"]
+                 [sablono "0.8.1-SNAPSHOT"]
                  [cljsjs/showdown "1.4.2-0"]]
 
   :source-paths ["src"]
@@ -64,7 +64,7 @@
                      [com.cemerick/piggieback "0.2.1"]
                      [org.clojure/tools.nrepl "0.2.12"]]                   
       :plugins [[lein-cljsbuild "1.1.4" :exclusions [org.clojure/clojure]]
-                [lein-figwheel "0.5.8"]]
+                [lein-figwheel "0.5.13"]]
       :resource-paths ["resources" "example-resources"]   
 
          }})
