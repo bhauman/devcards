@@ -363,10 +363,10 @@
   (render
    [this]
    (if (html-env?)
-     (js/React.DOM.div
+     (js/React.createElement "div"
       #js { :className "com-rigsomelight-devcards-dom-node" :ref (get-state this :unique_id)}
       "Card has not mounted DOM node.")
-     (js/React.DOM.div "Card has not mounted DOM node."))))
+     (js/React.createElement "div" nil "Card has not mounted DOM node."))))
 
 (defn booler? [key opts]
   (let [x (get opts key)]
