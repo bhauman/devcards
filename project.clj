@@ -9,7 +9,7 @@
                  [org.clojure/core.async  "0.3.443"]
                  [cljsjs/react "15.3.1-0"]
                  [cljsjs/react-dom "15.3.1-0"]
-                 [sablono "0.8.1-SNAPSHOT"]
+                 [sablono "0.8.1"]
                  [cljsjs/showdown "1.4.2-0"]]
 
   :source-paths ["src"]
