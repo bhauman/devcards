@@ -140,13 +140,14 @@
 
 ;; reagent helpers
 
-(defmacro reagent [body]
-  `(create-idevcard
-    (let [v# ~body]
-      (if (fn? v#)
-        (fn [data-atom# owner#] (reagent.core/as-element [v# data-atom# owner#]))
-        (reagent.core/as-element v#)))
-    {}))
+(defmacro reagent [body & [options]]
+  (let [options (or options {})]
+    `(create-idevcard
+      (let [v# ~body]
+        (if (fn? v#)
+          (fn [data-atom# owner#] (reagent.core/as-element [v# data-atom# owner#]))
+          (reagent.core/as-element v#)))
+      ~options)))
 
 (defmacro defcard-rg [& exprs]
   (when (utils/devcards-active?)

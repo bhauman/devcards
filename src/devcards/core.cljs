@@ -177,6 +177,8 @@
          [:div
           {:key (prn-str path)
            :class (str "com-rigsomelight-devcards-card-base-no-pad "
+                       (when (:no-top-margin options)
+                         " com-rigsomelight-devcards-card-no-top-margin")
                        (when (:hide-border options)
                          " com-rigsomelight-devcards-card-hide-border"))}
           (naked-card children card)])
@@ -423,7 +425,7 @@
                       {:label :initial-data
                        :message "should be an Atom or a Map or nil."
                        :value initial-data})]
-                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history :static-state :show-standalone-link :hide-documentation])))))
+                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history :static-state :show-standalone-link :hide-documentation :no-top-margin])))))
     [{:message "Card should be a Map."
       :value   opts}]))
 
@@ -434,6 +436,7 @@
                              :initial-data {}
                              :frame true
                              :heading false
+                             :no-top-margin false
                              :padding false
                              :inspect-data true
                              :static-state false
