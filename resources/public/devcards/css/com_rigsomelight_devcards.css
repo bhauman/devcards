@@ -9,6 +9,10 @@ body .hljs {
 }
   
 #com-rigsomelight-devcards-main {
+    padding-bottom: 0;
+}
+
+#com-rigsomelight-devcards-main.no-standalone {
     padding-bottom: 10em;
 }
 
