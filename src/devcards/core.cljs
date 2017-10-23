@@ -275,7 +275,8 @@
   (let [options   (:options card)
         hist-ctl  (when (:history options)
                     (hist-recorder* data-atom))
-        document  (when-let [docu (:documentation card)]
+        document  (when-let [docu (and (not (:hide-documentation options))
+                                       (:documentation card))]
                     (markdown->react docu))
         edn       (when (:inspect-data options)
                     (edn-rend/html-edn @data-atom))
@@ -422,7 +423,7 @@
                       {:label :initial-data
                        :message "should be an Atom or a Map or nil."
                        :value initial-data})]
-                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history :static-state :show-standalone-link])))))
+                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history :static-state :show-standalone-link :hide-documentation])))))
     [{:message "Card should be a Map."
       :value   opts}]))
 
