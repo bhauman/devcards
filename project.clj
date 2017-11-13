@@ -1,4 +1,4 @@
-(defproject devcards "0.2.4"
+(defproject devcards "0.2.5-SNAPSHOT"
   :description "Devcards is a ClojureScript library that provides a lab space in which you can develop your UI components independently and interactively."
   :url "http://github.com/bhauman/devcards"
   :license {:name "Eclipse Public License"
