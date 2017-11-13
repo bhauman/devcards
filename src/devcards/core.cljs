@@ -995,7 +995,7 @@
     (merge-front-matter-options! ns-symbol)
     (str
      "<div id=\"com-rigsomelight-devcards-main\">"
-     (js/React.renderToString
+     (js/ReactDOMServer.renderToString
       (sab/html
        [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
         (dev/render-cards (dev/display-cards card) dev/app-state)]))
@@ -1003,7 +1003,7 @@
 
 (defn render-ns [ns-symbol app-state]
   (when-let [card (get-cards-for-ns ns-symbol)]
-    (js/React.render
+    (js/ReactDOM.render
      (sab/html
       [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
        (dev/render-cards (dev/display-cards card) app-state)])
