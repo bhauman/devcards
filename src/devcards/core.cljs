@@ -270,8 +270,9 @@
                     (hist-recorder* data-atom))
         document  (when-let [docu (:documentation card)]
                     (markdown->react docu))
+        render-fn (or (:render-fn options) identity)
         edn       (when (:inspect-data options)
-                    (edn-rend/html-edn @data-atom))
+                    (edn-rend/html-edn (render-fn @data-atom)))
         ;; only documentation?
         card      (if (or (string? main)
                           (nil? main))
