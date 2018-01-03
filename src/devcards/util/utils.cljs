@@ -1,7 +1,9 @@
 (ns devcards.util.utils
   (:require
    [goog.object :as gobj]
-   [cljs.pprint :as pprint]))
+   [cljs.pprint :as pprint])
+  (:require-macros
+   [devcards.util.utils]))
 
 (defn html-env? []
   (if-let [doc js/goog.global.document]
