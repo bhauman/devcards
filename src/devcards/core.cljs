@@ -266,12 +266,14 @@
 
 (defn render-all-card-elements [main data-atom card]
   (let [options   (:options card)
+        project   (or (:projection options)
+                      identity)
         hist-ctl  (when (:history options)
                     (hist-recorder* data-atom))
         document  (when-let [docu (:documentation card)]
                     (markdown->react docu))
         edn       (when (:inspect-data options)
-                    (edn-rend/html-edn @data-atom))
+                    (edn-rend/html-edn (project @data-atom)))
         ;; only documentation?
         card      (if (or (string? main)
                           (nil? main))
