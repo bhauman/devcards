@@ -177,6 +177,8 @@
          [:div
           {:key (prn-str path)
            :class (str "com-rigsomelight-devcards-card-base-no-pad "
+                       (when (:no-top-margin options)
+                         " com-rigsomelight-devcards-card-no-top-margin")
                        (when (:hide-border options)
                          " com-rigsomelight-devcards-card-hide-border"))}
           (naked-card children card)])
@@ -186,14 +188,21 @@
            {:key "devcards_frame-normal-body"}
            (if path
              (sab/html
-              [:a
-               {:href "#"
-                :onClick
-                (devcards.system/prevent->
-                 #(devcards.system/set-current-path!
-                   devcards.system/app-state
-                   path))}
-               (name (last path))  " "])
+              [:div
+               [:a
+                {:href "#"
+                 :onClick
+                 (devcards.system/prevent->
+                   #(devcards.system/set-current-path!
+                      devcards.system/app-state
+                      [path]))}
+                (name (last path))  " "]
+               (when (:show-standalone-link options)
+                 (let [standalone-path (devcards.system/path->token path {:standalone true})]
+                   [:a
+                    {:href (str "#" standalone-path)
+                     :style #js {:fontSize "0.8em"}}
+                    "(standalone)"]))])
              (sab/html [:span (:name card)]))]
           (naked-card children card)]))
       (sab/html [:span])))))
@@ -270,7 +279,8 @@
                       identity)
         hist-ctl  (when (:history options)
                     (hist-recorder* data-atom))
-        document  (when-let [docu (:documentation card)]
+        document  (when-let [docu (and (not (:hide-documentation options))
+                                       (:documentation card))]
                     (markdown->react docu))
         edn       (when (:inspect-data options)
                     (edn-rend/html-edn (project @data-atom)))
@@ -417,7 +427,7 @@
                       {:label :initial-data
                        :message "should be an Atom or a Map or nil."
                        :value initial-data})]
-                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history :static-state])))))
+                 (mapv #(booler? % (:options opts)) [:frame :heading :padding :inspect-data :watch-atom :history :static-state :show-standalone-link :hide-documentation :no-top-margin])))))
     [{:message "Card should be a Map."
       :value   opts}]))
 
@@ -428,6 +438,7 @@
                              :initial-data {}
                              :frame true
                              :heading false
+                             :no-top-margin false
                              :padding false
                              :inspect-data true
                              :static-state false
@@ -862,7 +873,7 @@
             (dev/prevent->
              #(devcards.system/set-current-path!
                devcards.system/app-state
-                path))}
+                [path]))}
           (when path (str (name (last path))) )]
          [:button.com-rigsomelight-devcards-badge
           {:style {:float "right"

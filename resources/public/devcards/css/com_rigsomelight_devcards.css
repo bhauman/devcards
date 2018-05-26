@@ -9,6 +9,10 @@ body .hljs {
 }
   
 #com-rigsomelight-devcards-main {
+    padding-bottom: 0;
+}
+
+#com-rigsomelight-devcards-main.no-standalone {
     padding-bottom: 10em;
 }
 
@@ -160,6 +164,9 @@ body .hljs {
    border: 1px solid transparent;
 }
 
+.com-rigsomelight-devcards-card-base-no-pad.com-rigsomelight-devcards-card-no-top-margin {
+   margin-top: 0;
+}
 
 .com-rigsomelight-devcards-breadcrumbs {
     font-size: 16px;

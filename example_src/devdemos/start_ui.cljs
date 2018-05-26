@@ -5,6 +5,7 @@
    [devdemos.om]
    [devdemos.om-next]
    [devdemos.reagent]
+   [devdemos.re-frame]
    [devdemos.source-code-display]
    [devdemos.two-zero]
    [devdemos.testing]

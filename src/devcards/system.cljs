@@ -2,6 +2,7 @@
   (:require
    [clojure.string :as string]
    [cljs.core.async :refer [put! <! chan timeout]]
+   [cljs.reader :as reader]
    [sablono.core :as sab]
    [devcards.util.edn-renderer :as edn-rend]
    [goog.object :as gobj]
@@ -103,22 +104,27 @@
       (.setEnabled h true)
       h)))
 
-(defn path->token [path]
-  (str "!/" (string/join "/" (map name path))))
+(defn path->token
+  ([path] (path->token path {}))
+  ([path params]
+   (str "!/" (string/join "/" (map name path))
+        (when (seq params) (pr-str params)))))
 
 (defn token->path [token]
-  (vec (map keyword
-            (-> token
-              (string/replace-first #"#" "")
-              (string/replace-first #"!/" "")
-              (string/split #"/")))))
+  (let [[path-string params-string] (string/split token #"\{" 2)]
+    [(vec (map keyword
+              (-> path-string
+                  (string/replace-first #"#" "")
+                  (string/replace-first #"!/" "")
+                  (string/split #"/"))))
+     (when params-string (reader/read-string (str "{" params-string)))]))
 
 #_(prn (token->path (.getToken history)))
 
 #_(prn (token->path (gobj/get js/location "hash")))
 
-(defn hash-navigate [path]
-  (.setToken history (path->token path)))
+(defn hash-navigate [path params]
+  (.setToken history (path->token path params)))
 
 (defn hash-routing-init [state-atom]
   (events/listen history EventType/NAVIGATE
@@ -189,22 +195,33 @@
          :current-path
          (enforce-valid-path state (conj current-path (keyword path)))))
 
-(defn set-current-path [{:keys [current-path] :as state} path]
+(defn set-standalone-in-root-div-when-needed! [params]
+  ;; set "no-standalone" class in the root node, so we can tweak styling (bottom-padding)
+  ;; TODO: is there a better place where to put this?
+  (if (:standalone params)
+    (js-delete (devcards-app-node) "class")
+    (set! (.-className (devcards-app-node)) "no-standalone")))
+
+(defn set-current-path [{:keys [current-path current-path-params] :as state} [path params]]
   (let [path (vec (map keyword path))]
-    (if (not= current-path path)
-      (-> state
-        (assoc :current-path (enforce-valid-path state path))
-        #_add-navigate-effect)
+    (if (not= [current-path current-path-params] [path params])
+      (do
+        (set-standalone-in-root-div-when-needed! params)
+        (-> state
+          (assoc :current-path (enforce-valid-path state path))
+          (assoc :current-path-params params)
+        #_add-navigate-effect))
       state)))
 
-(defn set-current-path! [state-atom path]
-  (swap! state-atom set-current-path path)
-  (hash-navigate path))
+(defn set-current-path! [state-atom [path params]]
+  (swap! state-atom set-current-path [path params])
+  (hash-navigate path params))
 
 (defn current-page [data]
   (and (:current-path data)
        (:cards data)
-       (get-in (:cards data) (:current-path data))))
+       (-> (get-in (:cards data) (:current-path data))
+           (merge (select-keys (:current-path-params data) [:standalone])))))
 
 (defn display-single-card? [state]
   (devcard? (current-page state)))
@@ -264,7 +281,7 @@
                        :key (path->unique-card-id path)}
                 [:a.com-rigsomelight-devcards_set-current-path
                  {:href "#"
-                  :onClick      (prevent-> #(set-current-path! state-atom path))}
+                  :onClick      (prevent-> #(set-current-path! state-atom [path]))}
                  (str n)]]))
             crumbs)))
       (cljs-logo)])))
@@ -273,7 +290,7 @@
   (swap! state-atom
          (fn [s]
            (let [new-s (add-to-current-path s key)]
-             (hash-navigate (:current-path new-s))
+             (hash-navigate (:current-path new-s) (:current-path-params new-s))
              new-s))))
 
 (defn dir-links [dirs state-atom]
@@ -298,25 +315,28 @@
            (sort-by (fn [[key _]] (name key))  dirs))])))
 
 (defn main-template [state-atom]
-  (let [data @state-atom]
+  (let [data @state-atom
+        current-path-params (:current-path-params data)]
     (sab/html
-     [:div
-      {:className
-       (str "com-rigsomelight-devcards-base "
-            (when-let [n (first (:current-path data))]
-              (string/replace (name n) "." "-")))}
-      #_[:div.com-rigsomelight-devcards-navbar
-       [:div.com-rigsomelight-devcards-container
-        [:span.com-rigsomelight-devcards-brand
-         "(:devcards ClojureScript)"]]]
-      [:div.com-rigsomelight-devcards-container
-       (when-let [crumbs (breadcrumbs data)]
-         (breadcrumbs-templ crumbs state-atom))
-       (when-not (display-single-card? data)
-         (let [dir-paths (display-dir-paths data)]
-           (dir-links dir-paths state-atom)))
-       [:div
-        (main-cards-template state-atom)]]])))
+      (if (:standalone current-path-params)
+        (main-cards-template state-atom)
+        [:div
+         {:className
+          (str "com-rigsomelight-devcards-base "
+               (when-let [n (first (:current-path data))]
+                 (string/replace (name n) "." "-")))}
+         #_[:div.com-rigsomelight-devcards-navbar
+            [:div.com-rigsomelight-devcards-container
+             [:span.com-rigsomelight-devcards-brand
+              "(:devcards ClojureScript)"]]]
+         [:div.com-rigsomelight-devcards-container
+          (when-let [crumbs (breadcrumbs data)]
+            (breadcrumbs-templ crumbs state-atom))
+          (when-not (display-single-card? data)
+            (let [dir-paths (display-dir-paths data)]
+              (dir-links dir-paths state-atom)))
+          [:div
+           (main-cards-template state-atom)]]]))))
 
 (define-react-class DevcardsRoot
   (componentDidMount
