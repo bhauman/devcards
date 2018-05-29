@@ -156,8 +156,8 @@ interface responds.
 First make sure you include the following `:dependencies` in your `project.clj` file.
 
 ```clojure
-[org.clojure/clojurescript "1.7.170"]
-[devcards "0.2.1"]
+[org.clojure/clojurescript "1.10.238"]
+[devcards "0.2.5"]
 ```
 
 You will need an HTML file to host the devcards interface. It makes
