@@ -60,7 +60,7 @@
       :dependencies [;[org.omcljs/om "0.9.0"]
                      [org.omcljs/om "1.0.0-alpha46"]
                      [reagent "0.6.0"]
-                     [figwheel-sidecar "0.5.8"]
+                     [figwheel-sidecar "0.5.13"]
                      [com.cemerick/piggieback "0.2.1"]
                      [org.clojure/tools.nrepl "0.2.12"]]                   
       :plugins [[lein-cljsbuild "1.1.4" :exclusions [org.clojure/clojure]]
