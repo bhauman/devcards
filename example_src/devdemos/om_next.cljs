@@ -27,9 +27,20 @@
 
     Please refer to code of this file to see how these Om Next examples are
     built.
+<<<<<<< HEAD
 ")
 
 (defui Widget
+=======
+
+    ### One more thing
+    - If you want to experience the best of a live-programming environment, don't forget to write reloadable code:
+      - `defui ^:once` your components
+      - `defonce` your reconcilers!
+")
+
+(defui ^:once Widget
+>>>>>>> master
   Object
   (render [this]
     (sab/html [:h2 "This is an Om Next card, " (:text (om/props this))])))
@@ -54,7 +65,11 @@
 
 (defcard om-next-share-atoms
   (dc/doc
+<<<<<<< HEAD
    "#### You can share an Atom between `om-next-root` cards.
+=======
+   "#### You can share an Atom between `om-next-root`/`defcard-om-next` cards.
+>>>>>>> master
 
     Interact with the counters below."))
 
@@ -85,33 +100,60 @@
 
 (def om-next-counter-inc (counter inc "inc"))
 
+<<<<<<< HEAD
 (defcard-om-next om-next-card-shared-ex-1
   om-next-counter-inc
+=======
+(defonce rec1
+>>>>>>> master
   (om/reconciler {:state om-test-atom
                   :parser (om/parser {:read counter-read
                                       :mutate counter-mutate})
                   :shared {:title "First counter "}}))
 
+<<<<<<< HEAD
 (def om-next-counter-dec (counter dec "dec"))
 
 (defcard-om-next om-next-card-shared-ex-2
   om-next-counter-dec
+=======
+(defcard-om-next om-next-card-shared-ex-1
+  om-next-counter-inc
+  rec1)
+
+(def om-next-counter-dec (counter dec "dec"))
+
+(defonce rec2
+>>>>>>> master
   (om/reconciler {:state om-test-atom
                   :parser (om/parser {:read counter-read
                                       :mutate counter-mutate})
                   :shared {:title "Second counter "}}))
 
+<<<<<<< HEAD
 (dc/defcard om-test-atom-data
   "### You can share an Atom with an `edn-card` too:"
   om-test-atom)
 
 (defui UnmountSample
+=======
+(defcard-om-next om-next-card-shared-ex-2
+  om-next-counter-dec
+  rec2)
+
+(defcard om-test-atom-data
+  "### You can share an Atom with an `edn-card` too:"
+  om-test-atom)
+
+(defui ^:once UnmountSample
+>>>>>>> master
   Object
   (componentDidMount [_]
     (println "mounting"))
   (componentWillUnmount [_]
     (println "unmounting this"))
   (render [_]
+<<<<<<< HEAD
     (dom/div nil "unmount")))
 
 (defcard-om-next sample-om-next-card
@@ -144,3 +186,9 @@
                          :parser (om.next/parser {:read (fn [] {:value {}})})})
     ComponentWithLocalState
     nil nil))
+=======
+    (dom/div nil "unmount sample")))
+
+(defcard-om-next sample-om-next-card
+  UnmountSample)
+>>>>>>> master

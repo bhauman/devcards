@@ -1,3 +1,18 @@
+## 0.2.1-7 Some reagent fixes
+
+* Improved Reagent reloading PR #100
+* removed woarnings on duplicate "is" tests PR #101
+
+## 0.2.1-6
+
+* Fixed a regression where Component local state was lost during reload
+* refactored to accommodate Om Next extension
+* fixed some React missing key warnings
+
+## 0.2.1-5 Fixing minor dependency conflicts
+
+* getting rid of dep conflicts 
+
 ## 0.2.1-4 Om Next Helpers
 
 * bumping sablono deps

@@ -3,7 +3,6 @@
    [devcards.core :as dc]
    [sablono.core :as sab :include-macros true])
   (:require-macros
-   [cljs-react-reload.core :refer [defonce-react-class]]
    [devcards.core :refer [defcard defcard-doc]]))
 
 (defcard

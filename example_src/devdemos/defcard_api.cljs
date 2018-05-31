@@ -393,6 +393,7 @@
     :watch-atom true    ;; whether to watch the atom and render on change 
     :history false      ;; whether to record a change history of the atom
     :classname \"\"       ;; provide card with a custom classname
+    :projection identity ;; provide a projection function for card state
   }
   ```
 
@@ -437,6 +438,16 @@
                [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]]))
   {:count 50}
   {:inspect-data true :history true})
+
+(defcard project-data
+  (fn [data-atom _]
+    (sab/html [:div [:h3 "Inspecting data but only some of the data: Counter" (:count @data-atom)]
+               [:button {:onClick (fn [] (swap! data-atom update-in [:count] inc))} "inc"]
+               [:div "Random other state that is not important: " (:whatever @data-atom)]]))
+  {:count 50
+   :whatever "this state is present but not shown in `inspect-data` part."}
+  {:inspect-data true
+   :projection (fn [state] (select-keys state [:count]))})
 
 
 (defcard-doc

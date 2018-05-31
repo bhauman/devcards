@@ -156,8 +156,8 @@ interface responds.
 First make sure you include the following `:dependencies` in your `project.clj` file.
 
 ```clojure
-[org.clojure/clojurescript "1.7.170"]
-[devcards "0.2.1"]
+[org.clojure/clojurescript "1.10.238"]
+[devcards "0.2.5"]
 ```
 
 You will need an HTML file to host the devcards interface. It makes
@@ -180,8 +180,7 @@ file as in the leiningen template).
 </html>
 ```
 
-
-##Usage With Figwheel
+## Usage With Figwheel
 
 [lein-figwheel](https://github.com/bhauman/lein-figwheel) 
 is not required to use Devcards but it is definitely recommended
@@ -316,7 +315,7 @@ our site.
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="/css/{{your lib name}.css" rel="stylesheet" type="text/css">
+    <link href="/css/{{your lib name}}.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <div id="main-app-area"></div>
@@ -331,7 +330,7 @@ our site.
 `lein cljsbuild once hostedcards`
 
 Once the build is complete, simply copy the contents of `resources\public` 
-to your webserver and serve it up as you would any other page. You 
+to your webserver and serve it up as you would any other page.
 
 ## FAQ
 
