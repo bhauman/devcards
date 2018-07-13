@@ -210,9 +210,8 @@ Next you will need to include the Devcards macros into your file:
 ```clojure
 (ns example.core
   (:require
-   [sablono.core :as sab]) ; just for example
-  (:require-macros
-   [devcards.core :refer [defcard]]))
+   [sablono.core :as sab] ; just for example
+   [devcards.core :as dc :refer-macros [defcard]]))
 
 (defcard my-first-card
   (sab/html [:h1 "Devcards is freaking awesome!"]))
@@ -249,10 +248,8 @@ in this build adding the figwheel options doesn't help.
 ```clojure
 (ns example.core
   (:require
-   [devcards.core :as dc] ; <-- here
-   [sablono.core :as sab]) ; just for this example
-  (:require-macros
-   [devcards.core :refer [defcard]])) ; <-- and here
+   [sablono.core :as sab] ; just for this example
+   [devcards.core :as dc :refer-macros [defcard]]))
 
 (defcard my-first-card
   (sab/html [:h1 "Devcards is freaking awesome!"]))
@@ -297,9 +294,7 @@ our site.
 ```clojure
 (ns {{your lib name}}.core
   (:require
-   [devcards.core :as dc]) 
-  (:require-macros
-   [devcards.core :refer [defcard]])) 
+   [devcards.core :as dc :refer-macros [defcard]]))
 ```
 
 ### Start the Devcards UI in {{your lib name}}.core
