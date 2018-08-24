@@ -3,8 +3,8 @@
    [devcards.system :as dev]
 
    [devcards.util.markdown :as mark]
-   [devcards.util.utils :as utils :refer [html-env?]
-    :refer-macros [define-react-class define-react-class-once]]
+   [devcards.util.utils :as utils
+    :refer [html-env? define-react-class define-react-class-once]]
 
    [sablono.core :as sab :include-macros true]
    [devcards.util.edn-renderer :as edn-rend]
@@ -13,6 +13,7 @@
    [cljs.test]
    [cljs.core.async :refer [put! chan timeout <! close! alts!] :as async])
   (:require-macros
+   [devcards.core]
    [cljs.core.async.macros :refer [go]]))
 
 (enable-console-print!)

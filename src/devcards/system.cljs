@@ -8,7 +8,7 @@
    [goog.events :as events]
    [goog.history.EventType :as EventType]
    [goog.labs.userAgent.device :as device]
-   [devcards.util.utils :as utils :refer-macros [define-react-class]]
+   [devcards.util.utils :as utils :refer [define-react-class]]
    [cljsjs.react]
    [cljsjs.react.dom])
   (:require-macros
