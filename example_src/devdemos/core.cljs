@@ -6,6 +6,7 @@
      [om.core :as om :include-macros true]
      [om.dom :as dom :include-macros true]
      [om.next :as omnext :refer-macros [defui]]
+     [create-react-class :as create-react-class]
      [reagent.core :as reagent]
      [clojure.string :as string]
      [sablono.core :as sab :include-macros true]
@@ -16,6 +17,9 @@
      ;; but only the macros. This helps ensure that devcards will only
      ;; be created when the :devcards is set to true in the build config.
      [devcards.core :as dc :refer [defcard defcard-doc deftest dom-node defcard-om-next]]))
+
+;; this is to support om with the latest version of React
+(set! (.-createClass (.-React goog.global)) create-react-class)
 
 (def ^:export front-matter
   {:layout false
