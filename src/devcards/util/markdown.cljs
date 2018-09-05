@@ -1,7 +1,7 @@
 (ns devcards.util.markdown
   (:require
    [clojure.string :as string]
-   [cljsjs.showdown]))
+   [cljsjs.marked]))
 
 (defn leading-space-count [s]
   (when-let [ws (second (re-matches #"^([\s]*).*"  s))]
@@ -24,12 +24,8 @@
     (subs s margin)
     (string/trim s)))
 
-(let [conv-class (.-Converter js/showdown)
-      converter (conv-class.)]
-  (defn markdown-to-html
-    "render markdown"
-    [markdown-txt]
-    (.makeHtml converter markdown-txt)))
+(defn markdown-to-html [markdown-txt]
+  (js/marked markdown-txt))
 
 (defn matches-delim? [line]
   (re-matches #"^[\s]*```(\w*).*" line))
