@@ -19,10 +19,13 @@
    [devcards.core]
    [cljs.core.async.macros :refer [go]]))
 
+;; this is to support om with the latest version of React
+#_(set! (.-createClass (.-React goog.global)) create-react-class)
+
 (enable-console-print!)
 
 ;; this channel is only used for card registration notifications
-(defonce devcard-event-chan (chan))
+(defonce devcard-event-chan (chan (sliding-buffer 5000)))
 
 (def react-element-type-symbol
   "Make a react Symbol the same way as React 0.14"
