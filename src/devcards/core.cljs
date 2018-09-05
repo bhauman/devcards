@@ -22,6 +22,8 @@
 ;; this is to support om with the latest version of React
 #_(set! (.-createClass (.-React goog.global)) create-react-class)
 
+(goog-define active false)
+
 (enable-console-print!)
 
 ;; this channel is only used for card registration notifications

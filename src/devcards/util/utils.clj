@@ -3,7 +3,11 @@
 
 (defn devcards-active? []
   (and cljs.env/*compiler*
-       (get-in @cljs.env/*compiler* [:options :devcards])))
+       (when-let [{:keys [options]} @cljs.env/*compiler*]
+         (or (:devcards options)
+             (when-let [closure-defines (get options :closure-defines)]
+               (or (get closure-defines "devcards.core.active")
+                   (get closure-defines "devcards.core/active")))))))
 
 (defn specify-react-class! [body]
   (let [constructor-fn (when-let [cf
