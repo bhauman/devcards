@@ -23,11 +23,12 @@
 #_(set! (.-createClass (.-React goog.global)) create-react-class)
 
 (goog-define active false)
+(goog-define card-buffer-size 5000)
 
 (enable-console-print!)
 
 ;; this channel is only used for card registration notifications
-(defonce devcard-event-chan (chan (sliding-buffer 5000)))
+(defonce devcard-event-chan (chan (sliding-buffer card-buffer-size)))
 
 (def react-element-type-symbol
   "Make a react Symbol the same way as React 0.14"
