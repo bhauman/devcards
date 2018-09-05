@@ -1,3 +1,19 @@
+## 0.2.6 Updated for latest React 16.4
+
+* requires `cljsjs/react-create-class` - you may need to exclude this
+  along with `cljsjs/react` and `cljsjs/react-dom` if you are using
+  npm dependencies
+* should effortlessly support the latest reagent
+* fixed outstanding issue that made it difficult to work with npm dependencies
+* moved to `cljsjs/marked` instead of using showdown - I'm considering
+  injecting a wrapped version of this lib so that it doesn't conflict
+  if you happen to be using it from npm.
+* fixed an edn rendering error caused by MapEntry changes
+* fixed the 1024 buffer limitation, can be configured via `:closure-defines {devcards.core/card-buffer-size 10000}`
+* added tool friendly way to opt-in to devcards via `:closure-defines {devcards.core/active true}`
+* discoverd that `(set! (.-createClass (.-React goog.global)) create-react-class)` is a sweet 
+  hack to get `omcljs/om` to work with latest React
+
 ## 0.2.1-7 Some reagent fixes
 
 * Improved Reagent reloading PR #100
