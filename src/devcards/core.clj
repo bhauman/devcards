@@ -153,7 +153,7 @@
     (let [[vname docu main initial-data options] (parse-card-args exprs 'reagent-card)]
       (card vname docu `(devcards.core/reagent ~main) initial-data (assoc
                                                                     options
-                                                                    :watch-atom false)))))
+                                                                    :watch-atom true)))))
 
 ;; om helpers
 
