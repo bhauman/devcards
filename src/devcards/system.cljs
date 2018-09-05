@@ -8,9 +8,9 @@
    [goog.events :as events]
    [goog.history.EventType :as EventType]
    [goog.labs.userAgent.device :as device]
-   [devcards.util.utils :as utils :refer [define-react-class]]
-   [cljsjs.react]
-   [cljsjs.react.dom])
+   [devcards.util.utils :as utils :refer-macros [define-react-class]]
+   [react :as react]
+   [react-dom :as react-dom])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]
    [devcards.system :refer [inline-resouce-file]])

@@ -11,7 +11,10 @@
    [goog.object :as gobj]
    [clojure.string :as string]
    [cljs.test]
-   [cljs.core.async :refer [put! chan timeout <! close! alts!] :as async])
+   [react :as react]
+   [react-dom :as react-dom]
+   [create-react-class :as create-react-class]
+   [cljs.core.async :refer [put! chan sliding-buffer timeout <! close! alts!] :as async])
   (:require-macros
    [devcards.core]
    [cljs.core.async.macros :refer [go]]))

@@ -23,3 +23,4 @@ example-resources/public/devcards/js/compiled/*
 
 *-init.clj
 figwheel_server.log
+.rebel_readline_history

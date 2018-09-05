@@ -1,15 +1,16 @@
-(defproject devcards "0.2.5"
+(defproject devcards "0.2.6-SNAPSHOT"
   :description "Devcards is a ClojureScript library that provides a lab space in which you can develop your UI components independently and interactively."
   :url "http://github.com/bhauman/devcards"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.229"]
+                 [org.clojure/clojurescript "1.10.339"]
                  [org.clojure/core.async  "0.4.474"]
-                 [cljsjs/react "15.5.4-0"]
-                 [cljsjs/react-dom "15.5.4-0"]
-                 [sablono "0.8.1"]
+                 [cljsjs/react "16.4.1-0"]
+                 [cljsjs/react-dom "16.4.1-0"]
+                 [cljsjs/create-react-class "15.6.3-1"]
+                 [sablono "0.8.4"]
                  [cljsjs/showdown "1.4.2-0"]]
 
   :source-paths ["src"]
@@ -23,7 +24,10 @@
   :cljsbuild {
               :builds [{:id "devcards-demos"
                         :source-paths ["example_src" "src"]
-                        :figwheel { :devcards true }
+                        :figwheel {
+                                   :devcards true
+                                   :open-urls ["http://localhost:3449/devcards/index.html"]
+                                   }
                         :compiler {
                                    :main "devdemos.start-ui"
                                    :asset-path "js/compiled/out"
@@ -58,14 +62,14 @@
            :repl-options {:init (set! *print-length* 50)}}
    :dev {
       :dependencies [;[org.omcljs/om "0.9.0"]
-                     [org.omcljs/om "1.0.0-alpha46"]
-                     [reagent "0.6.0"]
-                     [figwheel-sidecar "0.5.13"]
+                     [org.omcljs/om "1.0.0-beta4"]
+                     [reagent "0.8.1"]
+                     [figwheel-sidecar "0.5.16"]
                      [com.cemerick/piggieback "0.2.1"]
                      [org.clojure/tools.nrepl "0.2.12"]]                   
       :plugins [[lein-cljsbuild "1.1.4" :exclusions [org.clojure/clojure]]
-                [lein-figwheel "0.5.13"]]
-      :resource-paths ["resources" "example-resources"]   
-
+                [lein-figwheel "0.5.16"]]
+         :resource-paths ["resources" "example-resources"]   
+         
          }})
 
