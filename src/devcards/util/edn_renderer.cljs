@@ -12,8 +12,10 @@
 (declare html)
 
 (defn literal? [x]
-  (and (not (seq? x))
-       (not (coll? x))))
+  (and
+   (not (map-entry? x))
+   (not (seq? x))
+   (not (coll? x))))
 
 (defn separator* [s]
   (sab/html [:span.seperator {:key (get-key)} s]))
@@ -22,7 +24,10 @@
   (sab/html [:span {:key (get-key)} (separator* s) [:span.clearfix]]))
 
 (defn separate-fn [coll]
-  (if (not (every? literal? coll)) clearfix-separator* separator*))
+  (try
+    (if (not (every? literal? coll)) clearfix-separator* separator*)
+    (catch js/Error e
+      clearfix-separator*)))
 
 (defn interpose-separator [rct-coll s sep-fn]
   (->> (rest rct-coll)

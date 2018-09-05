@@ -33,7 +33,8 @@
                                    :asset-path "js/compiled/out"
                                    :output-to "example-resources/public/devcards/js/compiled/devdemos.js"
                                    :output-dir "example-resources/public/devcards/js/compiled/out"
-                                   :recompile-dependents false                             
+                                   :recompile-dependents false
+                                   :preloads [devtools.preload]
                                    :optimizations :none
                                    :source-map-timestamp true}}
                        {:id "website"
@@ -66,6 +67,7 @@
                      [reagent "0.8.1"]
                      [figwheel-sidecar "0.5.16"]
                      [com.cemerick/piggieback "0.2.1"]
+                     [binaryage/devtools "0.9.10"]
                      [org.clojure/tools.nrepl "0.2.12"]]                   
       :plugins [[lein-cljsbuild "1.1.4" :exclusions [org.clojure/clojure]]
                 [lein-figwheel "0.5.16"]]
