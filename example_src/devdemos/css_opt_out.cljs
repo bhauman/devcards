@@ -60,28 +60,6 @@ You can find all the orginal CSS files here:
 [https://github.com/bhauman/devcards/blob/master/resources/public/devcards/css](https://github.com/bhauman/devcards/blob/master/resources/public/devcards/css)
 
 It's probably best to copy and edit the original CSS if you have any
-tricky CSS issues.
-
-
-## Highlight.js
-
-Currently Devcards inlines a
-custom [Highlight.js](https://highlightjs.org/) library into the head
-of the your Devcards UI document. If you inspect the `<head>` of your
-document you will see the element with the id
-`com-rigsomelight-code-highlighting`. If you would like to prevent
-this or use another custom Highlight.js pack you can use a similar
-strategy to the above.
-
-You just need to include an HTML tag with the id `com-rigsomelight-code-highlighting` 
-
-For example if you don't want the highlight.js code in your document
-at all you can add a TAG like the following to the head of
-your document.
-
-```html
-<script id=\"com-rigsomelight-code-highlighting\"></script>
-```
-"
+tricky CSS issues."
   )
 
