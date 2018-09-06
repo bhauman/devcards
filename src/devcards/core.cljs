@@ -1,19 +1,19 @@
 (ns devcards.core
   (:require
    [devcards.system :as dev]
-
    [devcards.util.markdown :as mark]
    [devcards.util.utils :as utils
     :refer [html-env? define-react-class define-react-class-once]]
-
    [sablono.core :as sab :include-macros true]
    [devcards.util.edn-renderer :as edn-rend]
    [goog.object :as gobj]
    [clojure.string :as string]
    [cljs.test]
+   [goog.labs.userAgent.device :as device]
    [react :as react]
    [react-dom :as react-dom]
    [create-react-class :as create-react-class]
+   [devcards-syntax-highlighter :as devcards-syntax-highlighter]
    [cljs.core.async :refer [put! chan sliding-buffer timeout <! close! alts!] :as async])
   (:require-macros
    [devcards.core]
@@ -105,14 +105,10 @@
 
 ;; syntax highlighting
 
-(defn get-hljs []
-  (gobj/get js/goog.global "hljs"))
-
 (defn highlight-node [this]
-  (when-let [node (ref->node this "code-ref")]
-    (when-let [hljs (get-hljs)]
-      (when-let [highlight-block (gobj/get hljs "highlightBlock")]
-        (highlight-block node)))))
+  (when-not (device/isMobile)
+    (when-let [node (ref->node this "code-ref")]
+      (js/DevcardsSyntaxHighlighter.highlightBlock node))))
 
 (define-react-class CodeHighlight
   (componentDidMount [this] (highlight-node this))
@@ -120,7 +116,7 @@
   (render
    [this]
    (sab/html
-    [:pre {:className (if (get-hljs) "com-rigsomelight-devcards-code-highlighting"  "")
+    [:pre {:className (if-not (device/isMobile) "com-rigsomelight-devcards-code-highlighting"  "")
            :key (hash (get-props this :code))}
      [:code {:className (or (get-props this :lang) "")
              :ref "code-ref"}

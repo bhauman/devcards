@@ -7,7 +7,6 @@
    [goog.object :as gobj]
    [goog.events :as events]
    [goog.history.EventType :as EventType]
-   [goog.labs.userAgent.device :as device]
    [devcards.util.utils :as utils :refer-macros [define-react-class]]
    [react :as react]
    [react-dom :as react-dom])
@@ -64,7 +63,6 @@
                       (create-style-element "com-rigsomelight-code-highlight-css"
                                             (inline-resouce-file "public/devcards/css/com_rigsomelight_github_highlight.css"))))
 
-
       (when-not (get-element-by-id "com-rigsomelight-devcards-css")
         (.appendChild head (create-style-element "com-rigsomelight-devcards-css"
                                                  (inline-resouce-file "public/devcards/css/com_rigsomelight_devcards.css"))))
@@ -74,16 +72,7 @@
       (when-not (get-element-by-id "com-rigsomelight-edn-css")
         (.appendChild head
                       (create-style-element "com-rigsomelight-edn-css"
-                                            (inline-resouce-file "public/devcards/css/com_rigsomelight_edn_flex.css"))))
-
-      ;; we are injecting conditionally so that we can skip mobile
-      ;; and skip node
-      ;; really not diggin this but ...
-      (when-not (or (get-element-by-id "com-rigsomelight-code-highlighting")
-                    (device/isMobile))
-        (.appendChild head
-                      (create-script-element "com-rigsomelight-code-highlighting"
-                                             (inline-resouce-file "public/devcards/js/highlight.pack.js")))))))
+                                            (inline-resouce-file "public/devcards/css/com_rigsomelight_edn_flex.css")))))))
 
 (defn render-base-if-necessary! []
   (add-css-if-necessary!)
