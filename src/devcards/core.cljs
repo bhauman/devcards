@@ -526,7 +526,7 @@
                            opts)))))
 
 ;; keep
-(defn- dom-node* [node-fn]
+(defn dom-node* [node-fn]
   (fn [data-atom owner]
      (js/React.createElement DomComponent
                              #js {:node_fn   node-fn
