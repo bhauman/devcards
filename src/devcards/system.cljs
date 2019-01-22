@@ -24,6 +24,40 @@
 
 (def devcards-rendered-card-class "com-rigsomelight-devcards_rendered-card")
 
+(def devcads-default-code-highlight-css
+  {:id    "com-rigsomelight-code-highlight-css"
+   :css  (inline-resouce-file "public/devcards/css/com_rigsomelight_github_highlight.css")})
+
+(def devcads-default-css
+  {:id    "com-rigsomelight-devcards-css"
+   :css   (inline-resouce-file "public/devcards/css/com_rigsomelight_devcards.css")})
+
+(def devcads-default-addons-css
+  {:id    "com-rigsomelight-devcards-addons-css"
+   :css  (inline-resouce-file "public/devcards/css/com_rigsomelight_github_highlight.css")})
+
+(def devcads-default-edn-css
+  {:id    "com-rigsomelight-edn-css"
+   :css  (inline-resouce-file "public/devcards/css/com_rigsomelight_edn_flex.css")})
+
+(def devcard-initial-data { :current-path []
+                            :position 0
+                            :cards {}
+                            :path-collision-count {}
+                            :css-resouces [devcads-default-code-highlight-css
+                                           devcads-default-css
+                                           devcads-default-addons-css
+                                           devcads-default-edn-css]
+                            :base-card-options { :frame true
+                                                 :heading true
+                                                 :padding true
+                                                 :hidden false
+                                                 :inspect-data false
+                                                 :watch-atom true
+                                                 :history false } })
+
+(defonce app-state (atom devcard-initial-data))
+
 (defn prevent-> [f] (fn [e] (.preventDefault e) (f e)))
 
 (defn get-element-by-id [id] (.getElementById js/document id))
@@ -58,21 +92,13 @@
 (defn add-css-if-necessary! []
   (if-let [heads (.getElementsByTagName js/document "head")]
     (let [head (aget heads 0)]
-      (when-not (get-element-by-id "com-rigsomelight-code-highlight-css")
-        (.appendChild head
-                      (create-style-element "com-rigsomelight-code-highlight-css"
-                                            (inline-resouce-file "public/devcards/css/com_rigsomelight_github_highlight.css"))))
-
-      (when-not (get-element-by-id "com-rigsomelight-devcards-css")
-        (.appendChild head (create-style-element "com-rigsomelight-devcards-css"
-                                                 (inline-resouce-file "public/devcards/css/com_rigsomelight_devcards.css"))))
-      (when-not (get-element-by-id "com-rigsomelight-devcards-addons-css")
-        (.appendChild head (create-style-element "com-rigsomelight-devcards-addons-css"
-                                                 (inline-resouce-file "public/devcards/css/com_rigsomelight_devcards_addons.css"))))
-      (when-not (get-element-by-id "com-rigsomelight-edn-css")
-        (.appendChild head
-                      (create-style-element "com-rigsomelight-edn-css"
-                                            (inline-resouce-file "public/devcards/css/com_rigsomelight_edn_flex.css")))))))
+      (doall
+        (map
+          (fn [resouce]
+            (when-not (get-element-by-id (:id resouce))
+              (.appendChild head
+                            (create-style-element (:id resouce) (:css resouce)))))
+        (:css-resouces @app-state))))))
 
 (defn render-base-if-necessary! []
   (add-css-if-necessary!)
@@ -152,19 +178,6 @@
                        :position position }))
         (register-collision path))))
 
-(def devcard-initial-data { :current-path []
-                            :position 0
-                            :cards {}
-                            :path-collision-count {}
-                            :base-card-options { :frame true
-                                                 :heading true
-                                                 :padding true
-                                                 :hidden false
-                                                 :inspect-data false
-                                                 :watch-atom true
-                                                 :history false } })
-
-(defonce app-state (atom devcard-initial-data))
 
 (defn valid-path? [state path]
   (or (= [] path)

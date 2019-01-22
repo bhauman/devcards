@@ -63,11 +63,14 @@
 (defn start-devcard-ui!*
   ([] (start-devcard-ui!* {}))
   ([options]
-   (when (and (map? options)
-              (map? (:default-card-options options)))
+   (when (map? (:default-card-options options))
      (swap! dev/app-state update-in
             [:base-card-options]
             (fn [opts] (merge opts (:default-card-options options)))))
+   (when (vector? (:css-resouces options))
+      (swap! dev/app-state assoc
+        :css-resouces
+        (:css-resouces options)))
    (dev/start-ui devcard-event-chan)
    (register-figwheel-listeners!)))
 
