@@ -1,6 +1,6 @@
 ## 0.2.6 Updated for latest React 16.4
 
-* requires `cljsjs/react-create-class` - you may need to exclude this
+* requires `cljsjs/create-react-class` - you may need to exclude this
   along with `cljsjs/react` and `cljsjs/react-dom` if you are using
   npm dependencies
 * should effortlessly support the latest reagent
