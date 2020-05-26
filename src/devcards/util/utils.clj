@@ -18,17 +18,17 @@
         constructor-fn (if constructor-fn
                          `(fn [props#]
                             (cljs.core/this-as this#
-                              (.call js/React.Component this# props#)
+                              (.call js/devcards.util.utils.react_holder.Component this# props#)
                               (.call ~constructor-fn this# props#)
                               this#))
                          `(fn [props#]
                             (cljs.core/this-as this#
-                              (.call js/React.Component this# props#)
+                              (.call js/devcards.util.utils.react_holder.Component this# props#)
                               this#)))
         body (->> body
                   (remove #(= 'constructor (first %))))]
     `(let [ctor# ~constructor-fn]
-       (goog.inherits ctor# js/React.Component)
+       (goog.inherits ctor# js/devcards.util.utils.react_holder.Component)
        (cljs.core/specify! (.-prototype ctor#)
          ~'Object
          ~@body)

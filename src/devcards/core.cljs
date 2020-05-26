@@ -96,10 +96,10 @@
 
 (defn- react-raw [raw-html-str]
   "A React component that renders raw html."
-  (js/React.createElement "div"
-    #js {:key (str (hash raw-html-str))
-         :dangerouslySetInnerHTML
-         #js {:__html raw-html-str}}))
+  (react/createElement "div"
+                       #js {:key (str (hash raw-html-str))
+                            :dangerouslySetInnerHTML
+                            #js {:__html raw-html-str}}))
 
 (declare get-props ref->node)
 
@@ -123,8 +123,8 @@
       (get-props this :code)]])))
 
 (defn code-highlight [code-str lang]
-  (js/React.createElement CodeHighlight #js {:code code-str
-                                             :lang lang}))
+  (react/createElement CodeHighlight #js {:code code-str
+                                          :lang lang}))
 
 (defmulti markdown-block->react :type)
 
@@ -132,8 +132,8 @@
   (-> content mark/markdown-to-html react-raw))
 
 (defmethod markdown-block->react :code-block [{:keys [content] :as block}]
-  (js/React.createElement CodeHighlight #js {:code (:content block)
-                                             :lang (:lang block)}))
+  (react/createElement CodeHighlight #js {:code (:content block)
+                                          :lang (:lang block)}))
 
 (declare react-element?)
 
@@ -217,7 +217,7 @@
 
 (defn ref->node [this ref]
   (when-let [comp (gobj/get (.. this -refs) ref)]
-    (js/ReactDOM.findDOMNode comp)))
+    (react-dom/findDOMNode comp)))
 
 (defn get-props [this k]
   (gobj/get (.-props this) (name k)))
@@ -239,9 +239,9 @@
 
 ;; this is not currently being used
 (defn dont-update [change-count children-thunk]
-  (js/React.createElement DontUpdate
-                          #js { :change_count change-count
-                                :children_thunk children-thunk}))
+  (react/createElement DontUpdate
+                       #js {:change_count change-count
+                            :children_thunk children-thunk}))
 
 (defn wrangle-inital-data [this]
   (let [data (or (:initial-data (get-props this :card)) {})]
@@ -366,15 +366,15 @@
   (componentWillUnmount
    [this]
    (when-let [node (ref->node this (get-state this :unique_id))]
-     (js/ReactDOM.unmountComponentAtNode node)))
+     (react-dom/unmountComponentAtNode node)))
   (componentDidMount [this] (render-into-dom this))
   (render
    [this]
    (if (html-env?)
-     (js/React.createElement "div"
+     (react/createElement "div"
       #js { :className "com-rigsomelight-devcards-dom-node" :ref (get-state this :unique_id)}
       "Card has not mounted DOM node.")
-     (js/React.createElement "div" nil "Card has not mounted DOM node."))))
+     (react/createElement "div" nil "Card has not mounted DOM node."))))
 
 (defn booler? [key opts]
   (let [x (get opts key)]
@@ -477,7 +477,7 @@
   (let [errors (validate-card-options card-options)]
     (if (not-empty errors)
       (render-errors card-options errors)
-      (js/React.createElement DevcardBase #js { :card (add-environment-defaults card-options) }))))
+      (react/createElement DevcardBase #js { :card (add-environment-defaults card-options) }))))
 
 (defrecord IdentityOptions [obj]
   IDevcardOptions
@@ -528,9 +528,9 @@
 ;; keep
 (defn- dom-node* [node-fn]
   (fn [data-atom owner]
-     (js/React.createElement DomComponent
-                             #js {:node_fn   node-fn
-                                  :data_atom data-atom})))
+     (react/createElement DomComponent
+                          #js {:node_fn   node-fn
+                               :data_atom data-atom})))
 
 ;; devcard protocol that takes a devcard and returns a devcard
 
@@ -733,8 +733,8 @@
 
 ;; keep
 (defn- hist-recorder* [data-atom]
-  (js/React.createElement HistoryComponent
-                         #js { :data_atom data-atom :key "devcards-history-control-bar"}))
+  (react/createElement HistoryComponent
+                       #js { :data_atom data-atom :key "devcards-history-control-bar"}))
 
 ;; Testing via cljs.test
 (comment
@@ -789,14 +789,14 @@
    m
    (sab/html
     [:div
-     (js/React.createElement CodeHighlight #js {:code (utils/pprint-code expected)
-                                                :lang "clojure"})
+     (react/createElement CodeHighlight #js {:code (utils/pprint-code expected)
+                                             :lang "clojure"})
      (when (= type :fail)
        (sab/html [:div {:style {:marginTop "5px"}}
                   [:div {:style {:position "absolute" :fontSize "0.9em"}} "▶"]
                   [:div {:style {:marginLeft "20px"}}
-                   (js/React.createElement CodeHighlight #js {:code (utils/pprint-code actual)
-                                                              :lang "clojure"})]]))])))
+                   (react/createElement CodeHighlight #js {:code (utils/pprint-code actual)
+                                                           :lang "clojure"})]]))])))
 
 (defmethod test-render :pass [m]
   (render-pass-fail m))
@@ -968,9 +968,9 @@
     IDevcard
     (-devcard [this devcard-opts]
       (let [path (:path devcards.system/*devcard-data*)]
-        (js/React.createElement TestDevcard
-                                #js {:test_thunks test-thunks
-                                     :path path})))))
+        (react/createElement TestDevcard
+                             #js {:test_thunks test-thunks
+                                  :path path})))))
 
 ;; render namespace to string
 
@@ -998,6 +998,7 @@
     (println "Adding base card options!" (prn-str  base-card-options))
     (swap! dev/app-state update-in [:base-card-options] (fn [opts] (merge opts base-card-options)))))
 
+;; deprecated
 (defn ^:export render-namespace-to-string [ns-symbol]
   (when-let [card (get-cards-for-ns ns-symbol)]
     (merge-front-matter-options! ns-symbol)
@@ -1011,7 +1012,7 @@
 
 (defn render-ns [ns-symbol app-state]
   (when-let [card (get-cards-for-ns ns-symbol)]
-    (js/ReactDOM.render
+    (react-dom/render
      (sab/html
       [:div.com-rigsomelight-devcards-base.com-rigsomelight-devcards-string-render
        (dev/render-cards (dev/display-cards card) app-state)])

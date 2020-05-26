@@ -3,7 +3,8 @@
      [sablono.core :as sab :include-macros true]
      [goog.object :as gobj]
      [devcards.util.utils :refer-macros [define-react-class-once]]
-     [devcards.core])
+     [devcards.core]
+     [react])
     (:require-macros
      ;; Notice that I am not including the 'devcards.core namespace
      ;; but only the macros. This helps ensure that devcards will only
@@ -36,5 +37,5 @@ This is mainly intended for verification of behavior.")
 The state of this counter is stored in the local state of the component.
 
 To test: increment the counter then save this file and verify that the counter state hasn't changed."
-  (js/React.createElement County))
+  (react/createElement County))
 

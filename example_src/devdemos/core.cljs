@@ -3,8 +3,8 @@
     :rigsomelight-post true}
   devdemos.core
     (:require
-     [om.core :as om :include-macros true]
-     [om.dom :as dom :include-macros true]
+     #_[om.core :as om :include-macros true]
+     #_[om.dom :as dom :include-macros true]
      [om.next :as omnext :refer-macros [defui]]
      [create-react-class :as create-react-class]
      [reagent.core :as reagent]
@@ -19,7 +19,8 @@
      [devcards.core :as dc :refer [defcard defcard-doc deftest dom-node defcard-om-next]]))
 
 ;; this is to support om with the latest version of React
-(set! (.-createClass (.-React goog.global)) create-react-class)
+;; TODO not needed?
+#_(set! (.-createClass (.-React goog.global)) create-react-class)
 
 (def ^:export front-matter
   {:layout false
@@ -248,7 +249,7 @@
 
 
 
-(defn om-slider [bmi-data param value min max]
+#_(defn om-slider [bmi-data param value min max]
   (sab/html
    [:input {:type "range" :value value :min min :max max
             :style {:width "100%"}
@@ -257,7 +258,7 @@
                          (when (not= param :bmi)
                            (om/update! bmi-data :bmi nil)))}]))
 
-(defn om-bmi-component [bmi-data owner]
+#_(defn om-bmi-component [bmi-data owner]
   (let [{:keys [weight height bmi]} (calc-bmi bmi-data)
         [color diagnose] (cond
                           (< bmi 18.5) ["orange" "underweight"]
@@ -279,7 +280,7 @@
         [:span {:style {:color color}} diagnose]
         (om-slider bmi-data :bmi bmi 10 50)]]))))
 
-(defcard
+#_(defcard
   "# Om support
 
    Here is the same calculator being rendered as an Om application.
@@ -292,7 +293,7 @@
    ``` 
    ")
 
-(defcard om-support
+#_(defcard om-support
   (dc/om-root om-bmi-component)
   {:height 180 :weight 80} ;; initial data
   {:inspect-data true
@@ -500,7 +501,7 @@ as a dependency.
     ;; conditionally start the app based on the presence of #main-app-area
     ;; node is on the page
     (if-let [node (.getElementById js/document \"main-app-area\")]
-      (js/React.render (sab/html [:div \"This is main app is ruunning.\"]) node)))
+      (react-dom/render (sab/html [:div \"This is main app is ruunning.\"]) node)))
 
   (main)  
   ```
@@ -557,5 +558,4 @@ your application's UI so you will want to make sure it isn't getting
 launched.
 
 
-  
   ")

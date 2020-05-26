@@ -52,10 +52,10 @@
                                    }}
                        ]}
   
-         :figwheel { :css-dirs ["resources/public/devcards/css"]
-                     :open-file-command "emacsclient"
-                    ;;:nrepl-port 7888
-                    }
+  :figwheel { :css-dirs ["resources/public/devcards/css"]
+             :open-file-command "emacsclient"
+             ;;:nrepl-port 7888
+             }
   
   :profiles {
    :repl { ;:plugins [[cider/cider-nrepl "0.11.1"]]

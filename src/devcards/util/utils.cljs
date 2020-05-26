@@ -1,9 +1,13 @@
 (ns devcards.util.utils
   (:require
    [goog.object :as gobj]
-   [cljs.pprint :as pprint])
+   [cljs.pprint :as pprint]
+   [react])
   (:require-macros
    [devcards.util.utils]))
+
+;; this is a reference
+(def react-holder react)
 
 (defn html-env? []
   (if-let [doc js/goog.global.document]
