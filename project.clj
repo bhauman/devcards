@@ -10,7 +10,7 @@
                  [cljsjs/react "16.4.1-0"]
                  [cljsjs/react-dom "16.4.1-0"]
                  [cljsjs/create-react-class "15.6.3-1"]
-                 [sablono "0.8.4"]]
+                 [sablono "0.8.6"]]
 
   :source-paths ["src"]
 
