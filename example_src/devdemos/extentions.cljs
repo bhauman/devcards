@@ -3,7 +3,7 @@
      [devcards.core]
      [sablono.core :as sab :include-macros true]
      [cljs.test :as t :include-macros true]
-     [om.core :as om]
+     #_[om.core :as om]
      [reagent.core :as rg])
     (:require-macros
      [devcards.core :as dc :refer [defcard defcard-doc deftest dom-node]]))
@@ -46,12 +46,12 @@
   {}
   {:heading 5})
 
-(defcard om-root
-  (dc/om-root
-   (fn [data owner]
-     (reify om/IRender
-       (render [_]
-         (sab/html [:h1 "This is om now!!!"]))))))
+#_(defcard om-root
+    (dc/om-root
+     (fn [data owner]
+       (reify om/IRender
+         (render [_]
+           (sab/html [:h1 "This is om now!!!"]))))))
 
 (defn simple-component []
   [:div
