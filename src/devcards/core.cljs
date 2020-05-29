@@ -912,6 +912,9 @@
 
 (defonce test-channel (chan))
 
+;; Used to collect combined results from all currently rendered test suites
+(defonce test-results (atom {}))
+
 (defn run-card-tests [test-thunks]
   (let [out (chan)
         test-env (assoc (cljs.test/empty-env)
@@ -940,13 +943,60 @@
           (cljs.test/clear-env!)
           (recur (<! test-channel)))))))
 
+(defn favicon! []
+  (if-let [favicon (js/document.getElementById "favicon")]
+    favicon
+    (let [favicon (js/document.createElement "link")]
+      (set! (.-id favicon) "favicon")
+      (set! (.-rel favicon) "shortcut icon")
+      (set! (.-type favicon) "image/png")
+      (set! (.-href favicon) "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAIElEQVQ4T2NMS0v7z0ABYBw1gGE0DBhGwwCYh4ZBOgAAcQUjIUXh8RYAAAAASUVORK5CYII=")
+      (js/document.head.appendChild favicon)
+      favicon)))
+
+(defn color-favicon-data-url [color]
+  (let [cvs (.createElement js/document "canvas")]
+    (set! (.-width cvs) 16)
+    (set! (.-height cvs) 16)
+    (let [ctx (.getContext cvs "2d")]
+      (set! (.-fillStyle ctx) color)
+      (.fillRect ctx 0 0 16 16))
+    (.toDataURL cvs)))
+
+(defn change-favicon-to-color [color]
+  (set! (.-href (favicon!)) (color-favicon-data-url color)))
+
+(defn report-results [suites m]
+  (println "\nRan" (if (< 0 (:test m))
+                     (:test m)
+                     (count suites)) "tests containing"
+           (+ (:pass m) (:fail m) (:error m)) "assertions.")
+  (println (:fail m) "failures," (:error m) "errors.")
+  (if (< 0 (+ (:fail m) (:error m)))
+    (change-favicon-to-color "#d00")
+    (change-favicon-to-color "#0d0")))
+
+(defn combine-results [a b]
+  {:test (+ (:test a) (:test b))
+   :pass (+ (:pass a) (:pass b))
+   :fail (+ (:fail a) (:fail b))
+   :error (+ (:error a) (:error b))})
+
+(add-watch test-results :results
+  (fn [k r o n]
+    (->> (vals n)
+         (map :report-counters)
+         (reduce combine-results {:test 0 :pass 0 :fail 0 :error 0})
+         (report-results (vals n)))))
 
 (defn test-card-test-run [this tests]
   (put! test-channel {:tests tests
-                      :callback (fn [results] (.setState
-                                              this
-                                              #js {:test_results
-                                                   results}))}))
+                      :callback (fn [results]
+                                  (swap! test-results assoc (get-props this :path) results)
+                                  (.setState
+                                   this
+                                   #js {:test_results
+                                        results}))}))
 
 (define-react-class TestDevcard
   (componentWillMount
@@ -957,6 +1007,9 @@
    [this next-props]
    (when-let [test-thunks (gobj/get next-props (name :test_thunks))]
      (test-card-test-run this test-thunks)))
+  (componentWillUnmount
+   [this]
+   (swap! test-results dissoc (get-props this :path)))
   (render
    [this]
    (let [test-summary (get-state this :test_results)
