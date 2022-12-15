@@ -83,10 +83,10 @@
 (defn card? [c]
   (and (map? c)
        (let [{:keys [path func]} c]
-         (vector? path)
-         (not-empty path)
-         (every? keyword? path)
-         (fn? func))))
+         (and (vector? path)
+              (not-empty path)
+              (every? keyword? path)
+              (fn? func)))))
 
 ;; could move into macros
 (defn register-card [c]
