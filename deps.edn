@@ -1,8 +1,11 @@
 {:aliases
- {:dev {:deps {thheller/shadow-cljs {:mvn/version "2.25.5"}}
+ {:dev {:extra-deps {thheller/shadow-cljs {:mvn/version "2.25.5"}}
         :extra-paths ["example_src" "src"]}}
+ :paths ["resources"]
  :deps
- {org.clojure/clojure {:mvn/version "1.8.0"}
-  org.clojure/clojurescript {:mvn/version "1.10.339"}
-  org.clojure/core.async  {:mvn/version "0.4.474"}
-  sablono/sablono {:mvn/version "0.8.6"}}}
+ {org.clojure/clojure {:mvn/version "1.11.1"}
+  org.clojure/core.async {:mvn/version "1.6.681"}
+  sablono/sablono {:mvn/version "0.8.6"}
+  reagent/reagent {:mvn/version "1.2.0"}
+  markdown-clj/markdown-clj {:mvn/version "1.11.4"}
+  }}

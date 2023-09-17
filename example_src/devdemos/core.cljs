@@ -5,7 +5,6 @@
     (:require
      #_[om.core :as om :include-macros true]
      #_[om.dom :as dom :include-macros true]
-     [om.next :as omnext :refer-macros [defui]]
      [create-react-class :as create-react-class]
      [reagent.core :as reagent]
      [clojure.string :as string]
@@ -16,7 +15,7 @@
      ;; Notice that I am not including the 'devcards.core namespace
      ;; but only the macros. This helps ensure that devcards will only
      ;; be created when the :devcards is set to true in the build config.
-     [devcards.core :as dc :refer [defcard defcard-doc deftest dom-node defcard-om-next]]))
+     [devcards.core :as dc :refer [defcard defcard-doc deftest dom-node]]))
 
 ;; this is to support om with the latest version of React
 ;; TODO not needed?
@@ -91,7 +90,7 @@
    [:input {:type "range" :value value :min min :max max
             :style {:width "100%"}
             :on-change (fn [e]
-                         (swap! bmi-data assoc param (.-target.value e))
+                         (swap! bmi-data assoc param e.target.value)
                          (when (not= param :bmi)
                            (swap! bmi-data assoc :bmi nil)))}]))
 
@@ -309,71 +308,13 @@
   [{:keys [state]} k {:keys [] :as params}]
   {:value (get @state k)})
 
-(defn om-next-slider [c param value min max]
-  (sab/html
-   [:input {:type "range" :value value :min min :max max
-            :style {:width "100%"}
-            :on-change (fn [e]
-                         (omnext/transact! c `[(change-bmi-key! {~param ~(.-target.value e)})])
-                         (when (not= param :bmi)
-                           (omnext/transact! c '[(change-bmi-key! {:bmi nil})])))}]))
-
-(defui ^:once BmiComponent
-  static omnext/IQuery
-  (query [this]
-    [:height :weight :bmi])
-  Object
-  (render [this]
-    (let [props (omnext/props this)
-          {:keys [weight height bmi]} (calc-bmi props)
-          [color diagnose] (cond
-                            (< bmi 18.5) ["orange" "underweight"]
-                            (< bmi 25) ["inherit" "normal"]
-                            (< bmi 30) ["orange" "overweight"]
-                            :else ["red" "obese"])]
-      (sab/html
-       [:div
-        [:h3 "BMI calculator"]
-        [:div
-         [:span (str "Height: " (int height) "cm")]
-         (om-next-slider this :height height 100 220)]
-        [:div
-         [:span (str "Weight: " (int weight) "kg")]
-         (om-next-slider this :weight weight 30 150)]
-        [:div
-         [:span (str "BMI: " (int bmi) " ")]
-         [:span {:style {:color color}} diagnose]
-         (om-next-slider this :bmi bmi 10 50)]]))))
-
-(defonce bmi-reconciler
-  (omnext/reconciler {:state {:height 180 :weight 80}
-                      :parser (omnext/parser {:read bmi-read :mutate bmi-mutate})}))
-
-(defcard
-  "# Om Next support
-
-   Here is the same calculator being rendered as an Om Next application.
-   ```
-   (defcard-om-next om-next-support
-     BmiComponent
-     bmi-reconciler
-     {:inspect-data true :history true })
-   ```
-   ")
-
-(defcard-om-next om-next-support
-  BmiComponent
-  bmi-reconciler
-  {:inspect-data true
-   :history true })
-
 (defonce re-bmi-data (reagent/atom {:height 180 :weight 80}))
 
 (defn re-slider [param value min max]
   [:input {:type "range" :value value :min min :max max
            :style {:width "100%"}
            :on-change (fn [e]
-                        (swap! re-bmi-data assoc param (.-target.value e))
+                        (swap! re-bmi-data assoc param e.target.value)
                         (when (not= param :bmi)
                           (swap! re-bmi-data assoc :bmi nil)))}])
 

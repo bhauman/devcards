@@ -32,3 +32,6 @@ node_modules/
 resources/public/js/cljs-runtime
 resources/public/js/default.js
 resources/public/js/manifest.edn
+example-resources/public/devcards/js/cljs-runtime/
+example-resources/public/devcards/js/devdemos.js
+example-resources/public/devcards/js/manifest.edn

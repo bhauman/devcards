@@ -1,4 +1,4 @@
-(ns devdemos.maintain_state
+(ns devdemos.maintain-state
     (:require
      [sablono.core :as sab :include-macros true]
      [goog.object :as gobj]

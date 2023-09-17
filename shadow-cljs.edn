@@ -2,12 +2,13 @@
 
  :http {:port 9640}
 
- :dev-http {8021 "example-resources/public"}
+ :dev-http {8021 ["example-resources/public" "classpath:public"]}
 
- :builds {:devcards-demos {:output-dir "resources/public/js/"
+ :builds {:devcards-demos {:output-dir "example-resources/public/devcards/js/compiled"
                            :target :browser
-                           :asset-path "/js/"
-                           :modules {:default {:default true}}
+                           :asset-path "js/compiled"
+                           :modules {:devdemos {:default true
+                                                :init-fn devdemos.start-ui/main}}
                            :compiler-options {:infer-externs :auto
                                               :pseudo-names true
                                               :devcards true

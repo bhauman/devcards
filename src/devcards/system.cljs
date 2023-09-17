@@ -111,7 +111,7 @@
 
 (defn hash-routing-init [state-atom]
   (events/listen history EventType/NAVIGATE
-                 #(swap! state-atom set-current-path (token->path (.-token %))))
+                 #(swap! state-atom set-current-path (token->path (.-token ^goog.History %))))
   ;; we should probably just get the location and parse this out to
   ;; avoid the initial race condition where .getToken isn't populated
   (when-let [token (gobj/get js/location "hash")]
