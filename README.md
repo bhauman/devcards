@@ -1,5 +1,11 @@
 # Devcards
 
+Modified version that used shadow-cljs and deps.edn. Run:
+
+    bin/devcards-demos
+
+To see the demo devcards.
+
 ### Current release:
 
 [![Clojars Project](https://clojars.org/devcards/latest-version.svg)](https://clojars.org/devcards)
