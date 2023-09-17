@@ -1,0 +1,22 @@
+{:deps {:aliases [:dev]}
+
+ :http {:port 9640}
+
+ :dev-http {8021 "example-resources/public"}
+
+ :builds {:devcards-demos {:output-dir "resources/public/js/"
+                           :target :browser
+                           :asset-path "/js/"
+                           :modules {:default {:default true}}
+                           :compiler-options {:infer-externs :auto
+                                              :pseudo-names true
+                                              :devcards true
+                                              :main "devdemos.start-ui"
+                                              :asset-path "js/compiled/out"
+                                              :output-to "example-resources/public/devcards/js/compiled/devdemos.js"
+                                              :output-dir "example-resources/public/devcards/js/compiled/out"
+                                              :recompile-dependents false
+                                              :preloads [devtools.preload]
+                                              :optimizations :none
+                                              :source-map-timestamp true
+                                              }}}}

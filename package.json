@@ -1,0 +1,20 @@
+{
+  "name": "cljs-devcards",
+  "version": "0.2.8",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {},
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "create-react-class": "^15.6.3",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1"
+  },
+  "devDependencies": {
+    "shadow-cljs": "^2.25.5"
+  }
+}

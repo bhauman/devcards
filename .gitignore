@@ -24,3 +24,11 @@ example-resources/public/devcards/js/compiled/*
 *-init.clj
 figwheel_server.log
 .rebel_readline_history
+.clj-kondo/
+.cpcache/
+.lsp/
+.shadow-cljs/
+node_modules/
+resources/public/js/cljs-runtime
+resources/public/js/default.js
+resources/public/js/manifest.edn

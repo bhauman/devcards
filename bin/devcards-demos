@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo 'To see the demos open: http://localhost:8021/devcards/'
+
+npx shadow-cljs watch devcards-demos
